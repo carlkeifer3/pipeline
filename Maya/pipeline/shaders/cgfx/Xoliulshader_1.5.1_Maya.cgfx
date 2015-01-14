@@ -1,0 +1,1137 @@
+#define GLOW_PASS 8
+
+//Maya viewport CGFX shader by Sylvain Hittelet - www.slayvin.net
+//Original Maya viewport HLSL shader by Laurens Corijn, http://www.laurenscorijn.com - http://viewportshader.com/
+//Big thanks to Ben Cloward for always being the guy to ask shader questions to; http://www.bencloward.com
+//thanks to Jeroen Maton and Lumonix ShaderFX, http://www.jeroenmaton.net, http://www.lumonix.net
+//thanks to Brice Vandemoortele for informing me about texCUBElod, made IBL easier and reflection gloss possible! http://www.mentalwarp.com
+//thanks to Romain Dura aka Romz for the HSL conversion functions! http://blog.mouaif.org/?p=94
+
+string description = "Shader v1.5.1";
+
+string url = "http://www.slayvin.net/tools-xoliul_shader";
+
+float4x4 World 					: World                 < string UIWidget = "None"; >;
+float4x4 View					: View					< string UIWidget = "None"; >;
+float4x4 WorldViewProj			: WorldViewProjection	< string UIWidget = "None"; >;
+float4x4 WorldInvTrans			: WorldInverseTranspose < string UIWidget = "None"; >;
+float4x4 ViewInv				: ViewInverseTranspose	< string UIWidget = "None"; >;
+
+//***************************************************************** DATAMEMBERS
+
+//================================= LIGHTS
+bool bUseLight1 : lights < string UIName = "Use Light 1";> = true;
+
+float3 gLightPos1 : Position
+<
+	string UIName = "Light 1";
+    string Space = "World";
+> = {10.0f, 10.0f, 10.0f};
+
+float3 light1Color : lights
+<
+	string UIName = "Light 1 Color";
+	string type = "color";
+	string UIWidget = "Color"; 
+> = { 1.0f, 1.0f, 1.0f};
+
+bool bUseLight2 : lights < string UIName = "Use Light 2";> = false;
+
+float3 gLightPos2 : Position
+<
+	string UIName = "Light 2";
+	string Space = "World";
+> = {0.0f, 0.0f, 0.0f};
+
+float3 light2Color : lights
+<
+	string UIName = "Light 2 Color";
+	string type = "color";
+	string UIWidget = "Color";
+> = { 1.0f, 1.0f, 1.0f}; 
+
+bool bUseLight3 : lights < string UIName = "Use Light 3";> = false;
+
+float3 gLightPos3 : Position
+<
+	string UIName = "Light 3";
+	string Space = "World";
+> = {0.0f, 0.0f, 0.0f};
+
+float3 light3Color : lights
+<
+	string UIName = "Light 3 Color";
+	string type = "color";
+	string UIWidget = "Color";
+> = { 1.0f, 1.0f, 1.0f}; 
+
+//================================= Shading options
+float HueAdjust : shading
+<
+	string UIName = "Saturation Adjustment";
+	string UIWidget = "FloatSpinner";
+	float UIMin = 0.0f;
+	float UIMax = 4.0f;
+	float UIStep = 0.1f;
+> = 0.3f;
+
+
+bool bUseHalfLambert : shading < string UIName = "Use Half-Lambert Shading";> = false;
+
+float HalfLambertPower : shading
+<
+string UIName = "Half-Lambert Power";
+string UIType = "FloatSpinner";
+float UIMin = 0.0f;
+float UIMax = 10.0f;
+float UIStep = 0.1;
+> = 2;
+
+//================================= AMBIENT
+float3 ambientcolor : Ambient
+<
+	string UIName = "Ambient Color";
+	string UIWidget = "Color";
+> = {0.0f, 0.0f, 0.0f};
+
+bool bUseIBL : Ambient < string UIName = "Use IBL cubemap for Ambient";> = false;
+
+texture IBLcubemap : Ambient
+<
+	string ResourceName = "";
+	string UIName = "IBL Cubemap";
+	string ResourceType = "Cube";
+>;
+
+samplerCUBE IBLcubemapSampler = sampler_state
+{
+	Texture = <IBLcubemap>;
+	MinFilter=LINEAR;
+	MagFilter=LINEAR;
+	MipFilter=LINEAR;
+	MipMapLodBias=0;
+	AddressU = ClampToEdge;
+	AddressV = ClampToEdge;
+};
+
+float IBLmultiplier : Ambient
+<
+	string UIName = "Ambient Cubemap Strength";
+	string UIType = "FloatSpinner";
+	float UIMin = 0.0f;
+	float UIMax = 2.0f;
+	float UIStep = 0.05;
+> = 0.5;
+
+bool bUseAOMap : Ambient < string UIName = "Use Ambient Occlusion Map";> = false;
+
+texture AOMap : Ambient
+<
+	string ResourceName = "";
+	string UIName = "Ambient Occlusion Map";
+	string ResourceType = "2D";
+>;
+
+sampler2D AOMapSampler = sampler_state
+{
+	Texture = <AOMap>;
+	MinFilter=LINEAR;
+	MagFilter=LINEAR;
+	MipFilter=LINEAR;
+	MipMapLodBias=0;
+	AddressU = WRAP;
+	AddressV = WRAP;
+};
+
+float AOmultiplier : Ambient
+<
+	string UIName = "Ambient Occlusion Strength";
+	string UIType = "FloatSpinner";
+	float UIMin = 0.0;
+	float UIMax = 1.0;
+	float UIStep = 0.1;
+> = 1.0;
+
+//================================= DIFFUSE
+float3 diffuseColor : DIFFUSE
+<
+	string UIWidget = "Color";
+    string UIName = "Diffuse Color";
+> = {0.5f, 0.0f, 0.6f};
+
+bool bColorDiffuse : DIFFUSE < string UIName = "Multiply Color and Diffuse Map";> = false;
+bool bUseColorDiffuseMask : DIFFUSE < string UIName = "     Use Diffuse map alpha channel as mask";> = false;
+
+bool bUseDiffuseMap : DIFFUSE < string UIName = "Use Diffuse Map";> = false;
+
+texture diffuseTexture : DIFFUSE
+<
+	string ResourceName = "";
+	string UIName = "Diffuse Map";	
+	string ResourceType = "2D";
+>;
+
+sampler2D diffuseSampler = sampler_state
+{
+	Texture = <diffuseTexture>;
+	MinFilter=LINEAR;
+	MagFilter=LINEAR;
+	MipFilter=LINEAR;
+	MipMapLodBias=-1;
+	AddressU = WRAP;
+	AddressV = WRAP;
+};
+
+//================================= OPACITY
+
+bool bUseAlpha : opacity < string UIName = "Enable alpha channel from Diffuse Map";> = false;
+
+float GlobalOpacity : opacity
+<
+string UIName = "Global Opacity Level";
+string UIType = "FloatSpinner";
+float UIMin = 0.0f;
+float UIMax = 1.0f;
+float UIStep = 0.05;
+> = 1;
+
+//================================= NORMALMAP
+ 
+bool bUseNormalMap : NORMAL < string UIName = "Use Normal Map";> = false;
+
+bool bUseObjectNormals : NORMAL < string UIName = "     Object Space";> = false;
+
+
+texture normalMap : NORMAL
+<
+	string ResourceName = "";
+	string UIName = "Normal Map";
+	string ResourceType = "2D";
+>;
+
+bool bFlipGreenChannel : NORMAL < string UIName = "     Flip Green";> = true;
+
+bool bFlipRG : NORMAL < string UIName = "     Switch RG Channels ";> = false;
+
+sampler2D normalSampler = sampler_state
+{
+	Texture = <normalMap>;
+	MinFilter=LINEAR;
+	MagFilter=LINEAR;
+	MipFilter=LINEAR;
+	MipMapLodBias=-1;
+	AddressU = WRAP;
+	AddressV = WRAP;
+};
+
+//================================= SPECULAR
+
+bool bUseSpecMap : SPECULAR < string UIName = "Use Specular Map";> = false;
+
+float3 specularColor : SPECULAR
+<
+	string UIWidget = "Color";
+    string UIName = "Specular Color";
+> = {1.0f, 1.0f, 1.0f};
+
+float speclevel : SPECULAR
+<
+string UIName = "Specular Global Level";
+string UIType = "FloatSpinner";
+float UIMin = 0.0f;
+float UIMax = 10.0f;
+float UIStep = 0.05;
+> = 1.0f;
+
+texture specularMap : SPECULAR
+<
+	string ResourceName = "";
+	string UIName = "Specular Map";
+	string ResourceType = "2D";
+
+>;
+
+sampler2D specularSampler = sampler_state
+{
+	Texture = <	specularMap	>;
+	MinFilter=LINEAR;
+	MagFilter=LINEAR;
+	MipFilter=LINEAR;
+	MipMapLodBias=-1;
+	AddressU = WRAP;
+	AddressV = WRAP;
+};
+
+//================================= GLOSSMAP
+
+float glossiness : GLOSSINESS
+<
+	string UIName = "Glossiness";
+	string UIType = "FloatSpinner";
+	float UIMin = 0.0f;
+	float UIMax = 100.0f;
+	float UIStep = 0.05;
+> = 25.0f;
+
+bool bUseGlossMap : GLOSSINESS < string UIName = "Use Gloss Map";> = false;
+
+texture gloss_Map : GLOSSINESS
+<
+	string ResourceName = "";
+	string UIName = "Gloss Map";
+	string ResourceType = "2D";
+
+>;
+
+sampler2D glossinessSampler = sampler_state
+{
+	MinFilter=LINEAR;
+	MagFilter=LINEAR;
+	MipFilter=LINEAR;
+	MipMapLodBias=-1;
+	Texture = < gloss_Map >;
+	AddressU = WRAP;
+	AddressV = WRAP;
+};
+
+float glossoffset : GLOSSINESS
+<
+	string UIName = "Glossmap Offset";
+	string UIType = "FloatSpinner";
+	float UIMin = -100.0f;
+	float UIMax = 100.0f;
+	float UIStep = 1.0f;
+> = 0.0f;
+ 
+//================================= SELF-ILLUMINATION
+
+bool bUseSIMap : Self_Illumination < string UIName = "Use Self-Illumination Map";> = false;
+
+texture siMap : Self_Illumination
+<
+	string ResourceName = "";
+	string UIName = "Self-Illumination Map";
+	string ResourceType = "2D";
+
+>;
+
+sampler2D siMapSampler = sampler_state
+{
+	Texture = <siMap>;
+	MinFilter=LINEAR;
+	MagFilter=LINEAR;
+	MipFilter=LINEAR;
+	MipMapLodBias=-1;
+	AddressU = WRAP;
+	AddressV = WRAP;
+};
+
+float siMapMult : Self_Illumination
+<
+	string UIName = "Self-Illumination Strength";
+	string UIType = "FloatSpinner";
+	float UIMin = 0.0f;
+	float UIMax = 10.0f;
+> = 1.0f;
+
+float siLevel : Self_Illumination
+<
+	string UIName = "Global SI Level";
+	string UIType = "FloatSpinner";
+	float UIMin = 0.0f;
+	float UIMax = 100.0f;
+	float UIStep = 1.0f;
+> = 0;
+
+//================================= GLOW
+bool bUseGlow : glow < string UIName = "Activate Glow";> = false;
+
+float Inflate : glow
+<
+    string UIWidget = "slider";
+    float UIMin = 0.0;
+    float UIMax = 1.0;
+    float UIStep = 0.01;
+    string UIName =  "Glow Size";
+> = 0.05f;
+
+float3 GlowColor : glow
+<
+    string UIName =  "Glow Color";
+    string type = "color";
+	string UIWidget = "Color"; 
+> = {1.0f, 1.0f, 1.0f};
+
+float GlowIntensity : glow
+<
+    string UIWidget = "slider";
+    float UIMin = 0.0;
+    float UIMax = 5.0;
+    float UIStep = 0.1;
+    string UIName =  "Glow Brightness";
+> = 1.0f;
+
+//================================= Outline
+
+bool bUseEdge : edge < string UIName = "Use Edge Outline";> = false;
+
+float EdgeStep : edge
+<
+	string UIWidget = "Spinner";
+	float UIMin = 0.0;
+	float UIMax = 1.0;
+	float UIStep = 0.01;
+	string UIName = "Edge Step";
+> = 0.8;
+
+float3 EdgeColor : edge
+<
+	string Type = "Color";
+	string UIWidget = "Color";
+    string UIName = "Edge Color";
+> = {0.0f, 0.0f, 0.0f};
+
+//================================= Reflections
+
+bool bUseFresnel : fresnel < string UIName = "Use Fresnel Reflections";> = false;
+
+bool bAlphaMasksFresnel  : fresnel < string UIName = "     Opacity Affects Reflections";> = false;
+
+float FresnelPower : fresnel
+<
+	string UIWidget = "Spinner";
+	float UIMin = 0.0;
+	float UIMax = 100.0;
+	float UIStep = 0.1;
+	string UIName = "     Fresnel Power";
+> = 3.0;
+ 
+ 
+float FresnelBias : fresnel
+<
+	string UIWidget = "Spinner";
+	float UIMin = 0.0;
+	float UIMax = 1.0;
+	float UIStep = 0.01;
+	string UIName = "     Fresnel Bias";
+> = 0.0;
+
+float FresnelMult : fresnel
+<
+	string UIWidget = "Spinner";
+	float UIMin = 0.0;
+	float UIMax = 100.0;
+	float UIStep = 0.1;
+	string UIName = "     Fresnel Multiplier";
+> = 2.0;
+
+float3 FresnelColor  : fresnel
+<
+	string Type = "Color";
+	string UIWidget = "Color";
+    string UIName = "     Rim Color";
+> = {1.0f, 1.0f, 1.0f};
+
+float FresnelMaskHardness : fresnel
+<
+	string UIWidget = "Spinner";
+	float UIMin = 0.0;
+	float UIMax = 100.0;
+	float UIStep = 0.1;
+	string UIName = "     Fresnel Mask Hardness";
+> = 4.0;
+
+bool bUseWorldMask  : fresnel < string UIName = "     Use Hard-Type World Masking";> = true;
+
+bool bUseReflMap  : fresnel < string UIName = "     Use Reflection Mask Map";> = false;
+
+texture ReflectionMask : fresnel
+<
+	string ResourceName = "";
+	string UIName = "Reflection Mask";
+	string ResourceType = "2D";
+>;
+
+sampler2D ReflMapSampler = sampler_state
+{
+	Texture = <ReflectionMask>;
+	MinFilter=LINEAR;
+	MagFilter=LINEAR;
+	MipFilter=LINEAR;
+	MipMapLodBias=0;
+	AddressU = WRAP;
+	AddressV = WRAP;
+};
+
+bool bUseCubeMap  : fresnel < string UIName = "     Use Reflection Cubemap";> = false;
+
+texture reflcubemap : fresnel
+<
+	string ResourceName = "";
+	string UIName = "Reflection Cubemap";
+	string ResourceType = "Cube";
+>;
+ 
+samplerCUBE reflcubemapSampler = sampler_state
+{
+	Texture = <reflcubemap>;
+	MinFilter=LINEAR;
+	MagFilter=LINEAR;
+	MipFilter=LINEAR;
+	MipMapLodBias=0;
+	AddressU = WRAP;
+	AddressV = WRAP;
+};
+
+
+//================================= Custom Functions
+
+//standard diffuse lighting by dot product
+float diffuselight( float3 normal, float3 lightvec)
+	{
+		normal = normalize(normal);
+		lightvec = normalize(lightvec);
+		
+		return saturate(dot(normal,lightvec)); //dot product between surface and light returns how lit the pixel is. clamp between 0 and 1 because intensity is multiplied later
+	}
+
+//Half Lambert lighting, function by Valve Software.
+//see http://www.valvesoftware.com/publications/2007/NPAR07_IllustrativeRenderingInTeamFortress2.pdf for more info
+float halflambert(float3 normal, float3 lightvec) 
+{
+	normal = normalize(normal);
+	lightvec = normalize(lightvec);
+	
+	float NdotL = dot(lightvec,normal);		//dot product for base diffuse light
+	float HalfLamb = (NdotL * 0.5f)+0.5f;	//magic formula!
+	HalfLamb = pow(HalfLamb,HalfLambertPower);	//power halflambert 
+
+	return  saturate(HalfLamb); 
+}
+
+float halflambert(float value) 
+{
+	
+	float HalfLamb = (value * 0.5f)+0.5f;	//magic formula!
+	HalfLamb = pow(HalfLamb,HalfLambertPower);		//power halflambert 
+
+	return  saturate(HalfLamb); 
+}
+
+float computeDiffuse(float3 normal, float3 lightvec)
+{
+	float diffuse;
+	if(bUseHalfLambert) 
+	{
+		diffuse = halflambert(normal,lightvec);
+	}
+	else //regular blinn/phong diffuse
+	{
+		diffuse = diffuselight(normal,lightvec);
+	}
+	
+	return diffuse;
+}
+
+//seperate specular calculation to make my life easier coding this thing
+//color and masking is NOT done here; this is just for pure, raw specular calculation
+//thanks to http://wiki.gamedev.net/index.php/D3DBook:(Lighting)_Blinn-Phong for the very clean and understandable explanation
+float blinnspecular(float3 normal, float3 lightvec, float3 eyevec, float gloss)
+{
+	normal = normalize(normal);
+	lightvec = normalize(lightvec);
+	eyevec = normalize(eyevec);
+	
+	float3 halfvector = normalize(eyevec+lightvec); //add eye and light together for half vector (Blinn)
+	
+	float specular;
+	specular = dot(halfvector, normal); //dot between half and normal (Blinn)
+	specular = pow(saturate(specular), gloss); //power specular to glossiness to sharpen highlight
+	specular *= saturate(dot(normal,lightvec));// * 4); //fix for Specular through surface bug. what this does is just make sure no specular happens on unlit parts. the multiplier works as a bias
+	
+	return (specular);
+	
+}
+
+//Fresnel falloff function for all round application
+float fresnel(float3 normal, float3 eyevec, float power, float bias)
+{
+	normal = normalize(normal);
+	eyevec = normalize(eyevec);
+	
+	float fresnel = saturate(abs(dot(normal,eyevec))); //get fallof by dot product between normal and eye, absolute to prevent falloff to go negative on backside of object 
+	fresnel = 1-fresnel; //invert falloff to get white instead of black on edges
+	fresnel = pow(fresnel, power); //power falloff to sharpen effect
+	fresnel+=bias; // add bias to falloff, this is mostly for cubemap reflections like in carpaint
+	
+	return saturate(fresnel);
+}
+
+//desaturate/luminance value function
+float desaturate(float3 color)
+{
+	float luminance;
+	luminance = dot(color,float3(0.299,0.587,0.114)); //desaturate by dot multiplying with luminance weights.
+	return luminance;
+}
+
+float3 RGBToHSL(float3 color) //Romain's conversion function
+{
+	float3 hsl; // init to 0 to avoid warnings ? (and reverse if + remove first part)
+	
+	float fmin = min(min(color.r, color.g), color.b);    //Min. value of RGB
+	float fmax = max(max(color.r, color.g), color.b);    //Max. value of RGB
+	float delta = fmax - fmin;             //Delta RGB value
+
+	hsl.z = (fmax + fmin) / 2.0; // Luminance
+
+	if (delta == 0.0)		//This is a gray, no chroma...
+	{
+		hsl.x = 0.0;	// Hue
+		hsl.y = 0.0;	// Saturation
+	}
+	else                                    //Chromatic data...
+	{
+		if (hsl.z < 0.5)
+			hsl.y = delta / (fmax + fmin); // Saturation
+		else
+			hsl.y = delta / (2.0 - fmax - fmin); // Saturation
+		
+		float deltaR = (((fmax - color.r) / 6.0) + (delta / 2.0)) / delta;
+		float deltaG = (((fmax - color.g) / 6.0) + (delta / 2.0)) / delta;
+		float deltaB = (((fmax - color.b) / 6.0) + (delta / 2.0)) / delta;
+
+		if (color.r == fmax )
+			hsl.x = deltaB - deltaG; // Hue
+		else if (color.g == fmax)
+			hsl.x = (1.0 / 3.0) + deltaR - deltaB; // Hue
+		else if (color.b == fmax)
+			hsl.x = (2.0 / 3.0) + deltaG - deltaR; // Hue
+
+		if (hsl.x < 0.0)
+			hsl.x += 1.0; // Hue
+		else if (hsl.x > 1.0)
+			hsl.x -= 1.0; // Hue
+	}
+
+	return hsl;
+}
+
+float HueToRGB(float f1, float f2, float hue)
+{
+	if (hue < 0.0)
+		hue += 1.0;
+	else if (hue > 1.0)
+		hue -= 1.0;
+	float res;
+	if ((6.0 * hue) < 1.0)
+		res = f1 + (f2 - f1) * 6.0 * hue;
+	else if ((2.0 * hue) < 1.0)
+		res = f2;
+	else if ((3.0 * hue) < 2.0)
+		res = f1 + (f2 - f1) * ((2.0 / 3.0) - hue) * 6.0;
+	else
+		res = f1;
+	return res;
+}
+
+
+float3 HSLToRGB(float3 hsl)
+{
+	float3 rgb;
+	
+	if (hsl.y == 0.0)
+		rgb = float3(hsl.z, hsl.z, hsl.z); // Luminance
+	else
+	{
+		float f2;
+		
+		if (hsl.z < 0.5)
+			f2 = hsl.z * (1.0 + hsl.y);
+		else
+			f2 = (hsl.z + hsl.y) - (hsl.y * hsl.z);
+			
+		float f1 = 2.0 * hsl.z - f2;
+		
+		rgb.r = HueToRGB(f1, f2, hsl.x + (1.0/3.0));
+		rgb.g = HueToRGB(f1, f2, hsl.x);
+		rgb.b= HueToRGB(f1, f2, hsl.x - (1.0/3.0));
+	}
+	
+	return rgb;
+}
+
+//----------------------------------VS & PS structs
+
+// input from application for Vertex Shader
+struct VS_InputStruct {
+	float4 position		: POSITION;
+	float2 texCoord1	: TEXCOORD0;
+	// float2 texCoord2	: TEXCOORD1;
+	float4 tangent		: TEXCOORD6; //TANGENT
+	float4 binormal		: TEXCOORD7; //BINORMAL
+	float4 normal		: NORMAL;
+};
+
+// Vertex Shader output for Pixel Shader
+struct VS_To_PS_Struct {
+	float4 position   		: POSITION;
+	float4 texCoord			: TEXCOORD0;
+	float3 eyeVec			: TEXCOORD1;
+	float3 worldNormal		: TEXCOORD2;
+	float3 worldTangent		: TEXCOORD3;
+	float3 worldBinormal	: TEXCOORD4;
+	float3 lightVec1		: TEXCOORD5;
+	float3 lightVec2		: TEXCOORD6;
+	float3 lightVec3		: TEXCOORD7;
+};
+
+//Vertex And Pixel Shaders
+
+//VERTEX SHADER
+VS_To_PS_Struct vs_main(VS_InputStruct In, uniform float3 LightPos1, uniform float3 LightPos2, uniform float3 LightPos3) //vertexshader gets input struct from application
+{
+	VS_To_PS_Struct Out; //define output struct
+	
+    Out.worldNormal = normalize(mul(WorldInvTrans, In.normal).xyz); //transform normal to worldspace
+	Out.worldTangent = mul(WorldInvTrans, In.tangent).xyz; //transform tangent to worldspace
+	Out.worldBinormal = mul(WorldInvTrans, In.binormal).xyz; //transform binormal to worldspace
+    
+	float4 worldSpacePos = mul(World, In.position); //transform position to worldspace
+  
+	Out.texCoord.xy = In.texCoord1; //pass texcoord to output
+	// Out.texCoord.zw = In.texCoord2; //pass texcoord2 to output
+	Out.lightVec1 = LightPos1 - worldSpacePos.xyz;
+	Out.lightVec2 = LightPos2 - worldSpacePos.xyz;
+	Out.lightVec3 = LightPos3 - worldSpacePos.xyz;
+	Out.eyeVec = ViewInv[3].xyz - worldSpacePos.xyz; //calculate eyevector
+    Out.position = mul(WorldViewProj, In.position);
+
+    return Out;
+}
+
+//PIXEL SHADER
+float4 ps_main(VS_To_PS_Struct In) : COLOR 
+{ 
+	//ambient occlusion
+	float4 AOColor = float4(1.0f, 1.0f, 1.0f, 1.0f); //default AOcolor
+	if(bUseAOMap)
+	{
+		float4 AOSampler = tex2D(AOMapSampler, In.texCoord.xy);
+		AOColor = lerp(AOColor, AOSampler, AOmultiplier);		
+	}
+	
+	//diffuse
+	float4 color = float4(diffuseColor, 1.0f); //default diffusecolor
+	if(bUseDiffuseMap)
+	{
+		color = tex2D(diffuseSampler, In.texCoord.xy);		
+		if(bColorDiffuse && bUseColorDiffuseMask)
+			color = color * lerp(float4(1.0f, 1.0f, 1.0f, 1.0f), float4(diffuseColor, 1.0f), color.a); //multiply diffuse texturesample with color, masked by the alpha (useful for recoloring grayscale diffusemaps)
+		else if(bColorDiffuse && !bUseColorDiffuseMask)
+			color = color * float4(diffuseColor, 1.0f);
+	}
+	
+	//opacity
+	float opacity = GlobalOpacity; //default is global opacity
+	if(bUseAlpha)
+		opacity = color.a; //sampled alpha from diffuse map
+	
+	//specular
+	float3 specColor = specularColor; //default is solid specular color
+	if(bUseSpecMap)
+	{
+		specColor = tex2D(specularSampler, In.texCoord.xy).rgb;
+	}
+	
+	//glossiness
+	float gloss = glossiness;
+	float3 glossColor;
+	if(bUseGlossMap)
+	{
+		glossColor = desaturate(tex2D(glossinessSampler, In.texCoord.xy).rgb);
+		gloss = (glossColor.r + glossColor.g + glossColor.b) / 3 * 100;
+		gloss += glossoffset; //offset gloss to prevent zero glossiness, allows for better control over glossiness map range
+	}
+	
+	//normal
+	float3 normal = In.worldNormal; //default worldspace vertex normal
+	if(bUseNormalMap)
+	{
+		normal = tex2D(normalSampler, In.texCoord.xy).rgb;
+		normal = (2*normal)-1; //expand into -1 to 1 range, since a normalmap is always returned in 0 to 1 space
+		if (bFlipGreenChannel)
+			normal.g = -normal.g; //flip green for texture instead of flipping tangent, works for object space normals also
+		
+		if (bFlipRG)
+		{
+			float temp = -normal.r;
+			normal.r = normal.g;
+			normal.g = temp;
+		}
+	}
+	
+	//Create Light Calculations
+	float3 LightVec1 = In.lightVec1;	
+	float3 LightVec2 = In.lightVec2;
+	float3 LightVec3 = In.lightVec3;
+	
+	//normal application
+	if(!bUseObjectNormals && bUseNormalMap) //tangentspace normalmap
+	{
+		const float3x3 basis = float3x3( normalize( In.worldTangent ), normalize( In.worldBinormal ), normalize( In.worldNormal ) );
+        normal = normalize( mul( normal, basis ) );
+	}
+	if(bUseObjectNormals && bUseNormalMap) //if object space, pure sampling equals the normal
+	{
+		normal = mul(normal, float3x3(WorldInvTrans)); // put objectspace normal in worldspace
+	}
+	
+	normal = normalize( normal );	
+	
+	// Ambient
+	float4 ambient;
+	
+	if(bUseIBL)
+		ambient = IBLmultiplier * texCUBE(IBLcubemapSampler, float3(normal.x,normal.y,normal.z));
+	else ambient = float4(ambientcolor,1.0f);
+		
+	//diffuse terms
+	float3 totaldiffuse =  ambient.rgb * AOColor.rgb; //start off with ambient color
+	if (bUseLight1)
+		totaldiffuse += computeDiffuse(normal,LightVec1) * light1Color; //add every light to the total diffuse sum (lights are additive towards each other), multiplied with light color 
+	if (bUseLight2)
+		totaldiffuse += computeDiffuse(normal,LightVec2) * light2Color;
+	if (bUseLight3)
+		totaldiffuse += computeDiffuse(normal,LightVec3) * light3Color;
+			
+	//specular terms		
+	float3 totalspecular = (0.0f,0.0f,0.0f);	
+	if (bUseLight1)
+		totalspecular += blinnspecular(normal, LightVec1, In.eyeVec, gloss) * (specColor) * light1Color; //apply specular color map and light color
+	if (bUseLight2)
+		totalspecular += blinnspecular(normal, LightVec2, In.eyeVec, gloss) * (specColor) * light2Color;			
+	if (bUseLight3)
+		totalspecular += blinnspecular(normal, LightVec3, In.eyeVec, gloss) * (specColor) * light3Color;			
+	
+	totalspecular *= speclevel; // apply global specular multiplier to increase global strength
+	
+	float4 ret = color; // our final returned color starts as unlit diffuse color
+	
+	if(HueAdjust != 0.0f) //if Hue adjust is not off
+	{
+		float adjust = HueAdjust/100; //value is divided since it's not very userfriendly to work with 0.01 increments
+		float3 rethsl = RGBToHSL(ret.rgb); //convert to HSL
+		rethsl.x -= adjust*(1 - (totaldiffuse.r + totaldiffuse.g + totaldiffuse.b) / 3.0); //Shift Hue
+		rethsl.x = saturate(rethsl.x);
+		rethsl.y += abs(10*adjust)*(1 - (totaldiffuse.r + totaldiffuse.g + totaldiffuse.b) / 3.0); //increase saturation
+		rethsl.y = saturate(rethsl.y);
+		rethsl.z -= abs(adjust)*(1 - (totaldiffuse.r + totaldiffuse.g + totaldiffuse.b) / 3.0); //decrease lightness, not too sure if this is all correct, with the multiplication following this...
+		rethsl.z = saturate(rethsl.z);
+		ret.rgb = HSLToRGB(rethsl);
+	}
+	
+	ret.rgb *= totaldiffuse; //multiply diffuse with color
+	ret.rgb += totalspecular; // ADD specular to colored diffuse
+	
+	// Self Illumination	
+	float4 selfillumination = (0.0f,0.0f,0.0f,0.0f); //default no self illum
+	if(bUseSIMap)
+	{
+		selfillumination = tex2D(siMapSampler, In.texCoord.xy);
+		//get total SI amount by adding (desaturated) map contribution to global level and the clamping between 0 and 1
+		float SItotal = saturate(desaturate(selfillumination.rgb) + (siLevel/100)); 
+		
+		ret = lerp( ret, color * siMapMult,  SItotal); //lerp blend between normal shaded model and unlit multiplied by SImapmultiplier.
+	}
+	
+	//Edge effect	
+	if(bUseEdge)
+	{
+		//calculate dot for falloff
+		float edge = fresnel(normal, In.eyeVec, 1.0f, 0.0f);
+		edge = step(edge, EdgeStep);
+		
+		ret.rgb = lerp(EdgeColor, ret.rgb, edge);
+	}
+	
+	//Opacity
+	ret.a = opacity;
+	
+	return ret;
+}
+
+struct glowVertOut {
+    float2 texCoord		: TEXCOORD0;
+	float4 Position		: POSITION;
+    float3 WorldNormal	: TEXCOORD1;
+    float3 WorldView	: TEXCOORD2;
+};
+
+glowVertOut glow_VS(VS_InputStruct In, uniform float glowStep)
+{
+    glowVertOut OUT;
+    OUT.texCoord = In.texCoord1;
+	OUT.WorldNormal = mul(WorldInvTrans,In.normal).xyz;
+    float4 Po = float4(In.position.xyz,1);
+    Po += (((GLOW_PASS+1)-glowStep)*Inflate/GLOW_PASS*normalize(float4(In.normal.xyz,0)));
+    float4 Pw = mul(World, Po);
+    OUT.WorldView = ViewInv[3].xyz - Pw.xyz; // eye vector
+	OUT.Position = mul(WorldViewProj,Po);
+    return OUT;
+}
+
+float4 glow_PS(glowVertOut In, uniform float glowStep) : COLOR
+{
+    float3 result = float3(0,0,0);
+	
+	//self illumination
+	float4 selfillumination = (0.0f,0.0f,0.0f,0.0f); //default is no self-illum
+	if(bUseSIMap)
+		selfillumination = tex2D(siMapSampler, In.texCoord.xy);
+	
+	if (bUseGlow)
+		result = (GlowIntensity * GlowColor.rgb)*((glowStep/GLOW_PASS) - 1/(GLOW_PASS+1)) * selfillumination.r;
+	
+	return float4(result, selfillumination.r);
+}
+	
+
+// -----------------------------------------------------------------------------------------------------------------------------------
+// Fresnel effects PS pass function. Main reason for split is to avoid hitting the dynamic branching limit
+float4 ps_fresnel(VS_To_PS_Struct In) : COLOR 
+{ 
+	float4 ret =(0.0, 0.0, 0.0, 0.0);
+	
+	//alpha
+	float opacity = GlobalOpacity; //default is global opacity
+	if(bUseAlpha)
+	{
+		opacity = tex2D(diffuseSampler, In.texCoord.xy).a; //sampled alpha from diffuse map
+	}
+	
+	//specular
+	float3 speccolor = specularColor.rgb; //default is solid specular color
+	if(bUseSpecMap)
+	{
+		speccolor = tex2D(specularSampler, In.texCoord.xy).rgb;
+	}
+	
+	//glossiness
+	float gloss = 1.0f;
+	float glosscorrect = 1.0f;
+	float3 glossColor;
+	if(bUseGlossMap)
+	{
+		glossColor = desaturate(tex2D(glossinessSampler, In.texCoord.xy).rgb); //overwrite glossiness global with texsample
+		gloss = (glossColor.r + glossColor.g + glossColor.b)/3;
+		glosscorrect = (glossoffset/glossiness);
+	}
+	
+	//normal
+	float3 normal = In.worldNormal; //default worldspace vertex normal
+	if(bUseNormalMap)
+	{
+		normal = tex2D(normalSampler, In.texCoord.xy).rgb;
+		normal = (2*normal)-1; //expand into -1 to 1 range, since a normalmap is always returned in 0 to 1 space
+		if (bFlipGreenChannel)
+			normal.g = -normal.g; //flip green for texture instead of flipping tangent, works for object space normals also
+		
+		if (bFlipRG)
+		{
+			float temp = -normal.r;
+			normal.r = normal.g;
+			normal.g = temp;
+		}
+	}
+	
+	//reflection
+	float3 reflectmap = speccolor.rgb; //use desaturated specmap for reflections if reflectmap is not enabled
+	if(bUseReflMap)
+	{
+		reflectmap = tex2D(ReflMapSampler, In.texCoord.xy).rgb; //use colored reflectmap to enable metal-like colored reflections
+	}
+	
+	//normal application
+	if(!bUseObjectNormals && bUseNormalMap) //tangentspace normalmap
+	{
+		const float3x3 basis = float3x3( normalize( In.worldTangent ), normalize( In.worldBinormal ), normalize( In.worldNormal ) );
+        normal = normalize( mul( normal, basis ) );
+	}
+	if(bUseObjectNormals && bUseNormalMap) //if object space, pure sampling equals the normal
+	{
+		normal = mul(normal, float3x3(WorldInvTrans)); // put objectspace normal in worldspace
+	}
+	
+	normal = normalize( normal );
+	
+	if(bUseFresnel)
+	{
+		ret.a = 1.0;
+		float3 reflectionamount = reflectmap * fresnel(normal, In.eyeVec, FresnelPower, FresnelBias); //start off by getting fresnel falloff
+		float3 V  = normalize(In.eyeVec.xyz);
+		float3 ReflectVector = reflect(V, normal); //compute reflection vector
+	
+		float worldmask = 1.0f;
+		if(!bUseWorldMask)
+		{
+			worldmask = 1 - saturate(dot(float3(0.0,-1.0,0.0),normal)); // invert, clamped dot product of normal and upward vector => only normals pointing upward will work
+			worldmask = pow(worldmask, FresnelMaskHardness); // power to hardness factor to control effect. 0 equals no control
+		}
+		else
+		{
+			//hard type masking activated for reflection faking
+			worldmask = (1 - saturate(dot(float3(0.0,FresnelMaskHardness,0.0), ReflectVector))); // invert, clamped dot product of reflection and upward vector => only reflections tracing upward will work
+			float limit = 0.0f;
+			limit = saturate(dot(float3(0.0,1.0,0.0), normal));// saturate(dot(float3(0.0,1.0,0.0), normal.xzy)); //prevent top from reflecting,m effectively creating a studio HDRi in code only.
+			worldmask -= saturate(pow(limit, 0.8)); //subtract top mask from reflect mask, powered to 0.8 to soften the effect a bit
+		}
+		
+		//final lerps, to blend between fresnel effect and lit color
+		if(!bUseCubeMap) //if no cubemap, fake fresnel rim used
+			ret.rgb = FresnelColor * FresnelMult * reflectionamount * worldmask; //fresnel color masked by specmap, masked by worldmask, multiplied by intensity
+		if(bUseCubeMap)
+		{
+			ReflectVector.yz = -ReflectVector.yz; //invert reflectionvector for cubemap sampling
+			float3 reflcubemap  = texCUBE(reflcubemapSampler, ReflectVector).rgb;
+			ret.rgb = FresnelMult * reflcubemap * reflectionamount; //add cubemap, multiplied with fresnel multiplier, masked by fresnel
+		}
+	}
+	
+	if(bUseEdge)
+	{
+		//calculate dot for falloff
+		float edge = fresnel(normal, In.eyeVec, 1.0f, 0.0f);
+		edge = step(edge, EdgeStep);
+		
+		ret.rgb *= edge;
+	}
+	
+	if(bAlphaMasksFresnel) ret.rgb *= opacity; //if opacity is used, you can reduce the fresnel effects strength to match the opacity. The is off by default since glass effects are better like this
+
+	return ret;
+}
+
+
+#define GLOW_PASS_SETTINGS DepthTestEnable = true; \
+		ZWriteEnable = false; \
+		CullFaceEnable = false; \
+		BlendEnable = true; \
+		BlendEquation = FuncAdd; \
+		BlendFunc  = int2(SrcAlpha, One);
+
+
+technique Default
+{  
+	pass  P0
+	{		
+		DepthTestEnable = true;
+		ZWriteEnable = true;
+		CullFaceEnable  = true;
+		BlendEnable = true;
+		BlendEquation = FuncAdd;
+		blendfunc = int2(SrcAlpha, OneMinusSrcAlpha);
+		VertexShader = compile glslv vs_main(gLightPos1, gLightPos2, gLightPos3);// light position must be passed as parameter with glsl profile!?
+		PixelShader = compile glslf ps_main();
+	}  
+	pass P1
+	{		 
+		DepthTestEnable = true; 
+		DepthFunc = LessEqual;
+		CullFaceEnable  = true;
+		BlendEnable = true;
+		BlendEquation = FuncAdd;
+		blendfunc = int2(one, one);
+		VertexShader = compile glslv vs_main(gLightPos1, gLightPos2, gLightPos3);
+		PixelShader = compile glslf ps_fresnel();
+	}
+	#if GLOW_PASS > 0
+	pass P2
+	{		
+		GLOW_PASS_SETTINGS		
+		VertexShader = compile arbvp1 glow_VS(1);	
+		PixelShader = compile arbfp1 glow_PS(1);
+	}
+	#endif
+	#if GLOW_PASS > 1
+	pass P3
+	{		
+		GLOW_PASS_SETTINGS		
+		VertexShader = compile arbvp1 glow_VS(2);	
+		PixelShader = compile arbfp1 glow_PS(2);
+	}
+	#endif
+	#if GLOW_PASS > 2
+	pass P4
+	{		
+		VertexShader = compile arbvp1 glow_VS(3);	
+		GLOW_PASS_SETTINGS		
+		PixelShader = compile arbfp1 glow_PS(3);
+	}
+	#endif
+	#if GLOW_PASS > 3
+	pass P5
+	{		
+		VertexShader = compile arbvp1 glow_VS(4);	
+		GLOW_PASS_SETTINGS		
+		PixelShader = compile arbfp1 glow_PS(4);
+	}
+	#endif
+	#if GLOW_PASS > 4
+	pass P6
+	{		
+		VertexShader = compile arbvp1 glow_VS(5);	
+		GLOW_PASS_SETTINGS		
+		PixelShader = compile arbfp1 glow_PS(5);
+	}
+	#endif
+	#if GLOW_PASS > 5
+	pass P7
+	{		
+		VertexShader = compile arbvp1 glow_VS(6);	
+		GLOW_PASS_SETTINGS		
+		PixelShader = compile arbfp1 glow_PS(6);
+	}
+	#endif
+	#if GLOW_PASS > 6
+	pass P8
+	{		
+		VertexShader = compile arbvp1 glow_VS(7);	
+		GLOW_PASS_SETTINGS		
+		PixelShader = compile arbfp1 glow_PS(7);
+	}
+	#endif
+	#if GLOW_PASS > 7
+	pass P9
+	{		
+		VertexShader = compile arbvp1 glow_VS(8);	
+		GLOW_PASS_SETTINGS		
+		PixelShader = compile arbfp1 glow_PS(8);
+	}
+	#endif
+} 
+
+technique TwoSided  
+{  
+	pass  P0
+	{		 
+		DepthTestEnable = true; 
+		CullFaceEnable  = false;
+		BlendEnable = true; //alphablend allows for full range, smooth opacity masking
+		BlendEquation = FuncAdd;
+		blendfunc = int2(srcalpha, oneminussrcalpha);
+		VertexShader = compile glslv vs_main(gLightPos1, gLightPos2, gLightPos3);
+		PixelShader = compile glslf ps_main();
+	}  
+	pass P1
+	{		 
+		DepthTestEnable = true; 
+		CullFaceEnable  = false;
+		BlendEnable = true; //alphablend allows for full range, smooth opacity masking
+		BlendEquation = FuncAdd;
+		blendfunc = int2(one, one);
+		VertexShader = compile arbvp1 vs_main(gLightPos1, gLightPos2, gLightPos3);
+		PixelShader = compile arbfp1 ps_fresnel();
+	}
+
+}
