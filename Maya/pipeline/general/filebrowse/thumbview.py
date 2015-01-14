@@ -17,7 +17,7 @@ class thumbView(QtGui.QListView):
         # setting up the list view to display icons nicely
         self.tview.setViewMode(QtGui.QListView.IconMode)
         self.tview.setSelectionMode(QtGui.QAbstractItemView.ExtendedSelection)
-        self.tview.setResizeMode(QtGui.QListView.adjust)
+        self.tview.setResizeMode(QtGui.QListView.Adjust)
         self.tview.setWordWrap(True)
         self.tview.setDragEnabled(True)
         self.tview.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
