@@ -23,6 +23,8 @@ class fbWindow(QtGui.QMainWindow):
     def __init__(self, parent=getMayaWindow()):
         super(fbWindow, self).__init__(parent)
         import os
+        import pipeline.general.filebrowse.thumbview as tv
+
         self.path = "d:/bank/reference/"
         self.directory = os.listdir(self.path)
 
@@ -43,8 +45,8 @@ class fbWindow(QtGui.QMainWindow):
         self.needHistory = True
         self.interfaceDisabled = False
 
-
-
+        self.thumbView = tv.thumbView()
+        """
         self.pixLayout = QtGui.QGridLayout()
         # here is where I want to add my thumbnail squares
         row = 0
@@ -52,18 +54,19 @@ class fbWindow(QtGui.QMainWindow):
         for image in self.directory:
             file = str(self.path+image)
             print file
-            label = QtGui.QLabel(self)
-            pixmap = QtGui.QPixmap(file)
+            self.label = QtGui.QLabel(self)
+            self.pixmap = QtGui.QPixmap(file)
             #pixmap = pixmap.scaled(600, 600)
-            label.setPixmap(pixmap)
-            self.pixLayout.addWidget(label, row, col)
+            self.label.setPixmap(self.pixmap)
+            self.pixLayout.addWidget(self.label, row, col)
             col+=1
-            if col == 6:
+            if col >= 6:
                 row+=1
                 col=0
+        """
 
         self.fbLayout.addWidget(self.fbWin)
-        self.setLayout(self.pixLayout)
+        self.setLayout(self.fbLayout)
 
 
 
