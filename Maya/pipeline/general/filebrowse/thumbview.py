@@ -22,4 +22,4 @@ class thumbView(QtGui.QListView):
         self.tview.setDragEnabled(True)
         self.tview.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
 
-        self.thumbViewModel = QtGui.QStandardItemModel(self)
+        self.thumbViewModel = QtGui.QStandardItemModel(self.tview)
