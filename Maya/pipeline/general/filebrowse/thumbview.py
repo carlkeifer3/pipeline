@@ -38,7 +38,7 @@ class thumbView(QtGui.QListView):
 
     def selectCurrentIndex(self):
 
-        if self.currentIndex.isValid() && self.thumbViewModel.rowCount() > 0:
+        if self.currentIndex.isValid() & self.thumbViewModel.rowCount() > 0:
             self.tview.scrollTo(self.currentIndex)
             self.tview.setCurrentIndex(self.currentIndex)
 
@@ -64,11 +64,11 @@ class thumbView(QtGui.QListView):
 
         self.thumbFileInfoList = self.thumbsDir.entryInfoList()
 
-
-        for currThumb = 0; currThumb < self.thumbFileInfoList.size; ++currThumb:
+        currThumb = 0
+        while  currThumb < self.thumbFileInfoList.size:
             thumbFileInfo = self.thumbFileInfoList.at(currThumb)
             thumbIitem = QtGui.QStandardItem()
             thumbIitem.setData(self.thumbFileInfo.filePath(), FileNameRole)
 
             self.thumbViewModel.appendRow(thumbIitem)
-
+            currThumb+=1
