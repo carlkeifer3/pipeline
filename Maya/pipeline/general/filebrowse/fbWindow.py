@@ -45,27 +45,14 @@ class fbWindow(QtGui.QMainWindow):
         self.needHistory = True
         self.interfaceDisabled = False
 
-        self.thumbView = tv.thumbView()
-        """
-        self.pixLayout = QtGui.QGridLayout()
-        # here is where I want to add my thumbnail squares
-        row = 0
-        col = 0
-        for image in self.directory:
-            file = str(self.path+image)
-            print file
-            self.label = QtGui.QLabel(self)
-            self.pixmap = QtGui.QPixmap(file)
-            #pixmap = pixmap.scaled(600, 600)
-            self.label.setPixmap(self.pixmap)
-            self.pixLayout.addWidget(self.label, row, col)
-            col+=1
-            if col >= 6:
-                row+=1
-                col=0
-        """
 
-        self.fbLayout.addWidget(self.fbWin)
+        #def createThumbView(self):
+        self.thumbView = tv.thumbView()
+        self.thumbView.thumbsDir.setPath(self.path)
+        self.thumbView.load()
+        print "thumbview should be built"
+
+        self.fbLayout.addWidget(self.thumbView)
         self.setLayout(self.fbLayout)
 
 
