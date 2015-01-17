@@ -52,7 +52,7 @@ class fbWindow(QtGui.QMainWindow):
         self.thumbView.load()
         print "thumbview should be built"
 
-        self.fbLayout.addWidget(self.thumbView)
+        self.fbLayout.addWidget(self.thumbView.tview)
         self.setLayout(self.fbLayout)
 
 

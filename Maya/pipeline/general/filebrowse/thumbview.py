@@ -143,9 +143,9 @@ class thumbView(QtGui.QListView):
         while  currThumb < len(self.thumbFileInfoList):
             thumbFileInfo = self.thumbFileInfoList[currThumb]
             thumbIitem = QtGui.QStandardItem()
-
-
-            thumbIitem.setIcon(self.thumbFileInfo)
+            #Icon = QtGui.QIcon()
+            #Icon.QFileIconProvider.icon(thumbFileInfo)
+            thumbIitem.setIcon(QtGui.QIcon(thumbFileInfo))
 
 
             self.thumbViewModel.appendRow(thumbIitem)
