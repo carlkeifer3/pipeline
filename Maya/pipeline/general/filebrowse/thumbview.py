@@ -119,9 +119,9 @@ class thumbView(QtGui.QListView):
         :return:
         """
         thumbAspect = 1.33
-        thumbHeight = QtCore.QSize()
+        thumbHeight = map(QtCore.QSize(), 200)
         thumbWidth = QtCore.QSize()
-        #self.tview.setIconSize(thumbWidth, thumbHeight)
+        self.tview.setIconSize(thumbHeight)
 
         # skipping filtered search for now
 
