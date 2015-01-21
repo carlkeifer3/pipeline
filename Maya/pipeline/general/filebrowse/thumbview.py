@@ -28,6 +28,8 @@ class thumbView(QtGui.QListView):
 
         self.thumbSize = 100
 
+        self.setPath = str("D:/bank/reference/")
+        self.directory = os.listdir(self.path)
         self.thumbsDir = QtCore.QDir()
         self.fileFilters = QtCore.QStringList
 
@@ -139,15 +141,17 @@ class thumbView(QtGui.QListView):
 
     def initThumbs(self):
 
-        self.thumbFileInfoList = self.thumbsDir.entryInfoList()
-        currThumb = 0
-        while  currThumb < len(self.thumbFileInfoList):
-            thumbFileInfo = self.thumbFileInfoList[currThumb]
-            thumbIitem = QtGui.QStandardItem()
+        #self.thumbFileInfoList = self.thumbsDir.entryInfoList()
+        #print self.thumbFileInfoList
+        #currThumb = 0
+        #while  currThumb < len(self.thumbFileInfoList):
+        for image in self.directory:
+            #thumbFileInfo = self.thumbFileInfoList[currThumb]
+            #thumbIitem = QtGui.QStandardItem()
             #Icon = QtGui.QIcon()
             #Icon.QFileIconProvider.icon(thumbFileInfo)
-            thumbIitem.setText(str(thumbFileInfo))
-            thumbIitem.setIcon(QtGui.QIcon("d:/bank/reference/model_sheet.jpg"))#thumbFileInfo))
+            #thumbIitem.setText(str(thumbFileInfo))
+            thumbIitem.setIcon(QtGui.QIcon("d:\\bank\\reference\\model_sheet.jpg"))#thumbFileInfo))
 
 
             self.thumbViewModel.appendRow(thumbIitem)
