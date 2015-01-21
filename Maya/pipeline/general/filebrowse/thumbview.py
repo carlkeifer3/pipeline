@@ -7,33 +7,31 @@ from PyQt4 import QtGui, QtCore
 
 class thumbView(QtGui.QListView):
 
-    def __init__(self,):
+    def __init__(self, parent=None):
         import os
 
-        # these variables should be global data
-
-        # these variables are local to the class
-        QtGui.QListView.__init__(self)
-        self. currentRow = 0
+        # initialize the QlistView
+        QtGui.QListView.__init__(self, parent)
+        #self. currentRow = 0
 
         # setting up the list view to display icons nicely
-        self.setViewMode(QtGui.QListView.IconMode)
-        self.setSelectionMode(QtGui.QAbstractItemView.ExtendedSelection)
-        self.setResizeMode(QtGui.QListView.Adjust)
-        self.setWordWrap(True)
-        self.setDragEnabled(True)
-        self.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
+        #self.view.setViewMode(QtGui.QListView.IconMode)
+        #self.view.setSelectionMode(QtGui.QAbstractItemView.ExtendedSelection)
+        #self.view.setResizeMode(QtGui.QListView.Adjust)
+        #self.view.setWordWrap(True)
+        #self.view.setDragEnabled(True)
+        #self.view.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
 
-        self.thumbViewModel = QtGui.QStandardItemModel(self)
+        self.thumbModel = QtGui.QStandardItemModel(self)
         #self.thumbViewModel.setSortRole()
-        self.setModel(self.thumbViewModel)
+        self.setModel(self.thumbModel)
 
-        self.thumbSize = 100
+        #self.thumbSize = 100
 
         self.setPath = str("D:/bank/reference/")
         self.directory = os.listdir(self.setPath)
-        self.thumbsDir = QtCore.QDir()
-        self.fileFilters = QtCore.QStringList
+        #self.thumbsDir = QtCore.QDir()
+        #self.fileFilters = QtCore.QStringList
 
     def setThumbColors(self):
         self.bgColor = QtCore.QString("background: rgb(%1, %2, %3)")
@@ -127,7 +125,7 @@ class thumbView(QtGui.QListView):
         thumbAspect = 1.33
         thumbHeight = self.thumbSize * thumbAspect
         thumbWidth = self.thumbSize * thumbAspect
-        self.setIconSize(QtCore.QSize(thumbWidth, thumbHeight))
+        self.view.setIconSize(QtCore.QSize(thumbWidth, thumbHeight))
 
         # skipping filtered search for now
 
@@ -136,7 +134,7 @@ class thumbView(QtGui.QListView):
 
     def load(self):
 
-        self.loadPrepare()
+        #self.loadPrepare()
         self.initThumbs()
         self.updateThumbsCount()
         #self.loadVisibleThumbs()
@@ -153,5 +151,5 @@ class thumbView(QtGui.QListView):
             #thumbIitem.setText(str(thumbFileInfo))
             thumbIitem.setIcon(QtGui.QIcon(str(self.setPath+image)))
             print image
-            self.thumbViewModel.appendRow(thumbIitem)
+            self.thumbModel.appendRow(thumbIitem)
             #currThumb+=1
