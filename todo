@@ -1,6 +1,20 @@
 there is probably going to be a long list.
 
 
+standalone python tools.
+
+    I would like to make a tactic tool it should handle
+
+        tactic login
+        asset browse
+        file checkin
+        file checkout
+        command line render managment with check in
+
+
+
+
+
 general workflow improvements
 
   I would like a button somewhere that makes a screenshot of what I'm doing.

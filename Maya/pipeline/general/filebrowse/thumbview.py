@@ -11,20 +11,22 @@ class thumbView(QtGui.QListView):
         # these variables should be global data
 
         # these variables are local to the class
-        self.tview = QtGui.QListView()
+        QtGui.QListView.__init__(self, parent=None)
         self. currentRow = 0
 
         # setting up the list view to display icons nicely
-        self.tview.setViewMode(QtGui.QListView.IconMode)
-        self.tview.setSelectionMode(QtGui.QAbstractItemView.ExtendedSelection)
-        self.tview.setResizeMode(QtGui.QListView.Adjust)
-        self.tview.setWordWrap(True)
-        self.tview.setDragEnabled(True)
-        self.tview.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
+        self.setViewMode(QtGui.QListView.IconMode)
+        self.setSelectionMode(QtGui.QAbstractItemView.ExtendedSelection)
+        self.setResizeMode(QtGui.QListView.Adjust)
+        self.setWordWrap(True)
+        self.setDragEnabled(True)
+        self.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
 
-        self.thumbViewModel = QtGui.QStandardItemModel(self.tview)
+        self.thumbViewModel = QtGui.QStandardItemModel(self)
         #self.thumbViewModel.setSortRole()
-        self.tview.setModel(self.thumbViewModel)
+        self.setModel(self.thumbViewModel)
+
+        self.thumbSize = 100
 
         self.thumbsDir = QtCore.QDir()
         self.fileFilters = QtCore.QStringList
@@ -119,9 +121,9 @@ class thumbView(QtGui.QListView):
         :return:
         """
         thumbAspect = 1.33
-        thumbHeight = map(QtCore.QSize(), 200)
-        thumbWidth = QtCore.QSize()
-        self.tview.setIconSize(thumbHeight)
+        thumbHeight = self.thumbSize * thumbAspect
+        thumbWidth = self.thumbSize * thumbAspect
+        self.setIconSize(QtCore.QSize(thumbWidth, thumbHeight))
 
         # skipping filtered search for now
 
@@ -138,14 +140,14 @@ class thumbView(QtGui.QListView):
     def initThumbs(self):
 
         self.thumbFileInfoList = self.thumbsDir.entryInfoList()
-
         currThumb = 0
         while  currThumb < len(self.thumbFileInfoList):
             thumbFileInfo = self.thumbFileInfoList[currThumb]
             thumbIitem = QtGui.QStandardItem()
             #Icon = QtGui.QIcon()
             #Icon.QFileIconProvider.icon(thumbFileInfo)
-            thumbIitem.setIcon(QtGui.QIcon(thumbFileInfo))
+            thumbIitem.setText(str(thumbFileInfo))
+            thumbIitem.setIcon(QtGui.QIcon("d:/bank/reference/model_sheet.jpg"))#thumbFileInfo))
 
 
             self.thumbViewModel.appendRow(thumbIitem)
