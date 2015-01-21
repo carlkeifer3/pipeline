@@ -8,10 +8,12 @@ from PyQt4 import QtGui, QtCore
 class thumbView(QtGui.QListView):
 
     def __init__(self,):
+        import os
+
         # these variables should be global data
 
         # these variables are local to the class
-        QtGui.QListView.__init__(self, parent=None)
+        QtGui.QListView.__init__(self)
         self. currentRow = 0
 
         # setting up the list view to display icons nicely
@@ -29,7 +31,7 @@ class thumbView(QtGui.QListView):
         self.thumbSize = 100
 
         self.setPath = str("D:/bank/reference/")
-        self.directory = os.listdir(self.path)
+        self.directory = os.listdir(self.setPath)
         self.thumbsDir = QtCore.QDir()
         self.fileFilters = QtCore.QStringList
 
@@ -130,7 +132,7 @@ class thumbView(QtGui.QListView):
         # skipping filtered search for now
 
         #self.thumbsDir.setPath(self.currentViewDir)
-        self.thumbViewModel.clear()
+        #self.thumbViewModel.clear()
 
     def load(self):
 
@@ -147,12 +149,9 @@ class thumbView(QtGui.QListView):
         #while  currThumb < len(self.thumbFileInfoList):
         for image in self.directory:
             #thumbFileInfo = self.thumbFileInfoList[currThumb]
-            #thumbIitem = QtGui.QStandardItem()
-            #Icon = QtGui.QIcon()
-            #Icon.QFileIconProvider.icon(thumbFileInfo)
+            thumbIitem = QtGui.QStandardItem()
             #thumbIitem.setText(str(thumbFileInfo))
-            thumbIitem.setIcon(QtGui.QIcon("d:\\bank\\reference\\model_sheet.jpg"))#thumbFileInfo))
-
-
+            thumbIitem.setIcon(QtGui.QIcon(str(self.setPath+image)))
+            print image
             self.thumbViewModel.appendRow(thumbIitem)
-            currThumb+=1
+            #currThumb+=1
