@@ -22,22 +22,23 @@ class fbWindow(QtGui.QMainWindow):
     """
 
     def __init__(self, parent=getMayaWindow()):
-        super(fbWindow, self).__init__(parent)
-        #import os
+        import os
+
+        # initialize the QWidget
+        QtGui.QWidget.__init__(self, parent)
 
         # this is just for now, I want to use QDirectory
         # preferred image locations like this will be
         # captured in qsettings
         self.path = "D:/bank/reference/"
-        #self.directory = os.listdir(self.path)
+        self.directory = os.listdir(self.path)
 
         self.setObjectName("FileBrowser")
         self.resize(810, 390)
-        self.fbWin = QtGui.QWidget(self)
-        self.fbLayout = QtGui.QVBoxLayout(self.fbWin)
-        self.fbLayout.addStretch(1)
-        self.fbLayout.setContentsMargins(0,0,0,0)
-        self.fbLayout.setSpacing(0)
+        self.fbLayout = QtGui.QHBoxLayout(self)
+        #self.fbLayout.addStretch(1)
+        #self.fbLayout.setContentsMargins(0,0,0,0)
+        self.fbLayout.setSpacing(10)
 
         # internal class variable time
         self.copyMoveToDialog = 0
@@ -51,12 +52,12 @@ class fbWindow(QtGui.QMainWindow):
         # create our views
         self.createThumbView()
 
-        #self.list = QtGui.QListWidget(self)
-        #self.list.setGeometry(QtCore.QRect(0, 0, 250, 400))
-        #for image in self.directory:
-        #    self.list.addItem(str(self.path + image))
+        self.list = QtGui.QListWidget(self)
+        self.list.setGeometry(QtCore.QRect(0, 0, 240, 400))
+        for image in self.directory:
+            self.list.addItem(str(self.path + image))
 
-        #self.fbLayout.addWidget(self.list)
+        self.fbLayout.addWidget(self.list)
 
         self.setLayout(self.fbLayout)
 
@@ -66,7 +67,6 @@ class fbWindow(QtGui.QMainWindow):
 
         self.thumbView = tv.thumbView(self)
         self.thumbView.thumbsDir.setPath(self.path)
-        self.thumbView.setGeometry(QtCore.QRect(0, 0, 800, 390))
         self.thumbView.load()
         print "thumbview should be built"
         self.fbLayout.addWidget(self.thumbView)

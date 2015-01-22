@@ -14,13 +14,14 @@ class thumbView(QtGui.QListView):
         QtGui.QListView.__init__(self, parent)
         #self. currentRow = 0
 
+        self.setGeometry(QtCore.QRect(245, 0, 600, 390))
         # setting up the list view to display icons nicely
         self.setViewMode(QtGui.QListView.IconMode)
-        self.setSelectionMode(QtGui.QAbstractItemView.ExtendedSelection)
-        self.setResizeMode(QtGui.QListView.Adjust)
-        self.setWordWrap(True)
-        self.setDragEnabled(True)
-        self.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
+        #self.setSelectionMode(QtGui.QAbstractItemView.ExtendedSelection)
+        #self.setResizeMode(QtGui.QListView.Adjust)
+        #self.setWordWrap(True)
+        #self.setDragEnabled(True)
+        #self.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
 
         self.thumbModel = QtGui.QStandardItemModel(self)
         #self.thumbViewModel.setSortRole()
@@ -28,8 +29,6 @@ class thumbView(QtGui.QListView):
 
         self.thumbSize = 100
 
-        #self.setPath = str("D:/bank/reference/")
-        #self.directory = os.listdir(self.setPath)
         self.thumbsDir = QtCore.QDir()
         #self.fileFilters = QtCore.QStringList
 
@@ -75,7 +74,7 @@ class thumbView(QtGui.QListView):
         self.tview.setWindowTitle(title)
 
     def setCurrentIndexByName(self, fileName):
-        self.indexList = self.thumbViewModel.match(self.thumbViewModel.index(0,0), self.fileNameRole, fileName)
+        self.indexList = self.thumbModel.match(self.thumbModel.index(0,0), self.fileNameRole, fileName)
         if self.indexList.size():
             self.currentIndex = indexList[0]
             self.setCurrentRow(self.currentIndex.row())
@@ -84,7 +83,7 @@ class thumbView(QtGui.QListView):
         return False
 
     def setCurrentIndexByRow(self, ):
-        idx = self.thumbViewModel.indexFromItem(self.thumbViewModel.item(row))
+        idx = self.thumbModel.indexFromItem(self.thumbModel.item(row))
         if idx.isValid():
             self.currentIndex = idx
             self.setCurrentRow(idx.row())
@@ -142,7 +141,7 @@ class thumbView(QtGui.QListView):
     def initThumbs(self):
 
         self.thumbFileInfoList = self.thumbsDir.entryInfoList()
-        #print self.thumbFileInfoList
+         #print self.thumbFileInfoList
         for thumbFileInfo in self.thumbFileInfoList:
             thumbIitem = QtGui.QStandardItem()
             #thumbIitem.setText(str(thumbFileInfo))
