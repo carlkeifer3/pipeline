@@ -14,7 +14,7 @@ class thumbView(QtGui.QListView):
         QtGui.QListView.__init__(self, parent)
         #self. currentRow = 0
 
-        self.setGeometry(QtCore.QRect(245, 0, 600, 390))
+        self.setGeometry(QtCore.QRect(245, 20, 565, 370))
         # setting up the list view to display icons nicely
         self.setViewMode(QtGui.QListView.IconMode)
         #self.setSelectionMode(QtGui.QAbstractItemView.ExtendedSelection)
