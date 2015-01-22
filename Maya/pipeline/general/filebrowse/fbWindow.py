@@ -55,19 +55,12 @@ class fbWindow(QtGui.QMainWindow):
         self.createMenus()
         self.createToolBars()
         self.createStatusBar()
-        #self.createFSTree()
+        self.createFSTree()
         #self.createBookmarks()
         #self.createImageView()
         #self.UpdateExternalApps()
         #self.loadShortcuts()
         #self.setupDocks()
-
-        self.list = QtGui.QListWidget(self)
-        self.list.setGeometry(QtCore.QRect(0, 70, 240, 370))
-        for image in self.directory:
-            self.list.addItem(str(self.path + image))
-
-        self.fbLayout.addWidget(self.list)
 
         self.setLayout(self.fbLayout)
 
@@ -91,6 +84,12 @@ class fbWindow(QtGui.QMainWindow):
         self.thumbView.load()
         print "thumbview should be built"
         self.fbLayout.addWidget(self.thumbView)
+
+        self.iiDock = QtGui.QDockWidget("Image Info", self)
+        self.iiDock.setObjectName("ImageInfo")
+        self.iiDock.setWidget(self.thumbView)
+
+        self.addDockWidget(QtCore.Qt.RightDockWidgetArea, self.iiDock)
 
     def AddMenuSeparator(self):
         """
@@ -289,6 +288,20 @@ class fbWindow(QtGui.QMainWindow):
         self.busyLabel.setVisible(False)
 
         self.setStatusBar(self.statusBar)
+
+    def createFSTree(self):
+        print "creating filesystem tree"
+        import pipeline.general.filebrowse.fstree as fs
+
+        self.fsDock = QtGui.QDockWidget("File System", self)
+        self.fsDock.setObjectName("File System")
+
+        self.fsTree = fs.FSTree(self.fsDock)
+        self.fsDock.setWidget(self.fsTree)
+
+        self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.fsDock)
+
+        #Context Menu
 
 def fbWinInit():
     myWindow = fbWindow()
