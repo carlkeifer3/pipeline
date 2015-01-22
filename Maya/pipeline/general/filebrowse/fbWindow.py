@@ -49,11 +49,18 @@ class fbWindow(QtGui.QMainWindow):
         self.needHistory = True
         self.interfaceDisabled = False
 
-        # create our views
+        #self.readSettings()
         self.createThumbView()
         self.createActions()
         self.createMenus()
         self.createToolBars()
+        self.createStatusBar()
+        #self.createFSTree()
+        #self.createBookmarks()
+        #self.createImageView()
+        #self.UpdateExternalApps()
+        #self.loadShortcuts()
+        #self.setupDocks()
 
         self.list = QtGui.QListWidget(self)
         self.list.setGeometry(QtCore.QRect(0, 70, 240, 370))
@@ -262,6 +269,26 @@ class fbWindow(QtGui.QMainWindow):
         self.viewToolBar.addAction(self.slideShowAction)
         self.viewToolBar.addAction(self.thumbsZoomInAct)
         self.viewToolBar.addAction(self.thumbsZoomOutAct)
+
+    def setToolbarIconSize(self):
+        print "setting Toolbar icon size"
+
+    def createStatusBar(self):
+        print "creating Status bar"
+
+        directory = "C:/Users/cargoyle/Documents/maya/scripts/pipeline/general/filebrowse"
+
+        self.statusBar = QtGui.QStatusBar()
+        self.stateLabel = QtGui.QLabel("Initializing")
+        self.statusBar.addWidget(self.stateLabel)
+
+        self.busyMovie = QtGui.QMovie(str(directory+"/images/busy.gif"))
+        self.busyLabel = QtGui.QLabel(self)
+        self.busyLabel.setMovie(self.busyMovie)
+        self.statusBar.addWidget(self.busyLabel)
+        self.busyLabel.setVisible(False)
+
+        self.setStatusBar(self.statusBar)
 
 def fbWinInit():
     myWindow = fbWindow()
