@@ -16,9 +16,9 @@ class FSTree(QtGui.QTreeView):
 
         self.setAcceptDrops(True)
         self.setDragEnabled(True)
-        self.setDragDropMode(QtCore.QAbstractItemView.InternalMove)
+        self.setDragDropMode(QtGui.QAbstractItemView.InternalMove)
 
-        self.fsModel = QtCore.QFileSystemModel(self)
+        self.fsModel = QtGui.QFileSystemModel(self)
         self.fsModel.setRootPath("")
         #self.setModelFlags()
 
