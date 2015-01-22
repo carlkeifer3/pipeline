@@ -15,18 +15,19 @@ class thumbView(QtGui.QListView):
         #self. currentRow = 0
 
         # setting up the list view to display icons nicely
-        #self.view.setViewMode(QtGui.QListView.IconMode)
-        #self.view.setSelectionMode(QtGui.QAbstractItemView.ExtendedSelection)
-        #self.view.setResizeMode(QtGui.QListView.Adjust)
-        #self.view.setWordWrap(True)
-        #self.view.setDragEnabled(True)
-        #self.view.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
+        self.setViewMode(QtGui.QListView.IconMode)
+        self.setSelectionMode(QtGui.QAbstractItemView.ExtendedSelection)
+        self.setResizeMode(QtGui.QListView.Adjust)
+        self.setGeometry(QtCore.QRect(0, 0, 800, 390))
+        self.setWordWrap(True)
+        self.setDragEnabled(True)
+        self.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
 
         self.thumbModel = QtGui.QStandardItemModel(self)
         #self.thumbViewModel.setSortRole()
         self.setModel(self.thumbModel)
 
-        #self.thumbSize = 100
+        self.thumbSize = 100
 
         self.setPath = str("D:/bank/reference/")
         self.directory = os.listdir(self.setPath)
@@ -134,9 +135,9 @@ class thumbView(QtGui.QListView):
 
     def load(self):
 
-        #self.loadPrepare()
+        self.loadPrepare()
         self.initThumbs()
-        self.updateThumbsCount()
+        #self.updateThumbsCount()
         #self.loadVisibleThumbs()
 
     def initThumbs(self):
@@ -150,6 +151,5 @@ class thumbView(QtGui.QListView):
             thumbIitem = QtGui.QStandardItem()
             #thumbIitem.setText(str(thumbFileInfo))
             thumbIitem.setIcon(QtGui.QIcon(str(self.setPath+image)))
-            print image
             self.thumbModel.appendRow(thumbIitem)
             #currThumb+=1

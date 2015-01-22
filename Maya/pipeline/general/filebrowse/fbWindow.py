@@ -50,8 +50,7 @@ class fbWindow(QtGui.QMainWindow):
         #def createThumbView(self):
         self.thumbView = tv.thumbView(self.fbWin)
         #self.thumbView.thumbsDir.setPath(self.path)
-        self.thumbView.setGeometry(QtCore.QRect(0, 0, 800, 390))
-        #self.thumbView.load()
+        self.thumbView.load()
         print "thumbview should be built"
         #self.tlist = QtGui.QListView(self)
         #self.tmodel = QtGui.QStandardItemModel(self.tlist)
