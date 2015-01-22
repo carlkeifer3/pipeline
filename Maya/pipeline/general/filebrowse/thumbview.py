@@ -18,7 +18,6 @@ class thumbView(QtGui.QListView):
         self.setViewMode(QtGui.QListView.IconMode)
         self.setSelectionMode(QtGui.QAbstractItemView.ExtendedSelection)
         self.setResizeMode(QtGui.QListView.Adjust)
-        self.setGeometry(QtCore.QRect(0, 0, 800, 390))
         self.setWordWrap(True)
         self.setDragEnabled(True)
         self.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
@@ -29,9 +28,9 @@ class thumbView(QtGui.QListView):
 
         self.thumbSize = 100
 
-        self.setPath = str("D:/bank/reference/")
-        self.directory = os.listdir(self.setPath)
-        #self.thumbsDir = QtCore.QDir()
+        #self.setPath = str("D:/bank/reference/")
+        #self.directory = os.listdir(self.setPath)
+        self.thumbsDir = QtCore.QDir()
         #self.fileFilters = QtCore.QStringList
 
     def setThumbColors(self):
@@ -126,12 +125,12 @@ class thumbView(QtGui.QListView):
         thumbAspect = 1.33
         thumbHeight = self.thumbSize * thumbAspect
         thumbWidth = self.thumbSize * thumbAspect
-        self.view.setIconSize(QtCore.QSize(thumbWidth, thumbHeight))
+        self.setIconSize(QtCore.QSize(thumbWidth, thumbHeight))
 
         # skipping filtered search for now
 
         #self.thumbsDir.setPath(self.currentViewDir)
-        #self.thumbViewModel.clear()
+        self.thumbModel.clear()
 
     def load(self):
 
@@ -142,14 +141,10 @@ class thumbView(QtGui.QListView):
 
     def initThumbs(self):
 
-        #self.thumbFileInfoList = self.thumbsDir.entryInfoList()
+        self.thumbFileInfoList = self.thumbsDir.entryInfoList()
         #print self.thumbFileInfoList
-        #currThumb = 0
-        #while  currThumb < len(self.thumbFileInfoList):
-        for image in self.directory:
-            #thumbFileInfo = self.thumbFileInfoList[currThumb]
+        for thumbFileInfo in self.thumbFileInfoList:
             thumbIitem = QtGui.QStandardItem()
             #thumbIitem.setText(str(thumbFileInfo))
-            thumbIitem.setIcon(QtGui.QIcon(str(self.setPath+image)))
+            thumbIitem.setIcon(QtGui.QIcon(thumbFileInfo.filePath()))
             self.thumbModel.appendRow(thumbIitem)
-            #currThumb+=1
