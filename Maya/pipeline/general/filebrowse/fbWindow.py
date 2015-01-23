@@ -56,7 +56,7 @@ class fbWindow(QtGui.QMainWindow):
         self.createToolBars()
         self.createStatusBar()
         self.createFSTree()
-        #self.createBookmarks()
+        self.createBookmarks()
         #self.createImageView()
         #self.UpdateExternalApps()
         #self.loadShortcuts()
@@ -302,6 +302,19 @@ class fbWindow(QtGui.QMainWindow):
         self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.fsDock)
 
         #Context Menu
+
+    def createBookmarks(self):
+        print "creating bookmarks window"
+        import pipeline.general.filebrowse.bookmarks as bm
+
+        self.bmDock = QtGui.QDockWidget("Bookmarks", self)
+        self.bmDock.setObjectName("Bookmarks")
+
+        self. bookmarks = bm.BookMarks(self.bmDock)
+        self.bmDock.setWidget(self.bookmarks)
+
+        self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.bmDock)
+
 
 def fbWinInit():
     myWindow = fbWindow()

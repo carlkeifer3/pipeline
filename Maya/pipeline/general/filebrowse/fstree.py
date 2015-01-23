@@ -3,7 +3,6 @@
 __author__ = 'cargoyle'
 
 """
-
 from PyQt4 import QtGui, QtCore
 
 class FSTree(QtGui.QTreeView):

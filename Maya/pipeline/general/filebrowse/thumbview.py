@@ -16,15 +16,19 @@ class thumbView(QtGui.QListView):
 
         # setting up the list view to display icons nicely
         self.setViewMode(QtGui.QListView.IconMode)
-        #self.setSelectionMode(QtGui.QAbstractItemView.ExtendedSelection)
-        #self.setResizeMode(QtGui.QListView.Adjust)
-        #self.setWordWrap(True)
-        #self.setDragEnabled(True)
-        #self.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
+        self.setSelectionMode(QtGui.QAbstractItemView.ExtendedSelection)
+        self.setResizeMode(QtGui.QListView.Adjust)
+        self.setWordWrap(True)
+        self.setDragEnabled(True)
+        self.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
 
         self.thumbModel = QtGui.QStandardItemModel(self)
         #self.thumbViewModel.setSortRole()
         self.setModel(self.thumbModel)
+
+        self.scrollbar = self.verticalScrollBar()
+        self.scrollbar.setValue = 0
+        self.scrollbar.valueChanged.connect(lambda:self.loadVisibleThumbs(self.scrollbar.value()))
 
         self.thumbSize = 100
 
@@ -100,6 +104,40 @@ class thumbView(QtGui.QListView):
 
         self.updateThumbSelection()
 
+    def loadVisibleThumbs(self, scrollbarValue):
+        #print "scrollbar moved"
+
+        self.lastScrollBarValue = 0
+
+        #if gdata.thumbsLayout == "Compact":
+        # scrolledForward = True
+        #else:
+        scrolledForward = bool(scrollbarValue)
+
+        self.lastScrollBarValue = scrollbarValue
+
+        first = self.getFirstVisibleThumb()
+        last = self.getLastVisibleThumb()
+        if first < 0 | last < 0:
+            return
+
+        if scrolledForward == True:
+            print "scrolled"
+
+
+    def getFirstVisibleThumb(self):
+        idx = QtCore.QModelIndex()
+        currThumb = 0
+        if self.thumbModel.rowCount() > currThumb:
+            idx = self.thumbModel.indexFromItem(self.thumbModel.item(currThumb))
+            #if self.viewport().rect().contains()
+            currThumb =+ 1
+
+        return -1
+
+    def getLastVisibleThumb(self):
+        return 4
+
     def isThumbVisible(self, idx):
         """
         :param idx:
@@ -110,6 +148,7 @@ class thumbView(QtGui.QListView):
         """
         :return:
         """
+        print "updating thumbs count"
 
     def updateThumbsSelection(self):
         """
@@ -134,8 +173,8 @@ class thumbView(QtGui.QListView):
 
         self.loadPrepare()
         self.initThumbs()
-        #self.updateThumbsCount()
-        #self.loadVisibleThumbs()
+        self.updateThumbsCount()
+        self.loadVisibleThumbs()
 
     def initThumbs(self):
 
