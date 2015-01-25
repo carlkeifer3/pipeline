@@ -23,6 +23,7 @@ class fbWindow(QtGui.QMainWindow):
 
     def __init__(self, parent=getMayaWindow()):
         import os
+        import pymel.core as pm
 
         # initialize the QWidget
         QtGui.QWidget.__init__(self, parent)
@@ -32,6 +33,10 @@ class fbWindow(QtGui.QMainWindow):
         # captured in qsettings
         self.path = "D:/bank/reference/"
         self.directory = os.listdir(self.path)
+
+        # locate the directory where all of the images for the ui live
+        ScriptDir = pm.internalVar(uad=True)
+        self.imgDirectory = str(ScriptDir+"/scripts/pipeline/general/filebrowse/images/")
 
         self.setObjectName("FileBrowser")
         self.resize(810, 460)
@@ -111,50 +116,50 @@ class fbWindow(QtGui.QMainWindow):
 
         :return:
         """
-        directory = "C:/Users/cargoyle/Documents/maya/scripts/pipeline/general/filebrowse"
-
         self.thumbsZoomInAct = QtGui.QAction("Enlarge Thumbnails", self)
-        self.thumbsZoomInAct.setIcon(QtGui.QIcon(str(directory+"/images/zoom_in.png")))
+        self.thumbsZoomInAct.setIcon(QtGui.QIcon(str(self.imgDirectory+"zoom_in.png")))
+        self.thumbsZoomInAct.triggered.connect(lambda:self.thumbsZoomIn())
+
 
         self.thumbsZoomOutAct = QtGui.QAction("Shrink Thumbnails", self)
-        self.thumbsZoomOutAct.setIcon(QtGui.QIcon(str(directory+"/images/zoom_out.png")))
+        self.thumbsZoomOutAct.setIcon(QtGui.QIcon(str(self.imgDirectory+"zoom_out.png")))
 
         self.cutAction = QtGui.QAction("Cut", self)
-        self.cutAction.setIcon(QtGui.QIcon(str(directory+"/images/cut.png")))
+        self.cutAction.setIcon(QtGui.QIcon(str(self.imgDirectory+"cut.png")))
 
         self.copyAction = QtGui.QAction("Copy", self)
-        self.copyAction.setIcon(QtGui.QIcon(str(directory+"/images/copy.png")))
+        self.copyAction.setIcon(QtGui.QIcon(str(self.imgDirectory+"copy.png")))
 
 
         self.deleteAction = QtGui.QAction("Delete", self)
-        self.deleteAction.setIcon(QtGui.QIcon(str(directory+"/images/delete.png")))
+        self.deleteAction.setIcon(QtGui.QIcon(str(self.imgDirectory+"delete.png")))
 
         self.refreshAction = QtGui.QAction("Reload", self)
-        self.refreshAction.setIcon(QtGui.QIcon(str(directory+"/images/refresh.png")))
+        self.refreshAction.setIcon(QtGui.QIcon(str(self.imgDirectory+"refresh.png")))
 
         self.subFoldersAction = QtGui.QAction("Include Sub-Folders", self)
-        self.subFoldersAction.setIcon(QtGui.QIcon(str(directory+"/images/tree.png")))
+        self.subFoldersAction.setIcon(QtGui.QIcon(str(self.imgDirectory+"tree.png")))
 
         self.pasteAction = QtGui.QAction("Paste Here", self)
-        self.pasteAction.setIcon(QtGui.QIcon(str(directory+"/images/paste.png")))
+        self.pasteAction.setIcon(QtGui.QIcon(str(self.imgDirectory+"paste.png")))
 
         self.goBackAction = QtGui.QAction("Back", self)
-        self.goBackAction.setIcon(QtGui.QIcon(str(directory+"/images/back.png")))
+        self.goBackAction.setIcon(QtGui.QIcon(str(self.imgDirectory+"back.png")))
 
         self.goFrwdAction = QtGui.QAction("Forward", self)
-        self.goFrwdAction.setIcon(QtGui.QIcon(str(directory+"/images/next.png")))
+        self.goFrwdAction.setIcon(QtGui.QIcon(str(self.imgDirectory+"next.png")))
 
         self.goUpAction = QtGui.QAction("Up", self)
-        self.goUpAction.setIcon(QtGui.QIcon(str(directory+"/images/up.png")))
+        self.goUpAction.setIcon(QtGui.QIcon(str(self.imgDirectory+"up.png")))
 
         self.goHomeAction = QtGui.QAction("Home", self)
-        self.goHomeAction.setIcon(QtGui.QIcon(str(directory+"/images/home.png")))
+        self.goHomeAction.setIcon(QtGui.QIcon(str(self.imgDirectory+"home.png")))
 
         self.slideShowAction = QtGui.QAction("Slide Show", self)
-        self.slideShowAction.setIcon(QtGui.QIcon(str(directory+"/images/play.png")))
+        self.slideShowAction.setIcon(QtGui.QIcon(str(self.imgDirectory+"play.png")))
 
         self.showClipboardAction = QtGui.QAction("Load Clipboard", self)
-        self.showClipboardAction.setIcon(QtGui.QIcon(str(directory+"/images/new.png")))
+        self.showClipboardAction.setIcon(QtGui.QIcon(str(self.imgDirectory+"new.png")))
 
     def createMenus(self):
         """
@@ -275,13 +280,11 @@ class fbWindow(QtGui.QMainWindow):
     def createStatusBar(self):
         print "creating Status bar"
 
-        directory = "C:/Users/cargoyle/Documents/maya/scripts/pipeline/general/filebrowse"
-
         self.statusBar = QtGui.QStatusBar()
         self.stateLabel = QtGui.QLabel("Initializing")
         self.statusBar.addWidget(self.stateLabel)
 
-        self.busyMovie = QtGui.QMovie(str(directory+"/images/busy.gif"))
+        self.busyMovie = QtGui.QMovie(str(self.imgDirectory+"busy.gif"))
         self.busyLabel = QtGui.QLabel(self)
         self.busyLabel.setMovie(self.busyMovie)
         self.statusBar.addWidget(self.busyLabel)
@@ -314,6 +317,10 @@ class fbWindow(QtGui.QMainWindow):
         self.bmDock.setWidget(self.bookmarks)
 
         self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.bmDock)
+
+    def thumbsZoomIn(self):
+        print "Enlarge Thumbs"
+        self.thumbView.thumbSize += 50
 
 
 def fbWinInit():

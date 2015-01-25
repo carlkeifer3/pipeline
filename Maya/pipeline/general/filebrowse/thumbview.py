@@ -28,7 +28,7 @@ class thumbView(QtGui.QListView):
 
         self.scrollbar = self.verticalScrollBar()
         self.scrollbar.setValue = 0
-        self.scrollbar.valueChanged.connect(lambda:self.loadVisibleThumbs(self.scrollbar.value()))
+        self.scrollbar.valueChanged.connect(lambda:self.loadVisibleThumbs( self.scrollbar.value()))
 
         self.thumbSize = 100
 
@@ -122,27 +122,56 @@ class thumbView(QtGui.QListView):
             return
 
         if scrolledForward == True:
-            print "scrolled"
+            last += last - first
+            if last >= self.thumbModel.rowCount():
+                last = self.thumbModel.rowCount() -1
+
+        else:
+            first -= last -first
+            if first < 0:
+                first = 0
+
+            last += 10
+            if last >= self.thumbModel.rowCount():
+                last = self.thumbModel.rowCount()-1
 
 
     def getFirstVisibleThumb(self):
+        print "get first visible thumb"
         idx = QtCore.QModelIndex()
         currThumb = 0
         if self.thumbModel.rowCount() > currThumb:
             idx = self.thumbModel.indexFromItem(self.thumbModel.item(currThumb))
-            #if self.viewport().rect().contains()
+            if self.viewport().rect().contains(self.visualRect(idx)):
+                print "thumbnail found"
+                return idx.row()
             currThumb =+ 1
 
         return -1
 
     def getLastVisibleThumb(self):
-        return 4
+        """
+
+        :return:
+        """
+        print "get last visible thumbnail"
+        idx = QtCore.QModelIndex()
+        currThumb = self.thumbModel.rowCount() -1
+        if self.thumbModel.rowCount() > currThumb:
+            idx = self.thumbModel.indexFromItem(self.thumbModel.item(currThumb))
+            if self.viewport().rect().contains(self.visualRect(idx)):
+                print "thumbnail found"
+                return idx.row()
+            currThumb =- 1
+
+        return -1
 
     def isThumbVisible(self, idx):
         """
         :param idx:
         :return:
         """
+        print "is thumbnail "+str(idx)+" visible"
 
     def updateThumbsCount(self):
         """
@@ -154,11 +183,13 @@ class thumbView(QtGui.QListView):
         """
         :return:
         """
+        print "update thumbnail selection"
 
     def loadPrepare(self):
         """
         :return:
         """
+        print "preparing to load thumbnails"
         thumbAspect = 1.33
         thumbHeight = self.thumbSize * thumbAspect
         thumbWidth = self.thumbSize * thumbAspect
@@ -174,7 +205,7 @@ class thumbView(QtGui.QListView):
         self.loadPrepare()
         self.initThumbs()
         self.updateThumbsCount()
-        self.loadVisibleThumbs()
+        self.loadVisibleThumbs(0)
 
     def initThumbs(self):
 
