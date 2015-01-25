@@ -145,15 +145,19 @@ class fbWindow(QtGui.QMainWindow):
 
         self.goBackAction = QtGui.QAction("Back", self)
         self.goBackAction.setIcon(QtGui.QIcon(str(self.imgDirectory+"back.png")))
+        self.goBackAction.triggered.connect(lambda:self.goBack())
 
         self.goFrwdAction = QtGui.QAction("Forward", self)
         self.goFrwdAction.setIcon(QtGui.QIcon(str(self.imgDirectory+"next.png")))
+        self.goFrwdAction.triggered.connect(lambda:self.goForward())
 
         self.goUpAction = QtGui.QAction("Up", self)
         self.goUpAction.setIcon(QtGui.QIcon(str(self.imgDirectory+"up.png")))
+        self.goUpAction.triggered.connect(lambda:self.goUp())
 
         self.goHomeAction = QtGui.QAction("Home", self)
         self.goHomeAction.setIcon(QtGui.QIcon(str(self.imgDirectory+"home.png")))
+        self.goHomeAction.triggered.connect(lambda:self.goHome())
 
         self.slideShowAction = QtGui.QAction("Slide Show", self)
         self.slideShowAction.setIcon(QtGui.QIcon(str(self.imgDirectory+"play.png")))
@@ -318,10 +322,67 @@ class fbWindow(QtGui.QMainWindow):
 
         self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.bmDock)
 
+    def refreshThumbs(self, scrollToTop):
+        self.thumbView.setNeedScroll(scrollToTop)
+        QtCore.QTimer.singleShot(0, self.reloadThumbsSlot())
+
+    def about(self):
+        print " displaying about message"
+
     def thumbsZoomIn(self):
         print "Enlarge Thumbs"
         self.thumbView.thumbSize += 50
 
+    def goTo(self, path):
+        print str("going to QDir "+path)
+        self.fsTree.setCurrentIndex(self.fsTree.fsModel.index(path))
+        self.thumbView.currentViewDir = path
+        # this is not the right directory, just trying to get this to work
+        self.thumbView.thumbsDir.setPath(self.path)
+        self.refreshThumbs(True)
+
+    def goSelectedDir(self):
+        print "go to the directory selected in the tree widget"
+
+    def goPathBarDir(self):
+        print "go to the directory indicated by the path bar"
+
+    def bookmarkClicked(self):
+        print "bookmark selected"
+
+    def setThumbsFilter(self):
+        print "setting thumbnails filter"
+
+    def clearThumbsFilter(self):
+        print "clearing thumbnails filter"
+
+    def goBack(self):
+        print "go back one directory"
+
+    def goForward(self):
+        print "go forward one directory"
+
+    def goUp(self):
+        print " go up one directory"
+
+    def goHome(self):
+        print " goto home directory"
+        self.goTo(QtCore.QDir.homePath())
+
+    def selectCurrentViewDir(self):
+        print "selecting currently viewed directory"
+
+    def checkDirState(self):
+        print "checking directory state"
+
+    def recordHistory(self):
+        print "record History"
+
+    def reloadThumbsSlot(self):
+        #if self.thumbView.busy:
+        self.thumbView.abort()
+        #    QtCore.QTimer.singleShot(0,self.reloadThumbsSlot())
+        self.thumbView.load()
 
 def fbWinInit():
     myWindow = fbWindow()

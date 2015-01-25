@@ -30,10 +30,19 @@ class thumbView(QtGui.QListView):
         self.scrollbar.setValue = 0
         self.scrollbar.valueChanged.connect(lambda:self.loadVisibleThumbs( self.scrollbar.value()))
 
+        self.lastScrollBarValue = 0
+
         self.thumbSize = 100
+        self.busy = True
+
+        self.abortOp = False
+        self.isNeedScroll = False
 
         self.thumbsDir = QtCore.QDir()
         #self.fileFilters = QtCore.QStringList
+
+    def setNeedScroll(self, needScroll):
+        isneedScroll = needScroll
 
     def setThumbColors(self):
         self.bgColor = QtCore.QString("background: rgb(%1, %2, %3)")
@@ -104,10 +113,16 @@ class thumbView(QtGui.QListView):
 
         self.updateThumbSelection()
 
+    def startDrag(self, dropActions):
+        print "starting drag action"
+
+    def abort(self):
+        self.abortOp = True
+
     def loadVisibleThumbs(self, scrollbarValue):
         #print "scrollbar moved"
 
-        self.lastScrollBarValue = 0
+
 
         #if gdata.thumbsLayout == "Compact":
         # scrolledForward = True
@@ -199,6 +214,8 @@ class thumbView(QtGui.QListView):
 
         #self.thumbsDir.setPath(self.currentViewDir)
         self.thumbModel.clear()
+
+        self.abortOp = False
 
     def load(self):
 
