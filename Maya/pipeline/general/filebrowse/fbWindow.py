@@ -123,6 +123,7 @@ class fbWindow(QtGui.QMainWindow):
 
         self.thumbsZoomOutAct = QtGui.QAction("Shrink Thumbnails", self)
         self.thumbsZoomOutAct.setIcon(QtGui.QIcon(str(self.imgDirectory+"zoom_out.png")))
+        self.thumbsZoomOutAct.triggered.connect(lambda: self.thumbsZoomOut())
 
         self.cutAction = QtGui.QAction("Cut", self)
         self.cutAction.setIcon(QtGui.QIcon(str(self.imgDirectory+"cut.png")))
@@ -310,6 +311,8 @@ class fbWindow(QtGui.QMainWindow):
 
         #Context Menu
 
+        self.fsTree.clicked.connect(lambda: self.goSelectedDir())
+
     def createBookmarks(self):
         print "creating bookmarks window"
         import pipeline.general.filebrowse.bookmarks as bm
@@ -324,25 +327,38 @@ class fbWindow(QtGui.QMainWindow):
 
     def refreshThumbs(self, scrollToTop):
         self.thumbView.setNeedScroll(scrollToTop)
-        QtCore.QTimer.singleShot(0, self.reloadThumbsSlot())
+        QtCore.QTimer.singleShot(0, lambda: self.reloadThumbsSlot())
 
     def about(self):
         print " displaying about message"
 
     def thumbsZoomIn(self):
         print "Enlarge Thumbs"
-        self.thumbView.thumbSize += 50
+        #if self.thumbView.thumbSize < self.ThumbMaxSize:
+        self.thumbView.thumbSize += 25
+        self.thumbsZoomInAct.setEnabled(True)
+        # check the thumbs to make sure we don't go over the max size
+        #if self.thumbView.thumbSize == self.ThumbMaxSize:
+        #    self.thumbsZoomInAct.setEnabled(False)
+        self.refreshThumbs(False)
+
+    def thumbsZoomOut(self):
+        print "shrink Thumbs"
+        #if self.thumbView.thumbSize < self.ThumbMinSize:
+        self.thumbView.thumbSize -= 25
+        self.thumbsZoomOutAct.setEnabled(True)
+        # check the thumbs to make sure we don't go over the max size
+        #if self.thumbView.thumbSize == self.ThumbMinSize:
+        #    self.thumbsZoomOutAct.setEnabled(False)
+        self.refreshThumbs(False)
 
     def goTo(self, path):
         print str("going to QDir "+path)
         self.fsTree.setCurrentIndex(self.fsTree.fsModel.index(path))
         self.thumbView.currentViewDir = path
         # this is not the right directory, just trying to get this to work
-        self.thumbView.thumbsDir.setPath(self.path)
+        self.thumbView.thumbsDir.setPath(path)
         self.refreshThumbs(True)
-
-    def goSelectedDir(self):
-        print "go to the directory selected in the tree widget"
 
     def goPathBarDir(self):
         print "go to the directory indicated by the path bar"
@@ -381,8 +397,25 @@ class fbWindow(QtGui.QMainWindow):
     def reloadThumbsSlot(self):
         #if self.thumbView.busy:
         self.thumbView.abort()
-        #    QtCore.QTimer.singleShot(0,self.reloadThumbsSlot())
+        # QtCore.QTimer.singleShot(0,self.reloadThumbsSlot())
         self.thumbView.load()
+
+    def getSelectedPath(self):
+        logging.info("getting the path selected in fsTree")
+        selectedDirs = self.fsTree.selectionModel().selectedRows()
+        if selectedDirs.size() && selectedDirs[0].isValid():
+            dirInfo = QtCore.QFileInfo(self.fsTree.fsModel.filePath(selectedDirs[0]))
+            return dirInfo.absoluteFilePath()
+        else:
+            return ""
+
+    def goSelectedDir(self):
+        logging.info("go to the directory selected in the tree widget")
+        self.thumbView.setNeedScroll(True)
+        selectedPath = self.getSelectedPath()
+        self.thumbView.currentViewDir = selectedPath
+        self.thumbView.thumbsDir.setPath(selectedPath)
+        self.refreshThumbs(True)
 
 def fbWinInit():
     myWindow = fbWindow()

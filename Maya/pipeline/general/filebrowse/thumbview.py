@@ -228,6 +228,7 @@ class thumbView(QtGui.QListView):
 
         self.thumbFileInfoList = self.thumbsDir.entryInfoList()
          #print self.thumbFileInfoList
+        print "current Path :"+str(self.thumbsDir.currentPath)
         for thumbFileInfo in self.thumbFileInfoList:
             thumbIitem = QtGui.QStandardItem()
             #thumbIitem.setText(str(thumbFileInfo))
