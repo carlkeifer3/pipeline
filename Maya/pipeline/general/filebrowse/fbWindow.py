@@ -403,7 +403,7 @@ class fbWindow(QtGui.QMainWindow):
     def getSelectedPath(self):
         logging.info("getting the path selected in fsTree")
         selectedDirs = self.fsTree.selectionModel().selectedRows()
-        if selectedDirs.size() && selectedDirs[0].isValid():
+        if selectedDirs[0].isValid():
             dirInfo = QtCore.QFileInfo(self.fsTree.fsModel.filePath(selectedDirs[0]))
             return dirInfo.absoluteFilePath()
         else:
