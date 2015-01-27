@@ -40,8 +40,7 @@ class GData():
     slideShowDelay = 0
     slideShowRandom = False
     slideShowActive = False
-    # not sure how to do this, work it out.
-    #actionKeys = QtCore.QMap.
+    actionKeys = QtCore.QMap()
     hueVal = 0
     saturationVal = 0
     lightnessVal = 0
@@ -60,17 +59,16 @@ class GData():
     includeSubFolders = False
     showHiddenFiles = False
     imageToolbarFullScreen = False
-    # more QMaps, I should get to it
-    #externalApps = QtCore.Qmap()
+    externalApps = QtCore.QMap()
     bookmarkPaths = QtCore.QSet()
     reverseMouseBehavior = False
-    # not sure if this is right either
-    #copyCutIdxList = QtCore.QStringList()
+    copyCutIdxList = QtCore.QStringList()
     copyOp = False
-    #copyCutFileList = QtCore.QStringList()
+    copyCutFileList = QtCore.QStringList()
     isFullScreen = False
     dialogLastX = 0
     dialogLastY = 0
+    # I don't know what this is.
     #startupDir StartupDir
     specifiedStartDir = QtCore.QString()
     enableImageInfoFS = False

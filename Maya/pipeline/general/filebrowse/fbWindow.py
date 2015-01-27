@@ -408,31 +408,40 @@ class fbWindow(QtGui.QMainWindow):
         print "Toggle Full Screen Mode"
 
     def selectAllThumbs(self):
-        print "selecting all thumbs"
+        logging.info("selecting all thumbs")
         self.thumbView.selectAll()
 
     def copyOrCutThumbs(self, copy):
-        print "copy or cut thumbs"
+        logging.info("copy or cut thumbs")
         self.GData.copyCutIdxList = self.thumbView.selectionModel().selectedIndexes()
+        copyCutCount = self.GData.copyCutIdxList.size()
+        self.GData.copyCutIdxList.clear()
+        i = 0
+        while i < copyCount:
+            self.GData.copyCutFileList.append(self.thumbView.thumbModel.item(self.GData.copyCutFileList[i].row()).data(self.thumbView.FileNameRole).toString())
+            i+=1
         self.GData.copyOp = copy
         self.pasteAction.setEnabled(True)
 
     def cutThumbs(self):
-        print "cut Thumb to clipboard"
+        logging.info("cut Thumb to clipboard")
         self.copyOrCutThumbs(False)
 
     def copyThumbs(self):
-        print "copy thumb to clipboard"
+        logging.info("copy thumb to clipboard")
         self.copyOrCutThumbs(True)
 
     def copyImagesTo(self):
-        print "copy images to"
+        logging.info("copy images to")
+        self.copyMoveImages(False)
 
     def moveImagesTo(self):
-        print "moving images to"
+        logging.info("moving images to")
+        self.copyMoveImages(True)
 
-    def copyMoveImages(self):
+    def copyMoveImages(self, move):
         print "copy or move images"
+
 
     def thumbsZoomIn(self):
         print "Enlarge Thumbs"
@@ -579,7 +588,7 @@ class fbWindow(QtGui.QMainWindow):
         print " go up one directory"
 
     def goHome(self):
-        print " goto home directory"
+        loggin.info(" goto home directory")
         self.goTo(QtCore.QDir.homePath())
 
     def setCopyCutActions(self):
@@ -595,9 +604,9 @@ class fbWindow(QtGui.QMainWindow):
         print "Writing Settings"
 
     def readSettings(self):
-        print "Reading Settings"
-        initComplete = False
-        needThumbsRefresh = False
+        logging.info("Reading Settings")
+        self.initComplete = False
+        self.needThumbsRefresh = False
 
         if self.GData.appSettings.contains("thumbsZoomVal"):
             self.resize(800,600)
@@ -655,6 +664,42 @@ class fbWindow(QtGui.QMainWindow):
         self.GData.flipH = False
         self.GData.flipV = False
         self.GData.defaultSaveQuality = self.GData.appSettings.value("defaultSaveQuality").toInt()
+        self.GData.noEnlargeSmallThumbs = self.GData.appSettings.value("noEnlargeSmallThumb").toBool()
+        self.GData.slideShowDelay = self.GData.appSettings.value("slideShowDelay").toInt()
+        self.GData.slideShowRandom = self.GData.appSettings.value("slideShowRandom").toBool()
+        self.GData.slideShowActive = False
+        self.editToolbarVisible = self.GData.appSettings.value("editToolBarVisible").toBool()
+        self.goToolBarVisible = self.GData.appSettings.value("goToolBarVisible").toBool()
+        self.viewToolBarVisible = self.GData.appSettings.value("viewToolBarVisible").toBool()
+        self.imageToolBarVisible = self.GData.appSettings.value("imageToolBarVisible").toBool()
+        self.GData.fsDockVisible = self.GData.appSettings.value("fsDockVisible").toBool()
+        self.GData.bmDockVisible = self.GData.appSettings.value("bmDockVisible").toBool()
+        self.GData.iiDockVisible = self.GData.appSettings.value("iiDockVisible").toBool()
+        self.GData.pvDockVisible = self.GData.appSettings.value("pvDockVisible").toBool()
+        self.GData.startupDir = self.GData.appSettings.value("startupDir").toInt()
+        self.GData.specifiedStartDir = self.GData.appSettings.value("specifiedStartDir").toString()
+        self.GData.thumbsBackImage = self.GData.appSettings.value("thumbsBackImage").toString()
+        self.GData.enableImageInfoFS = self.GData.appSettings.value("enableImageInfoFS").toBool()
+        self.GData.showLabels = self.GData.appSettings.value("showLabels").toBool()
+        self.GData.smallIcons = self.GData.appSettings.value("smallIcons").toBool()
+        self.GData.LockDocks = self.GData.appSettings.value("LockDocks").toBool()
+        self.GData.imageToolbarFullScreen = self.GData.appSettings.value("imageToolbarFullScreen").toBool()
+
+        #self.GData.appSettings.beginGroup("externalApps")
+        #extApps = self.GData.appSettings.childKeys()
+        #i = 0
+        #while i < extApps.size():
+        #    self.GData.externalApps[extApps.at(i)] = self.GData.appSettings.value(extApps.at(i).toString())
+        #    i +=1
+        #self.GData.appSettings.endGroup()
+
+        #self.GData.appSettings.beginGroup("CopyMoveToPaths")
+        #paths = self.GData.appSettings.childKeys()
+        #i = 0
+        #while i < paths.size():
+        #    self.GData.bookmarkPaths.insert(self.GData.appSettings.value(paths.at(i).toString()))
+        #    i +=1
+        #self.GData.appSettings.endGroup()
 
 
     def setupDocks(self):
