@@ -9,6 +9,7 @@ from PyQt4 import QtGui, QtCore
 import sip
 import maya.OpenMayaUI as apiUI
 import pipeline.general.filebrowse.thumbview as tv
+import pipeline.general.filebrowse.GData as g
 
 def getMayaWindow():
     ptr = apiUI.MQtUtil.mainWindow()
@@ -28,12 +29,15 @@ class fbWindow(QtGui.QMainWindow):
         # initialize the QWidget
         QtGui.QWidget.__init__(self, parent)
 
+        self.GData = g.GData()
+
+        self.GData.appSettings = QtCore.QSettings("photonic", "photonic_103")
+
         # locate the directory where all of the images for the ui live
         ScriptDir = pm.internalVar(uad=True)
         self.imgDirectory = str(ScriptDir+"/scripts/pipeline/general/filebrowse/images/")
 
         self.setObjectName("FileBrowser")
-        self.resize(810, 460)
         self.fbLayout = QtGui.QHBoxLayout(self)
         #self.fbLayout.addStretch(1)
         #self.fbLayout.setContentsMargins(0,0,0,0)
@@ -48,7 +52,7 @@ class fbWindow(QtGui.QMainWindow):
         self.needHistory = True
         self.interfaceDisabled = False
 
-        #self.readSettings()
+        self.readSettings()
         self.createThumbView()
         self.createActions()
         self.createMenus()
@@ -407,14 +411,19 @@ class fbWindow(QtGui.QMainWindow):
         print "selecting all thumbs"
         self.thumbView.selectAll()
 
-    def copyOrCutThumbs(self):
+    def copyOrCutThumbs(self, copy):
         print "copy or cut thumbs"
+        self.gdata.copyCutIdxList = self.thumbView.selectionModel().selectedIndexes()
+        self.gdata.copyOp = copy
+        self.pasteAction.setEnabled(True)
 
     def cutThumbs(self):
         print "cut Thumb to clipboard"
+        self.copyOrCutThumbs(False)
 
     def copyThumbs(self):
         print "copy thumb to clipboard"
+        self.copyOrCutThumbs(True)
 
     def copyImagesTo(self):
         print "copy images to"
@@ -587,6 +596,12 @@ class fbWindow(QtGui.QMainWindow):
 
     def readSettings(self):
         print "Reading Settings"
+        initComplete = False
+        needThumbsRefresh = False
+
+        if self.GData.appSettings.contains("thumbsZoomVal"):
+            self.resize(800,600)
+            self.GData.appSettings.setValue("thumbsSortFlags", int(0))
 
     def setupDocks(self):
         print "setting up the docks"
