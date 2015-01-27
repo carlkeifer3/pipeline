@@ -28,12 +28,6 @@ class fbWindow(QtGui.QMainWindow):
         # initialize the QWidget
         QtGui.QWidget.__init__(self, parent)
 
-        # this is just for now, I want to use QDirectory
-        # preferred image locations like this will be
-        # captured in qsettings
-        self.path = "D:/bank/reference/"
-        self.directory = os.listdir(self.path)
-
         # locate the directory where all of the images for the ui live
         ScriptDir = pm.internalVar(uad=True)
         self.imgDirectory = str(ScriptDir+"/scripts/pipeline/general/filebrowse/images/")
@@ -76,14 +70,21 @@ class fbWindow(QtGui.QMainWindow):
         """
         cliImageLoaded = False
 
-    def event(self):
-        print "event"
+#    def event(self, event):
+#        print "event"
+#        # this is really messed up
+#        # also the C++ code has a recursive call
+#        #if event.type() == QtCore.QEvent.ActivationChange():
+#        #    print "activation change"
+#
+#        # do not run this, its in the C++ code but python doesn't like it
+#        # return self.event(event)
+#        return event
 
     def createThumbView(self):
         import pipeline.general.filebrowse.thumbview as tv
 
         self.thumbView = tv.thumbView(self)
-        self.thumbView.thumbsDir.setPath(self.path)
         self.thumbView.load()
         print "thumbview should be built"
         self.fbLayout.addWidget(self.thumbView)
@@ -375,6 +376,55 @@ class fbWindow(QtGui.QMainWindow):
     def about(self):
         print " displaying about message"
 
+    def filterImagesFocus(self):
+        print "filtering ImagesFocus"
+
+    def setPathFocus(self):
+        print "setting Path Focus"
+
+    def cleanupSender(self):
+        print "cleanup Sender"
+
+    def externalAppError(self):
+        print "External Applications error"
+
+    def runExternalApp(self):
+        print "Running external Application"
+
+    def updateExternalApps(self):
+        print "updating External Application"
+
+    def chooseExternalApp(self):
+        print "Choose External Application"
+
+    def showSettings(self):
+        print "show settings"
+
+    def toggleFullScreen(self):
+        print "Toggle Full Screen Mode"
+
+    def selectAllThumbs(self):
+        print "selecting all thumbs"
+        self.thumbView.selectAll()
+
+    def copyOrCutThumbs(self):
+        print "copy or cut thumbs"
+
+    def cutThumbs(self):
+        print "cut Thumb to clipboard"
+
+    def copyThumbs(self):
+        print "copy thumb to clipboard"
+
+    def copyImagesTo(self):
+        print "copy images to"
+
+    def moveImagesTo(self):
+        print "moving images to"
+
+    def copyMoveImages(self):
+        print "copy or move images"
+
     def thumbsZoomIn(self):
         print "Enlarge Thumbs"
         #if self.thumbView.thumbSize < self.ThumbMaxSize:
@@ -395,12 +445,107 @@ class fbWindow(QtGui.QMainWindow):
         #    self.thumbsZoomOutAct.setEnabled(False)
         self.refreshThumbs(False)
 
+    def zoomOut(self):
+        print "zooming out"
+
+    def zoomIn(self):
+        print "zooming In"
+
+    def resetZoom(self):
+        print "resetting zoom"
+
+    def origZoom(self):
+        print "original size"
+
+    def keepZoom(self):
+        print "keep zoom"
+
+    def keepTransformClicked(self):
+        print "keep transform clicked"
+
+    def rotateLeft(self):
+        print "rotating left"
+
+    def rotateRight(self):
+        print "rotate right"
+
+    def flipVert(self):
+        print "filipping Vertically"
+
+    def flipHoiz(self):
+        print "flipping Hoizontally"
+
+    def cropImage(self):
+        print "cropping Image"
+
+    def scaleImage(self):
+        print "scaling Image"
+
+    def freeRotateLeft(self):
+        print "Free rotate left"
+
+    def freeRotateRight(self):
+        print "Free rotate Right"
+
+    def showColorsDialog(self):
+        print "Show colors dialog"
+
+    def moveRight(self):
+        print "moving Image Right"
+
+    def moveLeft(self):
+        print "moving Image Left"
+
+    def moveUp(self):
+        print "moving Image Up"
+
+    def moveDown(self):
+        print "moving Image Down"
+
+    def setMirrorDisabled(self):
+        print "setting mirroring as disabled"
+
+    def setMirrorDual(self):
+        print "setting Mirror to Dual"
+
+    def setMirrorTriple(self):
+        print "setting Mirror triple"
+
+    def setMirrorVDual(self):
+        print "set mirror V Dual"
+
+    def setMirrorQuad(self):
+        print "set mirror quad"
+
+    def isValidPath(self):
+        print "is this path Valid"
+
+    def pasteThumbs(self):
+        print "paste thumbnails"
+
+    def updateCurrentImage(self):
+        print "update current Image"
+
+    def deleteViewerImage(self):
+        print "deleteViewerImage"
+
+    def deleteOp(self):
+        print "Deleting"
+
     def goTo(self, path):
         print str("going to QDir "+path)
         self.fsTree.setCurrentIndex(self.fsTree.fsModel.index(path))
         self.thumbView.currentViewDir = path
         # this is not the right directory, just trying to get this to work
         self.thumbView.thumbsDir.setPath(path)
+        self.refreshThumbs(True)
+
+    def goSelectedDir(self):
+        logging.info("getting the directory selected in the tree widget")
+        self.thumbView.setNeedScroll(True)
+        selectedPath = self.getSelectedPath()
+        self.thumbView.currentViewDir = selectedPath
+        self.thumbView.thumbsDir.setPath(selectedPath)
         self.refreshThumbs(True)
 
     def goPathBarDir(self):
@@ -428,6 +573,141 @@ class fbWindow(QtGui.QMainWindow):
         print " goto home directory"
         self.goTo(QtCore.QDir.homePath())
 
+    def setCopyCutActions(self):
+        print "setting the cut and copy actions"
+
+    def changeActionsBySelection(self):
+        print "changing actions by selection"
+
+    def UpdateActions(self):
+        print "Updating Actions"
+
+    def writeSettings(self):
+        print "Writing Settings"
+
+    def readSettings(self):
+        print "Reading Settings"
+
+    def setupDocks(self):
+        print "setting up the docks"
+
+    def lockDocks(self):
+        print "locking all docked items"
+
+    def createPopupMenu(self):
+        print "creating popup menus"
+
+    def loadShortcuts(self):
+        print "loading shortcuts"
+
+    def closeEvent(self):
+        print "close Event"
+
+    def setStatus(self):
+        print "setting Status"
+
+    def mouseDoubleClickEvent(self):
+        print "mouse has been double clicked"
+
+    def mousePressEvent(self):
+        print "the mouse has been clicked"
+
+    def newImage(self):
+        print "creating a new Image"
+
+    def setDocksVisibility(self):
+        print "setting dock Visibility"
+
+    def openOp(self):
+        print "open operation"
+
+    def setEditToolBarVisibility(self):
+        print "setting the Edit Toolbar's visibility"
+
+
+    def setGoToolBarVisibility(self):
+        print "setting the Go Toolbar's Visibility"
+
+    def setViewToolBarVisibility(self):
+        print "setting the View Toolbar's Visibility"
+
+    def setImageToolBarVisibility(self):
+        print "setting the Image Toolbar's Visibility"
+
+    def setFsDockVisibility(self):
+        print "setting The File system Dock Visibility"
+
+    def setBmDockVisibility(self):
+        print "setting the Bookmark Dock Visibilty"
+
+    def setIiDockVisibility(self):
+        print "Setting the Thumbnail dock Visibility"
+
+    def setPvDockVisibility(self):
+        print "setting the Pv Dock Visibility"
+
+    def showViewer(self):
+        print "showing the Viewer"
+
+    def showBusyStatus(self):
+        print "Showing the Busy Status"
+
+    def loadImageFromThumb(self):
+        print "loading Image from thumbnail"
+
+    def updateViewerImageBySelection(self):
+        print "Updating Viewer image by selection"
+
+    def loadImagefromCli(self):
+        print "Loading Image from Cli"
+
+    def slideShow(self):
+        print "starting Slide show"
+
+    def slideShowHandler(self):
+        print "slide show handler"
+
+    def selectThumbsByRow(self):
+        print "selecting thumbs by row"
+
+    def loadNextImage(self):
+        print "Loading the next image"
+
+    def loadPrevImage(self):
+        print "Loading the previous image"
+
+    def loadFirstImage(self):
+        print "loading the first image"
+
+    def loadLastImage(self):
+        print "loading the last image"
+
+    def loadRandomImage(self):
+        print "loading a random image"
+
+    def selectRecentThumb(self):
+        print "selecting recent thumbnail"
+
+    def setViewerKeyEventsEnabled(self):
+        print "set viewer key events enabled"
+
+    def updateIndexByViewerImage(self):
+        print "update index by viewer image"
+
+    def hideViewer(self):
+        print "hide the viewer"
+
+    def goBottom(self):
+        print "Scroll Thumbnail view to the bottom"
+        self.thumbView.scrollToBottom()
+
+    def goTop(self):
+        print "Scroll Thumbnail view to the top"
+        self.thumbView.scrollToTop()
+
+    def dropOp(self):
+        print "drag item has been dropped"
+
     def selectCurrentViewDir(self):
         print "selecting currently viewed directory"
 
@@ -443,6 +723,21 @@ class fbWindow(QtGui.QMainWindow):
         # QtCore.QTimer.singleShot(0,self.reloadThumbsSlot())
         self.thumbView.load()
 
+    def setThumbViewWindowTitle(self):
+        print "set the thumbnail view window title"
+
+    def renameDir(self):
+        print "renaming directory"
+
+    def rename(self):
+        print "rename"
+
+    def deleteDir(self):
+        print "delete directory"
+
+    def createSubDirectory(self):
+        print "creating Sub Directory"
+
     def getSelectedPath(self):
         logging.info("getting the path selected in fsTree")
         selectedDirs = self.fsTree.selectionModel().selectedRows()
@@ -452,13 +747,35 @@ class fbWindow(QtGui.QMainWindow):
         else:
             return ""
 
-    def goSelectedDir(self):
-        logging.info("go to the directory selected in the tree widget")
-        self.thumbView.setNeedScroll(True)
-        selectedPath = self.getSelectedPath()
-        self.thumbView.currentViewDir = selectedPath
-        self.thumbView.thumbsDir.setPath(selectedPath)
-        self.refreshThumbs(True)
+    def wheelEvent(self):
+        print "mouse wheel event"
+
+    def showNewImageWarning(self):
+        print "showing a new Image Warning"
+
+    def removeDirOp(self):
+        print "removing directory Operation"
+
+    def cleanupCropDialog(self):
+        print "cleaning up the crop dialog"
+
+    def cleanupScaleDialog(self):
+        print "cleaning up the scale dialog"
+
+    def cleanupColorsDialog(self):
+        print "cleaning up the colors dialog"
+
+    def setInterfaceEnabled(self):
+        print "setting the interface to enabled"
+
+    def addNewBookmark(self):
+        print "adding a new bookmark"
+
+    def addBookmark(self):
+        print "adding bookmark"
+
+    def findDuplicateImages(self):
+        print "finding duplicate Images"
 
 def fbWinInit():
     myWindow = fbWindow()
