@@ -614,7 +614,7 @@ class fbWindow(QtGui.QMainWindow):
             self.GData.appSettings.setValue("zoomInFlags", 0)
             self.GData.appSettings.setValue("wrapImageList", False)
             self.GData.appSettings.setValue("exitInsteadOfClose", 0)
-            self.GData.appSettings.setValue("imageZoomFactor", float(1.0))
+            self.GData.appSettings.setValue("imageZoomFactor", 1.0)
             self.GData.appSettings.setValue("defaultSaveQuality", 100)
             self.GData.appSettings.setValue("noEnlargeSmallThumb", True)
             self.GData.appSettings.setValue("enableAnimations", True)
@@ -639,22 +639,22 @@ class fbWindow(QtGui.QMainWindow):
             self.GData.bookmarkPaths.insert(QtCore.QDir.homePath())
 
         self.GData.backgroundColor = self.GData.appSettings.value("backgroundColor")
-        self.GData.exitInsteadofClose = bool(self.GData.appSettings.value("exitInsteadOfClose"))
-        self.GData.enableAnimations = bool(self.GData.appSettings.value("enableAnimations"))
-        self.GData.exifRotationEnabled = bool(self.GData.appSettings.value("exifRotationEnabled"))
-        self.GData.exifThumbRotationEnabled = bool(self.GData.appSettings.value("exifThumbRotationEnabled"))
-        self.GData.reverseMouseBehavior = bool(self.GData.appSettings.value("reverseMouseBehavior"))
-        self.GData.showHiddenFiles = bool(self.GData.appSettings.value("showHiddenFiles"))
-        self.GData.wrapImageList = bool(self.GData.appSettings.value("wrapImageList"))
-        self.GData.imageZoomFactor = float(self.GData.appSettings.value("imageZoomFactor"))
-        self.GData.zoomOutFlags = int(self.GData.appSettings.value("zoomOutFlags"))
-        self.GData.zoomInFlags = int(self.GData.appSettings.value("zoomInFlags"))
+        self.GData.exitInsteadofClose = self.GData.appSettings.value("exitInsteadOfClose").toBool()
+        self.GData.enableAnimations = self.GData.appSettings.value("enableAnimations").toBool()
+        self.GData.exifRotationEnabled = self.GData.appSettings.value("exifRotationEnabled").toBool()
+        self.GData.exifThumbRotationEnabled = self.GData.appSettings.value("exifThumbRotationEnabled").toBool()
+        self.GData.reverseMouseBehavior = self.GData.appSettings.value("reverseMouseBehavior").toBool()
+        self.GData.showHiddenFiles = self.GData.appSettings.value("showHiddenFiles").toBool()
+        self.GData.wrapImageList = self.GData.appSettings.value("wrapImageList").toBool()
+        self.GData.imageZoomFactor = self.GData.appSettings.value("imageZoomFactor").toFloat()
+        self.GData.zoomOutFlags = self.GData.appSettings.value("zoomOutFlags").toInt()
+        self.GData.zoomInFlags = self.GData.appSettings.value("zoomInFlags").toInt()
         self.GData.rotation = 0
         self.GData.keepTransform = False
-        self.shouldMaximize = bool(self.GData.appSettings.value("shouldMaximize"))
+        self.shouldMaximize = self.GData.appSettings.value("shouldMaximize").toBool()
         self.GData.flipH = False
         self.GData.flipV = False
-        self.GData.defaultSaveQuality = self.GData.appSettings.value("defaultSaveQuality")
+        self.GData.defaultSaveQuality = self.GData.appSettings.value("defaultSaveQuality").toInt()
 
 
     def setupDocks(self):
