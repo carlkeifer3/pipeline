@@ -413,8 +413,8 @@ class fbWindow(QtGui.QMainWindow):
 
     def copyOrCutThumbs(self, copy):
         print "copy or cut thumbs"
-        self.gdata.copyCutIdxList = self.thumbView.selectionModel().selectedIndexes()
-        self.gdata.copyOp = copy
+        self.GData.copyCutIdxList = self.thumbView.selectionModel().selectedIndexes()
+        self.GData.copyOp = copy
         self.pasteAction.setEnabled(True)
 
     def cutThumbs(self):
@@ -602,6 +602,60 @@ class fbWindow(QtGui.QMainWindow):
         if self.GData.appSettings.contains("thumbsZoomVal"):
             self.resize(800,600)
             self.GData.appSettings.setValue("thumbsSortFlags", int(0))
+            self.GData.appSettings.setValue("thumbsZoomVal", 150)
+            self.GData.appSettings.setValue("isFullScreen", False)
+            self.GData.appSettings.setValue("backgroundColor", QtGui.QColor(25, 25, 25))
+            self.GData.appSettings.setValue("backgroundThumbColor", QtGui.QColor(200, 200, 200))
+            self.GData.appSettings.setValue("textThumbColor", QtGui.QColor(25, 25, 25))
+            self.GData.appSettings.setValue("thumbSpacing", 10)
+            self.GData.appSettings.setValue("thumbPagesReadahead", 2)
+            self.GData.appSettings.setValue("thumbsLayout", self.GData.thumbsLayout)
+            self.GData.appSettings.setValue("zoomOutFlags", 1)
+            self.GData.appSettings.setValue("zoomInFlags", 0)
+            self.GData.appSettings.setValue("wrapImageList", False)
+            self.GData.appSettings.setValue("exitInsteadOfClose", 0)
+            self.GData.appSettings.setValue("imageZoomFactor", float(1.0))
+            self.GData.appSettings.setValue("defaultSaveQuality", 100)
+            self.GData.appSettings.setValue("noEnlargeSmallThumb", True)
+            self.GData.appSettings.setValue("enableAnimations", True)
+            self.GData.appSettings.setValue("exifRotationEnabled", True)
+            self.GData.appSettings.setValue("referseMouseBehavior", False)
+            self.GData.appSettings.setValue("showHiddenFiles", False)
+            self.GData.appSettings.setValue("slideShowDelay", 5)
+            self.GData.appSettings.setValue("slideShowRandom", False)
+            self.GData.appSettings.setValue("editToolBarVisible", True)
+            self.GData.appSettings.setValue("goToolBarVisible", True)
+            self.GData.appSettings.setValue("viewToolBarVisible", True)
+            self.GData.appSettings.setValue("imageToolBarVisible", False)
+            self.GData.appSettings.setValue("fsDockVisible", True)
+            self.GData.appSettings.setValue("bmDockVisible", True)
+            self.GData.appSettings.setValue("iiDockVisible", True)
+            self.GData.appSettings.setValue("pvDockVisible", False)
+            self.GData.appSettings.setValue("enableImageInfoFS", False)
+            self.GData.appSettings.setValue("showLabels", True)
+            self.GData.appSettings.setValue("smallIcons", False)
+            self.GData.appSettings.setValue("LockDocks", True)
+            self.GData.appSettings.setValue("imageToolbarFullScreen", False)
+            self.GData.bookmarkPaths.insert(QtCore.QDir.homePath())
+
+        self.GData.backgroundColor = self.GData.appSettings.value("backgroundColor")
+        self.GData.exitInsteadofClose = bool(self.GData.appSettings.value("exitInsteadOfClose"))
+        self.GData.enableAnimations = bool(self.GData.appSettings.value("enableAnimations"))
+        self.GData.exifRotationEnabled = bool(self.GData.appSettings.value("exifRotationEnabled"))
+        self.GData.exifThumbRotationEnabled = bool(self.GData.appSettings.value("exifThumbRotationEnabled"))
+        self.GData.reverseMouseBehavior = bool(self.GData.appSettings.value("reverseMouseBehavior"))
+        self.GData.showHiddenFiles = bool(self.GData.appSettings.value("showHiddenFiles"))
+        self.GData.wrapImageList = bool(self.GData.appSettings.value("wrapImageList"))
+        self.GData.imageZoomFactor = float(self.GData.appSettings.value("imageZoomFactor"))
+        self.GData.zoomOutFlags = int(self.GData.appSettings.value("zoomOutFlags"))
+        self.GData.zoomInFlags = int(self.GData.appSettings.value("zoomInFlags"))
+        self.GData.rotation = 0
+        self.GData.keepTransform = False
+        self.shouldMaximize = bool(self.GData.appSettings.value("shouldMaximize"))
+        self.GData.flipH = False
+        self.GData.flipV = False
+        self.GData.defaultSaveQuality = self.GData.appSettings.value("defaultSaveQuality")
+
 
     def setupDocks(self):
         print "setting up the docks"
