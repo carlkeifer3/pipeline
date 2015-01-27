@@ -21,6 +21,7 @@ class FSTree(QtGui.QTreeView):
         self.fsModel = QtGui.QFileSystemModel(self)
         self.fsModel.setRootPath("")
         #self.setModelFlags()
+        self.fsModel.setFilter(QtCore.QDir.AllDirs|QtCore.QDir.NoDotAndDotDot)
 
         self.setModel(self.fsModel)
 

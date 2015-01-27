@@ -76,10 +76,8 @@ class fbWindow(QtGui.QMainWindow):
         """
         cliImageLoaded = False
 
-
-    #def event(self, QtCore.QEvent()):
-    #    """
-    #    """
+    def event(self):
+        print "event"
 
     def createThumbView(self):
         import pipeline.general.filebrowse.thumbview as tv
@@ -110,6 +108,7 @@ class fbWindow(QtGui.QMainWindow):
 
         :return:
         """
+        print "createImageView()"
 
     def createActions(self):
         """
@@ -127,22 +126,32 @@ class fbWindow(QtGui.QMainWindow):
 
         self.cutAction = QtGui.QAction("Cut", self)
         self.cutAction.setIcon(QtGui.QIcon(str(self.imgDirectory+"cut.png")))
+        self.cutAction.triggered.connect(lambda: self.cutThumbs())
 
         self.copyAction = QtGui.QAction("Copy", self)
         self.copyAction.setIcon(QtGui.QIcon(str(self.imgDirectory+"copy.png")))
-
+        self.copyAction.triggered.connect(lambda: self.copyThumbs())
 
         self.deleteAction = QtGui.QAction("Delete", self)
         self.deleteAction.setIcon(QtGui.QIcon(str(self.imgDirectory+"delete.png")))
+        self.deleteAction.triggered.connect(lambda: self.deleteOp())
+
+        # missing a bunch of actions here should add it to a ticket
 
         self.refreshAction = QtGui.QAction("Reload", self)
         self.refreshAction.setIcon(QtGui.QIcon(str(self.imgDirectory+"refresh.png")))
+        self.refreshAction.triggered.connect(lambda: self.reload())
 
         self.subFoldersAction = QtGui.QAction("Include Sub-Folders", self)
         self.subFoldersAction.setIcon(QtGui.QIcon(str(self.imgDirectory+"tree.png")))
+        self.subFoldersAction.setCheckable(True)
+        self.subFoldersAction.triggered.connect(lambda: self.setIncludeSubFolders())
 
         self.pasteAction = QtGui.QAction("Paste Here", self)
         self.pasteAction.setIcon(QtGui.QIcon(str(self.imgDirectory+"paste.png")))
+        self.pasteAction.triggered.connect(lambda: self.pasteThumbs())
+
+        # missing createDirAction
 
         self.goBackAction = QtGui.QAction("Back", self)
         self.goBackAction.setIcon(QtGui.QIcon(str(self.imgDirectory+"back.png")))
@@ -163,8 +172,14 @@ class fbWindow(QtGui.QMainWindow):
         self.slideShowAction = QtGui.QAction("Slide Show", self)
         self.slideShowAction.setIcon(QtGui.QIcon(str(self.imgDirectory+"play.png")))
 
+        #missing actions
+
         self.showClipboardAction = QtGui.QAction("Load Clipboard", self)
         self.showClipboardAction.setIcon(QtGui.QIcon(str(self.imgDirectory+"new.png")))
+        self.showClipboardAction.triggered.connect(lambda: self.newImage())
+
+        # missing several
+
 
     def createMenus(self):
         """
@@ -325,9 +340,37 @@ class fbWindow(QtGui.QMainWindow):
 
         self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.bmDock)
 
+    def sortThumbnails(self):
+        print "sorting thumbnails"
+
+    def reload(self):
+        print "reload"
+
+    def setIncludeSubFolders(self):
+        print "set Include SubFolders"
+
     def refreshThumbs(self, scrollToTop):
+        print "refresh Thumbs"
         self.thumbView.setNeedScroll(scrollToTop)
         QtCore.QTimer.singleShot(0, lambda: self.reloadThumbsSlot())
+
+    def setClassicThumbs(self):
+        print "setting classic thumbs view"
+
+    def setCompactThumbs(self):
+        print "setting compact thumbs view"
+
+    def setSquareishThumbs(self):
+        print "setting Square thumbs view"
+
+    def showHiddenFiles(self):
+        print "showing hidden files"
+
+    def toggleImageToolbar(self):
+        print "toggling Image Toolbar"
+
+    def showLabels(self):
+        print "showing Labels"
 
     def about(self):
         print " displaying about message"
