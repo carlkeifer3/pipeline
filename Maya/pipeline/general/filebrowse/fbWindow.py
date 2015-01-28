@@ -208,6 +208,53 @@ class fbWindow(QtGui.QMainWindow):
         self.actType.triggered.connect(lambda: self.sortThumbnails())
         self.actReverse.triggered.connect(lambda: self.sortThumbnails())
 
+        #if self.thumbView.thumbsSortFlags & QDir.time:
+        #    self.actTime.setChecked(True)
+        #elif self.thumbView.thumbsSortFlags & Qdir.Size:
+        #    self.actSize.setChecked(True)
+        #elif self.thumbView.thumbsSortFlags & QDir.Type:
+        #    self.actType.setChecked(True)
+        #else:
+        #    self.actName.setChecked(True)
+        #self.actReverse.setChecked(self.thumbView.thumbsSortFlags & QDir.reversed)
+
+        self.actShowHidden = QtGui.QAction("Show Hidden Files", self)
+        self.actShowHidden.setCheckable(True)
+        self.actShowHidden.setChecked(self.GData.showHiddenFiles)
+        self.actShowHidden.triggered.connect(lambda: self.showHiddenFiles())
+
+        self.actShowLabels = QtGui.QAction("Show Labels", self)
+        self.actShowLabels.setCheckable(True)
+        self.actShowLabels.setChecked(self.GData.showLabels)
+        self.actShowLabels.triggered.connect(lambda: self.showLabels())
+
+        self.actSmallIcons = QtGui.QAction("Small Icons", self)
+        self.actSmallIcons.setCheckable(True)
+        self.actSmallIcons.setChecked(self.GData.smallIcons)
+
+        self.actLockDocks = QtGui.QAction("Hide Docks Title Bar", self)
+        self.actLockDocks.setCheckable(True)
+        self.actLockDocks.setChecked(self.GData.LockDocks)
+        self.actLockDocks.triggered.connect(lambda: self.lockDocks())
+
+        self.actShowViewerToolbars = QtGui.QAction("Show Toolbar", self)
+        self.actShowViewerToolbars.setCheckable(True)
+        self.actShowViewerToolbars.setChecked(self.GData.imageToolbarFullScreen)
+        self.actShowViewerToolbars.triggered.connect(lambda: self.toggleImageToolbar())
+
+        # Thumbnail view actions
+        self.actClassic = QtGui.QAction("Classic Thumbs", self)
+        self.actCompact = QtGui.QAction("Compact", self)
+        self.actSquarish = QtGui.QAction("Squarish", self)
+        self.actClassic.triggered.connect(lambda: self.setClassicThumbs())
+        self.actCompact.triggered.connect(lambda: self.setCompactThumbs())
+        self.actSquarish.triggered.connect(lambda: self.setSquareishThumbs())
+        self.actClassic.setCheckable(True)
+        self.actCompact.setCheckable(True)
+        self.actSquarish.setCheckable(True)
+        #self.actClassic.setChecked(self.GData.thumbsLayout == self.thumbView.Classic)
+        #self.actCompact.setChecked(self.GData.thumbsLayout == self.thumbView.Compact)
+        #self.actSquarish.setChecked(self.GData.thumbsLayout == self.thumbView.Squares)
 
         self.refreshAction = QtGui.QAction("Reload", self)
         self.refreshAction.setIcon(QtGui.QIcon(str(self.imgDirectory+"refresh.png")))
@@ -222,7 +269,9 @@ class fbWindow(QtGui.QMainWindow):
         self.pasteAction.setIcon(QtGui.QIcon(str(self.imgDirectory+"paste.png")))
         self.pasteAction.triggered.connect(lambda: self.pasteThumbs())
 
-        # missing createDirAction
+        self.createDirAction = QtGui.QAction("New Folder", self)
+        self.createDirAction.setIcon(QtGui.QIcon(str(self.imgDirectory+"new_Folder.png")))
+        self.createDirAction.triggered.connect(lambda: self.createSubDirectory())
 
         self.goBackAction = QtGui.QAction("Back", self)
         self.goBackAction.setIcon(QtGui.QIcon(str(self.imgDirectory+"back.png")))
@@ -243,14 +292,143 @@ class fbWindow(QtGui.QMainWindow):
         self.slideShowAction = QtGui.QAction("Slide Show", self)
         self.slideShowAction.setIcon(QtGui.QIcon(str(self.imgDirectory+"play.png")))
 
-        #missing actions
+        self.nextImageAction = QtGui.QAction("Next", self)
+        self.nextImageAction.setIcon(QtGui.QIcon(str(self.imgDirectory+"Next.png")))
+        self.nextImageAction.triggered.connect(lambda: self.loadNextImage())
+
+        self.prevImageAction = QtGui.QAction("Previous", self)
+        self.prevImageAction.setIcon(QtGui.QIcon(str(self.imgDirectory+"back.png")))
+        self.prevImageAction.triggered.connect(lambda: self.loadPrevImage())
+
+        self.firstImageAction = QtGui.QAction("First", self)
+        self.firstImageAction.setIcon(QtGui.QIcon(str(self.imgDirectory+"first.png")))
+        self.firstImageAction.triggered.connect(lambda: self.loadFirstImage())
+
+        self.lastImageAction = QtGui.QAction("Last", self)
+        self.lastImageAction.setIcon(QtGui.QIcon(str(self.imgDirectory+"last.png")))
+        self.lastImageAction.triggered.connect(lambda: self.loadLastImage())
+
+        self.randomImageAction = QtGui.QAction("Random", self)
+        self.randomImageAction.triggered.connect(lambda: self.loadRandomImage())
+
+        self.openAction = QtGui.QAction("Open", self)
+        self.openAction.setIcon(QtGui.QIcon(str(self.imgDirectory+"open.png")))
+        self.openAction.triggered.connect(lambda: self.openOp())
 
         self.showClipboardAction = QtGui.QAction("Load Clipboard", self)
         self.showClipboardAction.setIcon(QtGui.QIcon(str(self.imgDirectory+"new.png")))
         self.showClipboardAction.triggered.connect(lambda: self.newImage())
 
-        # missing several
+        self.openWithSubMenu = QtGui.QMenu("Open With")
+        self.openWithMenuAct = QtGui.QAction("Open With", self)
+        self.openWithMenuAct.setMenu(self.openWithSubMenu)
+        self.chooseAppAct = QtGui.QAction("Manage External Applications", self)
+        self.chooseAppAct.triggered.connect(lambda: self.chooseExternalApp())
 
+        self.addBookmarkAction = QtGui.QAction("Add Bookmark", self)
+        self.addBookmarkAction.setIcon(QtGui.QIcon(str(self.imgDirectory+"new_Bookmark.png")))
+        self.addBookmarkAction.triggered.connect(lambda: self.addNewBookmark())
+
+        self.removeBookmarkAction = QtGui.QAction("Remove Bookmark", self)
+        self.removeBookmarkAction.setIcon(QtGui.QIcon(str(self.imgDirectory+"delete.png")))
+
+        self.zoomOutAct = QtGui.QAction("Zoom Out", self)
+        self.zoomOutAct.setIcon(QtGui.QIcon(str(self.imgDirectory+"zoom_out.png")))
+        self.zoomOutAct.triggered.connect(lambda: self.zoomOut())
+
+        self.zoomInAct = QtGui.QAction("Zoom In", self)
+        self.zoomInAct.setIcon(QtGui.QIcon(str(self.imgDirectory+"Zoom_in.png")))
+        self.zoomInAct.triggered.connect(lambda: self.zoomIn())
+
+        self.resetZoomAct = QtGui.QAction("Reset Zoom", self)
+        self.resetZoomAct.setIcon(QtGui.QIcon(str(self.imgDirectory+"zoom.png")))
+        self.resetZoomAct.triggered.connect(lambda: self.resetZoom())
+
+        self.origZoomAct = QtGui.QAction("Original Size", self)
+        self.origZoomAct.setIcon(QtGui.QIcon(str(self.imgDirectory+"zoom1.png")))
+        self.origZoomAct.triggered.connect(lambda: self.origZoom())
+
+        self.keepZoomAct = QtGui.QAction("Keep Zoom", self)
+        self.keepZoomAct.setCheckable(True)
+        self.keepZoomAct.triggered.connect(lambda: self.keepZoom())
+
+        self.rotateLeftAct = QtGui.QAction("Rotate 90 degree CCW", self)
+        self.rotateLeftAct.setIcon(QtGui.QIcon(str(self.imgDirectory+"rotate_left.png")))
+        self.rotateLeftAct.triggered.connect(lambda: self.rotateLeft())
+
+        self.rotateRightAct = QtGui.QAction("Rotate 90 degree CW", self)
+        self.rotateRightAct.setIcon(QtGui.QIcon(str(self.imgDirectory+"rotate_right.png")))
+        self.rotateRightAct.triggered.connect(lambda: self.rotateRight())
+
+        self.flipHAct = QtGui.QAction("Object-Flip-Horizontal", self)
+        self.flipHAct.setIcon(QtGui.QIcon(str(self.imgDirectory+"flipH.png")))
+        self.flipHAct.triggered.connect(lambda: self.flipHoriz())
+
+        self.flipVAct = QtGui.QAction("Object-Flip-Vertical", self)
+        self.flipVAct.setIcon(QtGui.QIcon(str(self.imgDirectory+"flipV.png")))
+        self.flipVAct.triggered.connect(lambda: self.flipVert())
+
+        self.cropAct = QtGui.QAction("Cropping", self)
+        self.cropAct.setIcon(QtGui.QIcon(str(self.imgDirectory+"crop.png")))
+        self.cropAct.triggered.connect(lambda: self.cropImage())
+
+        self.cropToSelectionAct = QtGui.QAction("Crop to Selection", self)
+        self.cropToSelectionAct.setIcon(QtGui.QIcon(str(self.imgDirectory+"crop.png")))
+
+        self.resizeAct = QtGui.QAction("Scale Image", self)
+        self.resizeAct.setIcon(QtGui.QIcon(str(self.imgDirectory+"scale.png")))
+        self.resizeAct.triggered.connect(lambda: self.scaleImage())
+
+        self.freeRotateLeftAct = QtGui.QAction("Rotate 1 degree CCW", self)
+        self.freeRotateLeftAct.triggered.connect(lambda:self.freeRotateLeft())
+
+        self.freeRotateRight = QtGui.QAction("Rotate 1 degree CW", self)
+        self.freeRotateRight.triggered.connect(lambda: self.freeRotateRight())
+
+        self.colorsAct = QtGui.QAction("Colors", self)
+        self.colorsAct.setIcon(QtGui.QIcon(str(self.imgDirectory+"colors.png")))
+        self.colorsAct.triggered.connect(lambda: self.showColorsDialog())
+
+        self.findDupesAction = QtGui.QAction("Find Duplicate Images", self)
+        self.findDupesAction.triggered.connect(lambda: self.findDupesAction)
+
+        self.mirrorDisabledAct = QtGui.QAction("Disable", self)
+        self.mirrorDualAct = QtGui.QAction("Dual", self)
+        self.mirrorTripleAct = QtGui.QAction("Triple", self)
+        self.mirrorVDualAct = QtGui.QAction("Dual Vertical", self)
+        self.mirrorQuadAct = QtGui.QAction("Quad", self)
+
+        self.mirrorDisabledAct.setCheckable(True)
+        self.mirrorQuadAct.setCheckable(True)
+        self.mirrorTripleAct.setCheckable(True)
+        self.mirrorDualAct.setCheckable(True)
+        self.mirrorVDualAct.setCheckable(True)
+        self.mirrorDisabledAct.triggered.connect(lambda: self.setMirrorDisabled())
+        self.mirrorDualAct.triggered.connect(lambda: self.setMirrorDual())
+        self.mirrorTripleAct.triggered.connect(lambda: self.setMirrorTriple())
+        self.mirrorVDualAct.triggered.connect(lambda: self.setMirrorVDual())
+        self.mirrorQuadAct.triggered.connect(lambda: self.setMirrorQuad())
+
+        self.keepTransformAct = QtGui.QAction("Lock Transformations", self)
+        self.keepTransformAct.setCheckable(True)
+        self.keepTransformAct.triggered.connect(lambda: self.keepTransformClicked())
+
+        self.moveLeftAct = QtGui.QAction("Move Left", self)
+        self.moveLeftAct.triggered.connect(lambda: self.moveLeft())
+        self.moveRightAct = QtGui.QAction("Move Right", self)
+        self.moveRightAct.triggered.connect(lambda: self.moveRight())
+        self.moveUpAct = QtGui.QAction("Move Up", self)
+        self.moveUpAct.triggered.connect(lambda: self.moveUp())
+        self.moveDownAct = QtGui.QAction("Move Down", self)
+        self.moveDownAct.triggered.connect(lambda: self.moveDown())
+
+        self.invertSelectionAct = QtGui.QAction("Invert Selection", self)
+        self.invertSelectionAct.triggered.connect(lambda: self.invertSelection())
+
+        self.filterImagesFocusAct = QtGui.QAction("Filter by Name", self)
+        self.filterImagesFocusAct.triggered.connect(lambda: self.filterImagesFocus())
+        self.setPathFocusAct = QtGui.QAction("Set Path", self)
+        self.setPathFocusAct.triggered.connect(lambda: self.setPathFocus())
 
     def createMenus(self):
         """
@@ -260,50 +438,50 @@ class fbWindow(QtGui.QMainWindow):
         print "creating the menus"
         self.menubar = QtGui.QMenuBar(self)
         self.fileMenu = QtGui.QMenu("&File", self.menubar)
-        self.fileMenu.addAction("subFoldersAction")
-        self.fileMenu.addAction("createDirectoryAction")
-        self.fileMenu.addAction("showClipboardAction")
-        self.fileMenu.addAction("addBookmarkAction")
+        self.fileMenu.addAction(self.subFoldersAction)
+        self.fileMenu.addAction(self.createDirAction)
+        self.fileMenu.addAction(self.showClipboardAction)
+        self.fileMenu.addAction(self.addBookmarkAction)
         self.fileMenu.addSeparator()
         # probably won't add this. but who knows.
         # I would like to use this widget as a dockable widget
-        self.fileMenu.addAction("exitAction")
+        self.fileMenu.addAction(self.exitAction)
 
         self.editMenu = QtGui.QMenu("&Edit", self.menubar)
-        self.editMenu.addAction("cutAction")
-        self.editMenu.addAction("copyAction")
-        self.editMenu.addAction("copyToAction")
-        self.editMenu.addAction("moveToAction")
-        self.editMenu.addAction("pasteAction")
-        self.editMenu.addAction("deleteAction")
+        self.editMenu.addAction(self.cutAction)
+        self.editMenu.addAction(self.copyAction)
+        self.editMenu.addAction(self.copyToAction)
+        self.editMenu.addAction(self.moveToAction)
+        self.editMenu.addAction(self.pasteAction)
+        self.editMenu.addAction(self.deleteAction)
         self.editMenu.addSeparator()
-        self.editMenu.addAction("selectAllAction")
-        self.editMenu.addAction("inverseSelectionAct")
+        self.editMenu.addAction(self.selectAllAction)
+        self.editMenu.addAction(self.invertSelectionAct)
         #addAction("filterImagesFocusAct")
         #addAction("setPathFocusAct")
         self.editMenu.addSeparator()
-        self.editMenu.addAction("settingsAction")
+        self.editMenu.addAction(self.settingsAction)
 
         self.goMenu = QtGui.QMenu("&Go", self.menubar)
-        self.goMenu.addAction("goBackAction")
-        self.goMenu.addAction("goFrwdAction")
-        self.goMenu.addAction("goUpAction")
-        self.goMenu.addAction("goHomeAction")
+        self.goMenu.addAction(self.goBackAction)
+        self.goMenu.addAction(self.goFrwdAction)
+        self.goMenu.addAction(self.goUpAction)
+        self.goMenu.addAction(self.goHomeAction)
         self.goMenu.addSeparator()
-        self.goMenu.addAction("thumbsGoTopAct")
-        self.goMenu.addAction("thumbsGoBottomAct")
+        self.goMenu.addAction(self.thumbsGoTopAct)
+        self.goMenu.addAction(self.thumbsGoBottomAct)
 
         self.viewMenu = QtGui.QMenu("&View", self.menubar)
-        self.viewMenu.addAction("slideShowAction")
+        self.viewMenu.addAction(self.slideShowAction)
         self.viewMenu.addSeparator()
-        self.viewMenu.addAction("thumbsZoomInAct")
-        self.viewMenu.addAction("thumbsZoomOutAct")
+        self.viewMenu.addAction(self.thumbsZoomInAct)
+        self.viewMenu.addAction(self.thumbsZoomOutAct)
         self.sortMenu = self.viewMenu.addAction("Sort By")
         self.sortTypesGroup = QtGui.QActionGroup(self)
-        self.sortTypesGroup.addAction("actName")
-        self.sortTypesGroup.addAction("actTime")
-        self.sortTypesGroup.addAction("actSize")
-        self.sortTypesGroup.addAction("actType")
+        self.sortTypesGroup.addAction(self.actName)
+        self.sortTypesGroup.addAction(self.actTime)
+        self.sortTypesGroup.addAction(self.actSize)
+        self.sortTypesGroup.addAction(self.actType)
         #self.sortMenu.addActions(self.sortTypesGroup.actions())
         #self.sortMenu.addSeparator()
         #self.sortMenu.addActions("actReverse")
@@ -311,14 +489,11 @@ class fbWindow(QtGui.QMainWindow):
 
 
         self.toolsMenu = QtGui.QMenu("&Tools", self.menubar)
-        self.toolsMenu.addAction("findDupesAction")
+        self.toolsMenu.addAction(self.findDupesAction)
 
         self.menubar.addSeparator()
         self.helpMenu = QtGui.QMenu("&Help", self.menubar)
-        self.helpMenu.addAction("aboutAction")
-
-
-
+        self.helpMenu.addAction(self.aboutAction)
 
         self.menubar.addMenu(self.fileMenu)
         self.menubar.addMenu(self.editMenu)
@@ -327,6 +502,22 @@ class fbWindow(QtGui.QMainWindow):
         self.menubar.addMenu(self.toolsMenu)
         self.menubar.addMenu(self.helpMenu)
         self.setMenuBar(self.menubar)
+
+        # thumbView Context menu
+        self.thumbView.addAction(self.openAction)
+        self.thumbView.addAction(self.openWithMenuAct)
+        self.thumbView.addAction(self.cutAction)
+        self.thumbView.addAction(self.copyAction)
+        self.thumbView.addAction(self.pasteAction)
+        #self.addMenuSeparator(self.thumbView)
+        self.thumbView.addAction(self.copyToAction)
+        self.thumbView.addAction(self.moveToAction)
+        self.thumbView.addAction(self.renameAction)
+        self.thumbView.addAction(self.deleteAction)
+        #self.addMenuSeparator(self.thumbView)
+        self.thumbView.addAction(self.selectAllAction)
+        self.thumbView.addAction(self.invertSelectionAct)
+        #self.thumbView.setContextMenuPolicy()
 
     def createToolBars(self):
         print "Creating the tool bars"
@@ -418,7 +609,9 @@ class fbWindow(QtGui.QMainWindow):
         print "reload"
 
     def setIncludeSubFolders(self):
-        print "set Include SubFolders"
+        logging.debug("set Include SubFolders")
+        self.GData.includeSubFolders = self.subFoldersAction.isChecked()
+        self.refreshThumbs(False)
 
     def refreshThumbs(self, scrollToTop):
         print "refresh Thumbs"
@@ -445,6 +638,12 @@ class fbWindow(QtGui.QMainWindow):
 
     def about(self):
         print " displaying about message"
+        aboutString = QtCore.QString("<h2>Phototonic v1.5 for maya</h2>"\
+            "<p>ImageViewer and Organizer</p>"\
+            "QT v"\
+            "<p><a href=\"http://oferkv.github.io/phototonic\">"+"Bug reports"+"</a></p>")
+
+        QtGui.QMessageBox.about(self, "About Phototonic", aboutString)
 
     def filterImagesFocus(self):
         print "filtering ImagesFocus"
@@ -469,6 +668,15 @@ class fbWindow(QtGui.QMainWindow):
 
     def showSettings(self):
         print "show settings"
+        if self.GData.slideShowActive:
+            self.slideShow()
+        #self.imageView.setCursorHiding(False)
+        dialog = QtGui.SettingsDialog()
+       #if dialog.exec():
+       #     self.thumbView.setThumbColors()
+       #     self.GData.imageZoomFactor = 1.0
+
+        del dialog
 
     def toggleFullScreen(self):
         print "Toggle Full Screen Mode"
