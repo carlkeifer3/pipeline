@@ -40,7 +40,7 @@ class GData():
     slideShowDelay = 0
     slideShowRandom = False
     slideShowActive = False
-    actionKeys = QtCore.QMap()
+    actionKeys = None
     hueVal = 0
     saturationVal = 0
     lightnessVal = 0
@@ -59,8 +59,8 @@ class GData():
     includeSubFolders = False
     showHiddenFiles = False
     imageToolbarFullScreen = False
-    externalApps = QtCore.QMap()
-    bookmarkPaths = QtCore.QSet()
+    externalApps = None
+    bookmarkPaths = None
     reverseMouseBehavior = False
     copyCutIdxList = QtCore.QStringList()
     copyOp = False

@@ -6,6 +6,7 @@ __author__ = 'cargoyle'
 import logging
 
 from PyQt4 import QtGui, QtCore
+import os
 import sip
 import maya.OpenMayaUI as apiUI
 import pipeline.general.filebrowse.thumbview as tv
@@ -44,6 +45,7 @@ class fbWindow(QtGui.QMainWindow):
         self.fbLayout.setSpacing(10)
 
         # internal class variable time
+        self.copyCutCount = 0
         self.copyMoveToDialog = 0
         self.colorsDialog = 0
         self.cropDialog = 0
@@ -120,10 +122,31 @@ class fbWindow(QtGui.QMainWindow):
 
         :return:
         """
+        logging.debug("creating all actions for the file browser")
+        self.thumbsGoTopAct = QtGui.QAction("Top", self)
+        self.thumbsGoTopAct.setIcon(QtGui.QIcon(str(self.imgDirectory+"top.png")))
+        self.thumbsGoTopAct.triggered.connect(lambda: self.goTop())
+
+        self.thumbsGoBottomAct = QtGui.QAction("Bottom", self)
+        self.thumbsGoBottomAct.setIcon(QtGui.QIcon(str(self.imgDirectory+"bottom.png")))
+
+        self.closeImageAct = QtGui.QAction("Close Image", self)
+        self.closeImageAct.triggered.connect(lambda: self.hideViewer())
+
+        self.fullScreenAct = QtGui.QAction("Full Screen", self)
+        self.fullScreenAct.setCheckable(True)
+        self.fullScreenAct.triggered.connect(lambda: self.toggleFullScreen())
+
+        self.settingsAction = QtGui.QAction("Preferences", self)
+        self.settingsAction.setIcon(QtGui.QIcon(str(self.imgDirectory+"settings.png")))
+        self.settingsAction.triggered.connect(lambda: self.showSettings())
+
+        self.exitAction = QtGui.QAction("Exit", self)
+        self.exitAction.triggered.connect(lambda: self.close())
+
         self.thumbsZoomInAct = QtGui.QAction("Enlarge Thumbnails", self)
         self.thumbsZoomInAct.setIcon(QtGui.QIcon(str(self.imgDirectory+"zoom_in.png")))
         self.thumbsZoomInAct.triggered.connect(lambda:self.thumbsZoomIn())
-
 
         self.thumbsZoomOutAct = QtGui.QAction("Shrink Thumbnails", self)
         self.thumbsZoomOutAct.setIcon(QtGui.QIcon(str(self.imgDirectory+"zoom_out.png")))
@@ -132,16 +155,59 @@ class fbWindow(QtGui.QMainWindow):
         self.cutAction = QtGui.QAction("Cut", self)
         self.cutAction.setIcon(QtGui.QIcon(str(self.imgDirectory+"cut.png")))
         self.cutAction.triggered.connect(lambda: self.cutThumbs())
+        self.cutAction.setEnabled(False)
 
         self.copyAction = QtGui.QAction("Copy", self)
         self.copyAction.setIcon(QtGui.QIcon(str(self.imgDirectory+"copy.png")))
         self.copyAction.triggered.connect(lambda: self.copyThumbs())
+        self.copyAction.setEnabled(False)
+
+        self.copyToAction = QtGui.QAction("Copy to...", self)
+        self.copyToAction.triggered.connect(lambda: self.copyImagesTo())
+
+        self.moveToAction = QtGui.QAction("Move To...", self)
+        self.moveToAction.triggered.connect(lambda: self.moveImagesTo())
 
         self.deleteAction = QtGui.QAction("Delete", self)
         self.deleteAction.setIcon(QtGui.QIcon(str(self.imgDirectory+"delete.png")))
         self.deleteAction.triggered.connect(lambda: self.deleteOp())
 
-        # missing a bunch of actions here should add it to a ticket
+        self.saveAction = QtGui.QAction("Save", self)
+        self.saveAction.setIcon(QtGui.QIcon(str(self.imgDirectory+"save.png")))
+
+        self.saveAsAction = QtGui.QAction("Save As", self)
+        self.saveAsAction.setIcon(QtGui.QIcon(str(self.imgDirectory+"save_as.png")))
+
+        self.copyImageAction = QtGui.QAction("Copy Image Data", self)
+        self.pasteImageAction = QtGui.QAction("Paste Image Data", self)
+
+        self.renameAction = QtGui.QAction("Rename", self)
+        self.renameAction.triggered.connect(lambda: self.rename())
+
+        self.selectAllAction = QtGui.QAction("Select All", self)
+        self.selectAllAction.triggered.connect(lambda:self.selectAllThumbs())
+
+        self.aboutAction = QtGui.QAction("About", self)
+        self.aboutAction.setIcon(QtGui.QIcon(str(self.imgDirectory+"about.png")))
+        self.aboutAction.triggered.connect(lambda:self.about())
+
+        # sort Actions
+        self.actName = QtGui.QAction("Name", self)
+        self.actTime = QtGui.QAction("Time", self)
+        self.actSize = QtGui.QAction("Size", self)
+        self.actType = QtGui.QAction("Type", self)
+        self.actReverse = QtGui.QAction("Reverse", self)
+        self.actName.setCheckable(True)
+        self.actTime.setCheckable(True)
+        self.actSize.setCheckable(True)
+        self.actType.setCheckable(True)
+        self.actReverse.setCheckable(True)
+        self.actName.triggered.connect(lambda: self.sortThumbnails())
+        self.actTime.triggered.connect(lambda: self.sortThumbnails())
+        self.actSize.triggered.connect(lambda: self.sortThumbnails())
+        self.actType.triggered.connect(lambda: self.sortThumbnails())
+        self.actReverse.triggered.connect(lambda: self.sortThumbnails())
+
 
         self.refreshAction = QtGui.QAction("Reload", self)
         self.refreshAction.setIcon(QtGui.QIcon(str(self.imgDirectory+"refresh.png")))
@@ -414,12 +480,10 @@ class fbWindow(QtGui.QMainWindow):
     def copyOrCutThumbs(self, copy):
         logging.info("copy or cut thumbs")
         self.GData.copyCutIdxList = self.thumbView.selectionModel().selectedIndexes()
-        copyCutCount = self.GData.copyCutIdxList.size()
-        self.GData.copyCutIdxList.clear()
-        i = 0
-        while i < copyCount:
-            self.GData.copyCutFileList.append(self.thumbView.thumbModel.item(self.GData.copyCutFileList[i].row()).data(self.thumbView.FileNameRole).toString())
-            i+=1
+        self.GData.copyCutFileList.clear()
+        for f in self.GData.copyCutIdxList:
+            self.GData.copyCutFileList.append(self.thumbView.thumbModel.item(f.row()).data(self.thumbView.fileNameRole).toString())
+            self.copyCutCount +=1
         self.GData.copyOp = copy
         self.pasteAction.setEnabled(True)
 
@@ -540,6 +604,32 @@ class fbWindow(QtGui.QMainWindow):
 
     def pasteThumbs(self):
         print "paste thumbnails"
+        if self.copyCutCount == 0:
+            logging.debug("No thumbnails on clipboard")
+            return
+
+        destDir = 0
+        # this will probably break later
+        logging.debug("check if we have stored the selected Path")
+        if self.copyMoveToDialog != 0:
+            destDir = self.copyMoveToDialog.selectedPath()
+        #else:
+
+
+        #if not os.isvalidpath(destDir):
+        #    msgBox = QtGui.QMessageBox()
+        #    msgBox.critical("Error", str("can not Copy or Move to"+destDir))
+        #    self.selectCurrentViewDir()
+        #    return
+
+        # I don't like this.
+        # what if you want to past this item multiple times
+        self.copyCutCount = 0
+
+        #self.GData.copyCutIdxList.clear()
+        #self.GData.copyCutFileList.clear()
+        self.pasteAction.setEnabled(False)
+        self.thumbView.loadVisibleThumbs(0)
 
     def updateCurrentImage(self):
         print "update current Image"

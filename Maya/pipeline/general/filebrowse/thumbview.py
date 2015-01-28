@@ -3,7 +3,8 @@
 __author__ = 'cargoyle'
 
 """
-from PyQt4 import QtGui, QtCore
+from PyQt4 import Qt, QtGui, QtCore
+
 
 class thumbView(QtGui.QListView):
 
@@ -34,6 +35,8 @@ class thumbView(QtGui.QListView):
 
         self.thumbSize = 100
         self.busy = True
+
+        self.fileNameRole = 1
 
         self.abortOp = False
         self.isNeedScroll = False
