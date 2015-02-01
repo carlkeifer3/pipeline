@@ -2,6 +2,8 @@
 
 __author__ = 'cargoyle'
 
+   Not currently working
+
 """
 import win32gui
 import win32ui

@@ -3,10 +3,18 @@
 __author__ = 'cargoyle'
 
 """
+import.logging
 from PyQt4 import QtGui, QtCore
 
 class GData():
-    appSettings = QtCore.QSettings()
+    logging.info("Setting the global data")
+    QtCore.QCoreApplication.setOrganizationName("ckPipeline")
+    QtCore.QCoreApplication.setOrganizationDomain("carlkeifer.com")
+    QtCore.QCoreApplication.setApplicationName("Phototonic")
+    appSettings = QtCore.QSettings( )
+    # setPath() to try to save to current working directory
+    appSettings.setPath(QtCore.QSettings.IniFormat, QtCore.QSettings.SystemScope, './__phototonicS.ini')
+    appSettings.setFallbacksEnabled(False)    # File only, no fallback to registry or or.
     layoutMode = 0
     zoomInFlags = 0
     zoomOutFlags = 0
@@ -81,4 +89,4 @@ class GData():
     pvDockVisible = False
     ivDockVisible = False
     thumbsBackImage = QtCore.QString()
-
+    logging.info("GData Setup Finished")

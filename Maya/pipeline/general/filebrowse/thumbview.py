@@ -3,6 +3,7 @@
 __author__ = 'cargoyle'
 
 """
+import logging
 from PyQt4 import Qt, QtGui, QtCore
 
 
@@ -10,10 +11,17 @@ class thumbView(QtGui.QListView):
 
     def __init__(self, parent=None):
         import os
+        import pipeline.general.filebrowse.GData as g
 
-        # initialize the QlistView
+        #logging.debug("initialize the QlistView")
         QtGui.QListView.__init__(self, parent)
         #self. currentRow = 0
+
+        #logging.info("Get the global Settings Data for use by thumbView class")
+        self.GData = g.GData()
+
+        self.thumbSize = self.GData.appSettings.value("thumbsZoomVal").toInt()[0]
+        logging.info(self.thumbSize)
 
         # setting up the list view to display icons nicely
         self.setViewMode(QtGui.QListView.IconMode)
@@ -33,7 +41,6 @@ class thumbView(QtGui.QListView):
 
         self.lastScrollBarValue = 0
 
-        self.thumbSize = 100
         self.busy = True
 
         self.fileNameRole = 1
@@ -209,7 +216,7 @@ class thumbView(QtGui.QListView):
         """
         print "preparing to load thumbnails"
         thumbAspect = 1.33
-        thumbHeight = self.thumbSize * thumbAspect
+        thumbHeight = float(self.thumbSize) * thumbAspect
         thumbWidth = self.thumbSize * thumbAspect
         self.setIconSize(QtCore.QSize(thumbWidth, thumbHeight))
 

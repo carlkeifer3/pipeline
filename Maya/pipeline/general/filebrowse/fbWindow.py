@@ -32,8 +32,6 @@ class fbWindow(QtGui.QMainWindow):
 
         self.GData = g.GData()
 
-        self.GData.appSettings = QtCore.QSettings("photonic", "photonic_103")
-
         # locate the directory where all of the images for the ui live
         ScriptDir = pm.internalVar(uad=True)
         self.imgDirectory = str(ScriptDir+"/scripts/pipeline/general/filebrowse/images/")
@@ -641,7 +639,21 @@ class fbWindow(QtGui.QMainWindow):
         aboutString = QtCore.QString("<h2>Phototonic v1.5 for maya</h2>"\
             "<p>ImageViewer and Organizer</p>"\
             "QT v"\
-            "<p><a href=\"http://oferkv.github.io/phototonic\">"+"Bug reports"+"</a></p>")
+            "<p><a href=\"http://oferkv.github.io/phototonic\">"+"Bug reports"+"</a></p>"\
+            "<p><a href=\"https://github.com/oferkv/phototonic/issues\">"+"Bug reports"+"</a></p>"\
+		    "<p>Copyright &copy; 2013-2014 Ofer Kashayov (oferkv@live.com)</p>"\
+		    "Contributors / Code:<br>"\
+		    "Christopher Roy Bratusek (nano@jpberlin.de)<br><br>"\
+            "Carl Keifer: Maya Port (cargoyle@hotmail.com)<br><br>"\
+		    "Contributors / Translations:"\
+		    "<table><tr><td>Czech:</td><td>Pavel Fric (pavelfric@seznam.cz)</td></tr>"\
+		    "<tr><td>French:</td><td>David Geiger (david.david@mageialinux-online.org)</td></tr>"\
+		    "<tr><td></td><td>Adrien Daugabel (adrien.d@mageialinux-online.org)</td></tr>"\
+		    "<tr><td></td><td>Raomi Verschelde (akien@mageia.org)</td></tr>"\
+		    "<tr><td>German:</td><td>Jonathan Hooverman (jonathan.hooverman@gmail.com)</td></tr>"\
+		    "<tr><td>Polish:</td><td>Robert Wojew\u00F3dzki (robwoj44@poczta.onet.pl)</td></tr>"\
+		    "<tr><td>Russian:</td><td>Ilya Alexandrovich (yast4ik@gmail.com)</td></tr></table>"\
+		    "<p>Phototonic is licensed under the GNU General Public License version 3</p>")
 
         QtGui.QMessageBox.about(self, "About Phototonic", aboutString)
 
@@ -716,23 +728,23 @@ class fbWindow(QtGui.QMainWindow):
 
 
     def thumbsZoomIn(self):
-        print "Enlarge Thumbs"
         #if self.thumbView.thumbSize < self.ThumbMaxSize:
         self.thumbView.thumbSize += 25
         self.thumbsZoomInAct.setEnabled(True)
         # check the thumbs to make sure we don't go over the max size
         #if self.thumbView.thumbSize == self.ThumbMaxSize:
         #    self.thumbsZoomInAct.setEnabled(False)
+        logging.info("Thumbs have been enlarged to: " + str(self.thumbView.thumbSize))
         self.refreshThumbs(False)
 
     def thumbsZoomOut(self):
-        print "shrink Thumbs"
         #if self.thumbView.thumbSize < self.ThumbMinSize:
         self.thumbView.thumbSize -= 25
         self.thumbsZoomOutAct.setEnabled(True)
         # check the thumbs to make sure we don't go over the max size
         #if self.thumbView.thumbSize == self.ThumbMinSize:
         #    self.thumbsZoomOutAct.setEnabled(False)
+        logging.info("Thumbs have been shrunk to: " + str(self.thumbView.thumbSize))
         self.refreshThumbs(False)
 
     def zoomOut(self):
@@ -849,7 +861,7 @@ class fbWindow(QtGui.QMainWindow):
         print "Deleting"
 
     def goTo(self, path):
-        print str("going to QDir "+path)
+        logging.info(str("going to QDir "+path))
         self.fsTree.setCurrentIndex(self.fsTree.fsModel.index(path))
         self.thumbView.currentViewDir = path
         # this is not the right directory, just trying to get this to work
@@ -886,7 +898,7 @@ class fbWindow(QtGui.QMainWindow):
         print " go up one directory"
 
     def goHome(self):
-        loggin.info(" goto home directory")
+        logging.info(" goto home directory")
         self.goTo(QtCore.QDir.homePath())
 
     def setCopyCutActions(self):
@@ -899,15 +911,25 @@ class fbWindow(QtGui.QMainWindow):
         print "Updating Actions"
 
     def writeSettings(self):
-        print "Writing Settings"
+        logging.info("Writing Settings")
+        #if self.GData.layoutMode
+
+        #self.GData.appSettings.setValue("ThumbsSortFlags", int(self.thumbView.thumbSortFlags))
+        self.GData.appSettings.setValue("ThumbsZoomVal", int(self.thumbView.thumbSize))
+        self.GData.appSettings.setValue("isFullScreen", bool(self.GData.isFullScreen))
+        self.GData.appSettings.setValue("backgroundColor", self.GData.backgroundColor)
+        self.GData.appSettings.setValue("backgroundThumbColor", self.GData.thumbsBackgroundColor)
+        self.GData.appSettings.setValue("textThumbColor", self.GData.thumbsTextColor)
+
 
     def readSettings(self):
         logging.info("Reading Settings")
         self.initComplete = False
         self.needThumbsRefresh = False
 
-        if self.GData.appSettings.contains("thumbsZoomVal"):
-            self.resize(800,600)
+        if not self.GData.appSettings.contains("thumbsZoomVal"):
+            logging.info(" app settings not found")
+            self.resize(800, 600)
             self.GData.appSettings.setValue("thumbsSortFlags", int(0))
             self.GData.appSettings.setValue("thumbsZoomVal", 150)
             self.GData.appSettings.setValue("isFullScreen", False)
@@ -943,8 +965,9 @@ class fbWindow(QtGui.QMainWindow):
             self.GData.appSettings.setValue("smallIcons", False)
             self.GData.appSettings.setValue("LockDocks", True)
             self.GData.appSettings.setValue("imageToolbarFullScreen", False)
-            self.GData.bookmarkPaths.insert(QtCore.QDir.homePath())
+            #self.GData.bookmarkPaths.insert(QtCore.QDir.homePath())
 
+        logging.debug("store loaded setting in memory")
         self.GData.backgroundColor = self.GData.appSettings.value("backgroundColor")
         self.GData.exitInsteadofClose = self.GData.appSettings.value("exitInsteadOfClose").toBool()
         self.GData.enableAnimations = self.GData.appSettings.value("enableAnimations").toBool()
@@ -1012,8 +1035,12 @@ class fbWindow(QtGui.QMainWindow):
     def loadShortcuts(self):
         print "loading shortcuts"
 
-    def closeEvent(self):
-        print "close Event"
+    def closeEvent(self, event):
+        logging.info("close Event")
+        self.thumbView.abort()
+        self.writeSettings()
+
+        event.accept()
 
     def setStatus(self):
         print "setting Status"
