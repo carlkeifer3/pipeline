@@ -10,6 +10,7 @@ import os
 import sip
 import maya.OpenMayaUI as apiUI
 import pipeline.general.filebrowse.thumbview as tv
+import pipeline.general.filebrowse.dialogs as dia
 import pipeline.general.filebrowse.GData as g
 
 def getMayaWindow():
@@ -61,9 +62,9 @@ class fbWindow(QtGui.QMainWindow):
         self.createFSTree()
         self.createBookmarks()
         self.createImageView()
-        self.UpdateExternalApps()
-        self.loadShortcuts()
-        self.setupDocks()
+        #self.UpdateExternalApps()
+        #self.loadShortcuts()
+        #self.setupDocks()
 
         self.setLayout(self.fbLayout)
 
@@ -679,15 +680,15 @@ class fbWindow(QtGui.QMainWindow):
         print "Choose External Application"
 
     def showSettings(self):
-        print "show settings"
+        logging.info("loading preferences window")
         if self.GData.slideShowActive:
             self.slideShow()
         #self.imageView.setCursorHiding(False)
-        dialog = QtGui.SettingsDialog()
-       #if dialog.exec():
-       #     self.thumbView.setThumbColors()
-       #     self.GData.imageZoomFactor = 1.0
+        dialog = dia.settingsDialog()
 
+        #if dialog.exec():
+        #     self.thumbView.setThumbColors()
+        #     self.GData.imageZoomFactor = 1.0
         del dialog
 
     def toggleFullScreen(self):
@@ -918,9 +919,13 @@ class fbWindow(QtGui.QMainWindow):
         self.GData.appSettings.setValue("ThumbsZoomVal", int(self.thumbView.thumbSize))
         self.GData.appSettings.setValue("isFullScreen", bool(self.GData.isFullScreen))
         self.GData.appSettings.setValue("backgroundColor", self.GData.backgroundColor)
+        #logging.info("Background Color" + str(self.GData.backgroundColor))
         self.GData.appSettings.setValue("backgroundThumbColor", self.GData.thumbsBackgroundColor)
+        #logging.info("Background Thumb Color" + str(self.GData.thumbsBackgroundColor))
         self.GData.appSettings.setValue("textThumbColor", self.GData.thumbsTextColor)
-        self.GData.appSettings.setValue("thumbSpacing", int(self.GData.thumbsSpacing))
+        #logging.info("Text Thumb Color" + str(self.GData.thumbsTextColor))
+        self.GData.appSettings.setValue("thumbSpacing", self.GData.thumbsSpacing)
+        logging.info("Thumbs Spacing " + str(self.GData.thumbsSpacing[0]))
         self.GData.appSettings.setValue("thumbsPagesReadahead", int(self.GData.thumbPagesReadahead))
         self.GData.appSettings.setValue("thumbLayout", int(self.GData.thumbsLayout))
         self.GData.appSettings.setValue("exitInsteadOfClose", int(self.GData.exitInsteadofClose))
@@ -1034,6 +1039,8 @@ class fbWindow(QtGui.QMainWindow):
         self.GData.startupDir = self.GData.appSettings.value("startupDir").toInt()
         self.GData.specifiedStartDir = self.GData.appSettings.value("specifiedStartDir").toString()
         self.GData.thumbsBackImage = self.GData.appSettings.value("thumbsBackImage").toString()
+        self.GData.thumbsSpacing = self.GData.appSettings.value("thumbSpacing").toInt()
+        logging.info("Thumb Spacing: "+ str(self.GData.thumbsSpacing[0]))
         self.GData.enableImageInfoFS = self.GData.appSettings.value("enableImageInfoFS").toBool()
         self.GData.showLabels = self.GData.appSettings.value("showLabels").toBool()
         self.GData.smallIcons = self.GData.appSettings.value("smallIcons").toBool()
