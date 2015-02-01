@@ -3,7 +3,7 @@
 __author__ = 'cargoyle'
 
 """
-import.logging
+import logging
 from PyQt4 import QtGui, QtCore
 
 class GData():

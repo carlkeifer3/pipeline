@@ -60,10 +60,10 @@ class fbWindow(QtGui.QMainWindow):
         self.createStatusBar()
         self.createFSTree()
         self.createBookmarks()
-        #self.createImageView()
-        #self.UpdateExternalApps()
-        #self.loadShortcuts()
-        #self.setupDocks()
+        self.createImageView()
+        self.UpdateExternalApps()
+        self.loadShortcuts()
+        self.setupDocks()
 
         self.setLayout(self.fbLayout)
 
@@ -920,6 +920,40 @@ class fbWindow(QtGui.QMainWindow):
         self.GData.appSettings.setValue("backgroundColor", self.GData.backgroundColor)
         self.GData.appSettings.setValue("backgroundThumbColor", self.GData.thumbsBackgroundColor)
         self.GData.appSettings.setValue("textThumbColor", self.GData.thumbsTextColor)
+        self.GData.appSettings.setValue("thumbSpacing", int(self.GData.thumbsSpacing))
+        self.GData.appSettings.setValue("thumbsPagesReadahead", int(self.GData.thumbPagesReadahead))
+        self.GData.appSettings.setValue("thumbLayout", int(self.GData.thumbsLayout))
+        self.GData.appSettings.setValue("exitInsteadOfClose", int(self.GData.exitInsteadofClose))
+        self.GData.appSettings.setValue("enableAnimations", bool(self.GData.enableAnimations))
+        self.GData.appSettings.setValue("exifRotationEnabled", bool(self.GData.exifRotationEnabled))
+        self.GData.appSettings.setValue("reverseMouseBehavior", bool(self.GData.reverseMouseBehavior))
+        self.GData.appSettings.setValue("showHiddenFiles", bool(self.GData.showHiddenFiles))
+        self.GData.appSettings.setValue("wrapImageList", bool(self.GData.wrapImageList))
+        self.GData.appSettings.setValue("imageZoomFactor", self.GData.imageZoomFactor)
+        self.GData.appSettings.setValue("shouldMaximize", bool(self.isMaximized()))
+        self.GData.appSettings.setValue("defaultSaveQuality", self.GData.defaultSaveQuality)
+        self.GData.appSettings.setValue("noEnlargeSmallThumb", bool(self.GData.noEnlargeSmallThumbs))
+        self.GData.appSettings.setValue("slideShowDelay", self.GData.slideShowDelay)
+        self.GData.appSettings.setValue("slideShowRandom", bool(self.GData.slideShowRandom))
+        self.GData.appSettings.setValue("editToolBarVisible", bool(self.editToolbarVisible))
+        self.GData.appSettings.setValue("goToolBarVisible", bool(self.goToolBarVisible))
+        self.GData.appSettings.setValue("viewToolBarVisible", bool(self.viewToolBarVisible))
+        self.GData.appSettings.setValue("imageToolBarVisible", bool(self.imageToolBarVisible))
+        self.GData.appSettings.setValue("fsDockVisible", bool(self.GData.fsDockVisible))
+        self.GData.appSettings.setValue("iiDockVisible", bool(self.GData.iiDockVisible))
+        self.GData.appSettings.setValue("pvDockVisible", bool(self.GData.pvDockVisible))
+        #self.GData.appSettings.setValue("startupDir", int(self.GData.startupDir))
+        self.GData.appSettings.setValue("specifiedStartDir", self.GData.specifiedStartDir)
+        self.GData.appSettings.setValue("thumbsBackImage", self.GData.thumbsBackImage)
+        #self.GData.appSettings.setValue("lastDir", self.GData.startupDir == self.GData.rememberLastDir)
+
+        self.GData.appSettings.setValue("enableImageInfoFS", bool(self.GData.enableImageInfoFS))
+        self.GData.appSettings.setValue("showLabels", bool(self.GData.showLabels))
+        self.GData.appSettings.setValue("smallIcons", bool(self.GData.smallIcons))
+        self.GData.appSettings.setValue("LockDocks", bool(self.GData.LockDocks))
+        self.GData.appSettings.setValue("imageToolbarFullScreen", bool(self.GData.imageToolbarFullScreen))
+
+        logging.info("settings Written exiting Cleanly")
 
 
     def readSettings(self):
@@ -1021,6 +1055,8 @@ class fbWindow(QtGui.QMainWindow):
         #    self.GData.bookmarkPaths.insert(self.GData.appSettings.value(paths.at(i).toString()))
         #    i +=1
         #self.GData.appSettings.endGroup()
+
+        logging.info("settings Read, program continuing")
 
 
     def setupDocks(self):
