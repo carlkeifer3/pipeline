@@ -434,7 +434,7 @@ class fbWindow(QtGui.QMainWindow):
 
         :return:
         """
-        print "creating the menus"
+        logging.info("creating the menus")
         self.menubar = QtGui.QMenuBar(self)
         self.fileMenu = QtGui.QMenu("&File", self.menubar)
         self.fileMenu.addAction(self.subFoldersAction)
@@ -486,6 +486,14 @@ class fbWindow(QtGui.QMainWindow):
         #self.sortMenu.addActions("actReverse")
         self.viewMenu.addSeparator()
 
+        #self.thumbsLayoutGroup = QtGui.QActionGroup(self)
+        #self.thumbsLayoutGroup.addAction(self.actClassic)
+        #self.thumbsLayoutGroup.addAction(self.actCompact)
+        #self.thumbsLayoutGroup.addAction(self.actSquarish)
+        #self.viewMenu.addAction(self.thumbsLayoutGroup.actions())
+        #self.viewMenu.addSeparator()
+        self.viewMenu.addAction(self.refreshAction)
+
 
         self.toolsMenu = QtGui.QMenu("&Tools", self.menubar)
         self.toolsMenu.addAction(self.findDupesAction)
@@ -516,7 +524,8 @@ class fbWindow(QtGui.QMainWindow):
         #self.addMenuSeparator(self.thumbView)
         self.thumbView.addAction(self.selectAllAction)
         self.thumbView.addAction(self.invertSelectionAct)
-        #self.thumbView.setContextMenuPolicy()
+        self.thumbView.setContextMenuPolicy(QtCore.Qt.ActionsContextMenu)
+        self.menubar.setVisible(True)
 
     def createToolBars(self):
         print "Creating the tool bars"
@@ -528,6 +537,7 @@ class fbWindow(QtGui.QMainWindow):
         self.editToolBar.addAction(self.pasteAction)
         self.editToolBar.addAction(self.deleteAction)
         self.editToolBar.addAction(self.showClipboardAction)
+        self.editToolBar.toggleViewAction().triggered.connect(lambda: self.setEditToolBarVisibility())
 
         # Navigation Toolbar
         self.goToolBar = self.addToolBar("Navigation")
@@ -540,10 +550,14 @@ class fbWindow(QtGui.QMainWindow):
 
         # Path Toolbar
         self.pathBar = QtGui.QLineEdit()
-
-        # enter pathbar stuff here
+        self.pathComplete = QtGui.QCompleter(self)
+        self.pathCompleteDirMod = QtGui.QDirModel()
+        self.pathCompleteDirMod.setFilter(QtCore.QDir.AllDirs | QtCore.QDir.NoDotAndDotDot)
+        self.pathComplete.setModel(self.pathCompleteDirMod)
+        self.pathBar.setCompleter(self.pathComplete)
         self.pathBar.setMinimumWidth(200)
         self.pathBar.setMaximumWidth(300)
+        self.pathBar.returnPressed.connect(lambda: self.goPathBarDir())
 
         self.goToolBar.addWidget(self.pathBar)
         self.goToolBar.addAction(self.subFoldersAction)
