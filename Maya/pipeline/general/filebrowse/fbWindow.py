@@ -561,6 +561,7 @@ class fbWindow(QtGui.QMainWindow):
 
         self.goToolBar.addWidget(self.pathBar)
         self.goToolBar.addAction(self.subFoldersAction)
+        self.goToolBar.toggleViewAction().triggered.connect(lambda: self.setGoToolBarVisibility())
 
         # View Toolbar
         self.viewToolBar = self.addToolBar("View")
@@ -568,6 +569,26 @@ class fbWindow(QtGui.QMainWindow):
         self.viewToolBar.addAction(self.slideShowAction)
         self.viewToolBar.addAction(self.thumbsZoomInAct)
         self.viewToolBar.addAction(self.thumbsZoomOutAct)
+
+        # Filter Bar
+        self.filterAct = QtGui.QAction("Filter", self)
+        self.filterAct.setIcon(QtGui.QIcon(self.imgDirectory+"zoom.png"))
+        self.filterAct.triggered.connect(lambda: self.setThumbsFilter())
+        self.filterBar = QtGui.QLineEdit()
+        self.filterBar.setMinimumWidth(100)
+        self.filterBar.setMaximumWidth(200)
+        self.filterBar.returnPressed.connect(lambda: self.setThumbsFilter())
+        self.filterBar.textChanged.connect(lambda: self.clearThumbsFilter())
+
+        self.viewToolBar.addSeparator()
+        self.viewToolBar.addWidget(self.filterBar)
+        self.viewToolBar.addAction(self.settingsAction)
+        #self.viewToolBar.toggleViewAction().triggered.connect(lambda: self.setViewToolBarVisibility())
+
+        # Image
+        self.imageToolBar = self.addToolBar("Image")
+        self.imageToolBar.setObjectName("Image")
+        self.imageToolBar.addAction(self.prevImageAction)
 
     def setToolbarIconSize(self):
         print "setting Toolbar icon size"
