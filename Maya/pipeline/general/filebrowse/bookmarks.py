@@ -41,3 +41,19 @@ class BookMarks(QtGui.QTreeWidget):
         item.setToolTip(0, model)
         self.insertTopLevelItem(0, item)
 
+    def resizeTreeColumn(self):
+        logging.info("resizing Tree Column")
+        self.resizeColumnToContents(0)
+
+    def removeBookmark(self):
+        logging.info("remove the selected bookmark")
+        selectedDirs = self.selectionModel().selectedRows()
+
+    def dragEnterEvent(self, event):
+        logging.info("Drag enter event")
+
+    def dragMoveEvent(self, event):
+        logging.info("Drag move event")
+
+    def dropEvent(self, event):
+        logging.info("Drop event")
