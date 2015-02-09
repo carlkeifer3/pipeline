@@ -41,7 +41,7 @@ class fbWindow(QtGui.QMainWindow):
         self.fbLayout = QtGui.QHBoxLayout(self)
         #self.fbLayout.addStretch(1)
         #self.fbLayout.setContentsMargins(0,0,0,0)
-        self.fbLayout.setSpacing(10)
+        #self.fbLayout.setSpacing(10)
 
         # internal class variable time
         self.copyCutCount = 0
@@ -66,7 +66,12 @@ class fbWindow(QtGui.QMainWindow):
         #self.loadShortcuts()
         #self.setupDocks()
 
-        self.setLayout(self.fbLayout)
+        self.fbLayout.addWidget(self.thumbView)
+        self.centralWidget = QtGui.QWidget()
+        self.centralWidget.setLayout(self.fbLayout)
+        self.setCentralWidget(self.centralWidget)
+
+        #self.setLayout(self.fbLayout)
 
     def handleStartupArgs(self):
         """
@@ -87,18 +92,20 @@ class fbWindow(QtGui.QMainWindow):
 #        return event
 
     def createThumbView(self):
+        logging.info("Building the ThumbView")
         import pipeline.general.filebrowse.thumbview as tv
 
         self.thumbView = tv.thumbView(self)
-        self.thumbView.load()
-        print "thumbview should be built"
-        self.fbLayout.addWidget(self.thumbView)
+        #self.thumbView.load()
+        #print "thumbview should be built"
+        #self.fbLayout.addWidget(self.thumbView)
 
         self.iiDock = QtGui.QDockWidget("Image Info", self)
         self.iiDock.setObjectName("ImageInfo")
-        self.iiDock.setWidget(self.thumbView)
+        #self.iiDock.setWidget(self.thumbView)
 
         self.addDockWidget(QtCore.Qt.RightDockWidgetArea, self.iiDock)
+        logging.info("ThumbView should be built")
 
     def AddMenuSeparator(self):
         """
