@@ -25,3 +25,11 @@ class BookMarks(QtGui.QTreeWidget):
         self.setAcceptDrops(True)
         self.setDragEnabled(False)
         self.setDragDropMode(QtGui.QAbstractItemView.DropOnly)
+
+        self.setColumnCount(1)
+        self.setHeaderHidden(True)
+        self.reloadBookmarks()
+
+    def reloadBookmarks(self):
+        logging.info("reloading Bookmarks")
+        self.clear()
