@@ -589,6 +589,27 @@ class fbWindow(QtGui.QMainWindow):
         self.imageToolBar = self.addToolBar("Image")
         self.imageToolBar.setObjectName("Image")
         self.imageToolBar.addAction(self.prevImageAction)
+        self.imageToolBar.addAction(self.nextImageAction)
+        self.imageToolBar.addAction(self.firstImageAction)
+        self.imageToolBar.addAction(self.lastImageAction)
+        self.imageToolBar.addAction(self.slideShowAction)
+        self.imageToolBar.addSeparator()
+        self.imageToolBar.addAction(self.saveAction)
+        self.imageToolBar.addAction(self.saveAsAction)
+        self.imageToolBar.addAction(self.deleteAction)
+        self.imageToolBar.addSeparator()
+        self.imageToolBar.addAction(self.resizeAct)
+        self.imageToolBar.addAction(self.rotateRightAct)
+        self.imageToolBar.addAction(self.rotateLeftAct)
+        self.imageToolBar.addAction(self.flipHAct)
+        self.imageToolBar.addAction(self.flipVAct)
+        self.imageToolBar.addAction(self.cropAct)
+        self.imageToolBar.addAction(self.colorsAct)
+        self.imageToolBar.setVisible(True)
+
+        self.imageToolBar.toggleViewAction().triggered.connect(lambda: self.setImageToolBarVisibility())
+
+        self.setToolbarIconSize()
 
     def setToolbarIconSize(self):
         print "setting Toolbar icon size"
