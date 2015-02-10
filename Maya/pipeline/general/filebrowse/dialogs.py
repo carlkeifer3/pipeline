@@ -59,8 +59,8 @@ class settingsDialog(QtGui.QDialog):
         self.bgColBox.addWidget(self.backgroundColorLab)
         self.bgColBox.addWidget(self.backgroundColorButton)
         self.bgColBox.addStretch(1)
-        self.backgroundColorButton.clicked.connect(lambda : self.pickColor())
-        #self.setButtonBgColor(g.GData.backgroundColor, self.backgroundColorButton)
+        self.backgroundColorButton.clicked.connect(lambda: self.pickColor())
+        self.setButtonBgColor(g.GData.backgroundColor, self.backgroundColorButton)
         self.backgroundColorButton.setAutoFillBackground(True)
         self.bgColor = g.GData.backgroundColor
 
@@ -120,7 +120,7 @@ class settingsDialog(QtGui.QDialog):
         self.bgThumbColBox.addWidget(self.bgThumbTxtLab)
         self.bgThumbColBox.addWidget(self.colThumbButton)
         self.colThumbButton.clicked.connect(lambda: self.pickThumbsColor())
-        #self.setButtonColor(g.GData.thumbsBackgroundColor, self.colThumbButton)
+        self.setButtonBgColor(g.GData.thumbsBackgroundColor, self.colThumbButton)
         self.colThumbButton.setAutoFillBackground(True)
         self.thumbBgColor = g.GData.thumbsBackgroundColor
 
@@ -132,7 +132,7 @@ class settingsDialog(QtGui.QDialog):
         self.bgThumbColBox.addWidget(self.colThumbTextButton)
         self.bgThumbColBox.addStretch(1)
         self.colThumbTextButton.clicked.connect(lambda: self.pickThumbsTextColor())
-        #self.setButtonBgColor(g.GData.thumbsTextColor, self.colThumbTextButton)
+        self.setButtonBgColor(g.GData.thumbsTextColor, self.colThumbTextButton)
         self.colThumbTextButton.setAutoFillBackground(True)
         self.thumbTextColor = g.GData.thumbsTextColor
 
@@ -225,10 +225,10 @@ class settingsDialog(QtGui.QDialog):
         self.startupDirEdit.setMaximumWidth(400)
 
         self.chooseStartupDirButton = QtGui.QToolButton()
-        #self.chooseStartupDirButton.setIcon(QtGui.QIcon.fromTheme("document-open"), QtGui.QIcon(":/images/open.png"))
+        self.chooseStartupDirButton.setIcon(QtGui.QIcon.fromTheme("document-open", QtGui.QIcon(":/images/open.png")))
         self.chooseStartupDirButton.setFixedSize(26, 26)
         self.chooseStartupDirButton.setIconSize(QtCore.QSize(16, 16))
-        #self.chooseStartupDirButton.clicked.connect(lambda: self.pickStartupDir())
+        self.chooseStartupDirButton.clicked.connect(lambda: self.pickStartupDir())
 
         self.startupDirEditBox = QtGui.QHBoxLayout()
         self.startupDirEditBox.addWidget(self.startupDirRadios[2])
@@ -332,6 +332,18 @@ class settingsDialog(QtGui.QDialog):
         g.GData.wrapImageList = self.wrapListCb.isChecked()
         g.GData.defaultSaveQuality = self.saveQualitySpin.value()
         g.GData.slideShowDelay = self.slideDelaySpin.value()
+        g.GData.slideShowRandom = self.slideRandomCb.isChecked()
+        g.GData.enableAnimations = self.enableAnimCb.isChecked()
+        g.GData.exifRotationEnabled = self.enableExifCb.isChecked()
+        g.GData.reverseMouseBehavior = self.reverseMouseCb.isChecked()
+
+        if self.startupDirRadios[0].isChecked():
+            g.GData.startupDir = g.GData.defaultDir
+        elif self.startupDirRadios[1].isChecked():
+            g.GData.startupDir = g.GData.rememberLastDir
+        else:
+            g.GData.startupDir = g.GData.specifiedStartDir
+            g.GData.specifiedStartDir = self.startupDirEdit.text()
 
 
         self.accept()
@@ -350,7 +362,7 @@ class settingsDialog(QtGui.QDialog):
 
     def setButtonBgColor(self, color, button):
         logging.info("Setting buttons background color")
-        style = "background: rgb(%i, %i, %i)"% (color.red(), color.green(), color.blue())
+        style = "background: rgb(%i, %i, %i)" % (color.red(), color.green(), color.blue())
         button.setStyleSheet(style)
 
     def pickThumbsColor(self):
@@ -367,3 +379,7 @@ class settingsDialog(QtGui.QDialog):
             self.setButtonBgColor(userColor, self.colThumbTextButton)
             self.thumbTextColor = userColor
 
+    def pickStartupDir(self):
+        logging.info("pick Startup Directory")
+        dirName = QtGui.QFileDialog.getExistingDirectory(caption="Choose a startup folder", directory="", options=QtGui.QFileDialog.ShowDirsOnly)
+        self.startupDirEdit.setText(dirName)

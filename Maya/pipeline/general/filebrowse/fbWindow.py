@@ -31,7 +31,8 @@ class fbWindow(QtGui.QMainWindow):
         # initialize the QWidget
         QtGui.QWidget.__init__(self, parent)
 
-        self.GData = g.GData()
+        self.log =logging.getLogger("phototonic_Logger")
+        self.log.setLevel(logging.debug)
 
         # locate the directory where all of the images for the ui live
         ScriptDir = pm.internalVar(uad=True)
@@ -97,7 +98,8 @@ class fbWindow(QtGui.QMainWindow):
 #        return event
 
     def createThumbView(self):
-        logging.info("Building the ThumbView")
+        self.log.debug("fbWindow.createThumbView")
+        self.log.info("Building the ThumbView")
         import pipeline.general.filebrowse.thumbview as tv
 
         self.thumbView = tv.thumbView(self)
@@ -110,13 +112,14 @@ class fbWindow(QtGui.QMainWindow):
         #self.iiDock.setWidget(self.thumbView)
 
         self.addDockWidget(QtCore.Qt.RightDockWidgetArea, self.iiDock)
-        logging.info("ThumbView should be built")
+        self.log.info("ThumbView should be built")
 
     def AddMenuSeparator(self):
         """
 
         :return:
         """
+        self.log.debug("fbWindow.addMenuSeparator")
         separator = QtCore.QAction(self)
         separator.setSeparator(True)
         self.addAction(separator)
@@ -133,7 +136,7 @@ class fbWindow(QtGui.QMainWindow):
 
         :return:
         """
-        logging.debug("creating all actions for the file browser")
+        self.log.debug("creating all actions for the file browser")
         self.thumbsGoTopAct = QtGui.QAction("Top", self)
         self.thumbsGoTopAct.setIcon(QtGui.QIcon(str(self.imgDirectory+"top.png")))
         self.thumbsGoTopAct.triggered.connect(lambda: self.goTop())
@@ -446,7 +449,7 @@ class fbWindow(QtGui.QMainWindow):
 
         :return:
         """
-        logging.info("creating the menus")
+        self.log.info("creating the menus")
         self.menubar = QtGui.QMenuBar(self)
         self.fileMenu = QtGui.QMenu("&File", self.menubar)
         self.fileMenu.addAction(self.subFoldersAction)
@@ -627,7 +630,7 @@ class fbWindow(QtGui.QMainWindow):
         print "setting Toolbar icon size"
 
     def createStatusBar(self):
-        print "creating Status bar"
+        self.log.debug("creating Status bar")
 
         self.statusBar = QtGui.QStatusBar()
         self.stateLabel = QtGui.QLabel("Initializing")
@@ -1033,7 +1036,7 @@ class fbWindow(QtGui.QMainWindow):
         g.GData.appSettings.setValue("ThumbsZoomVal", int(self.thumbView.thumbSize))
         g.GData.appSettings.setValue("isFullScreen", bool(g.GData.isFullScreen))
         g.GData.appSettings.setValue("backgroundColor", g.GData.backgroundColor)
-        #logging.info("Background Color" + str(g.GData.backgroundColor))
+        logging.info("Background Color" + str(g.GData.backgroundColor))
         g.GData.appSettings.setValue("backgroundThumbColor", g.GData.thumbsBackgroundColor)
         #logging.info("Background Thumb Color" + str(g.GData.thumbsBackgroundColor))
         g.GData.appSettings.setValue("textThumbColor", g.GData.thumbsTextColor)
@@ -1121,8 +1124,8 @@ class fbWindow(QtGui.QMainWindow):
             #g.GData.bookmarkPaths.insert(QtCore.QDir.homePath())
 
         logging.debug("store loaded setting in memory")
-        g.GData.backgroundColor = g.GData.appSettings.value("backgroundColor")
-        logging.info("Background Color: ")
+        g.GData.backgroundColor = QtGui.QColor(g.GData.appSettings.value("backgroundColor"))
+        logging.info("Background Color: "+str(g.GData.backgroundColor))
         g.GData.exitInsteadofClose = g.GData.appSettings.value("exitInsteadOfClose").toBool()
         logging.info("Exit instead of Close: "+str(g.GData.exitInsteadofClose))
         g.GData.enableAnimations = g.GData.appSettings.value("enableAnimations").toBool()
