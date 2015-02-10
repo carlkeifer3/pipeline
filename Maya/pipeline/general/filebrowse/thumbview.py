@@ -24,7 +24,7 @@ class thumbView(QtGui.QListView):
         g.GData.thumbsBackgroundColor = QtGui.QColor(g.GData.appSettings.value("backgroundThumbColor"))
         g.GData.thumbsTextColor = QtGui.QColor(g.GData.appSettings.value("textThumbColor"))
 
-        self.setThumbColors()
+
 
         self.thumbSize = g.GData.appSettings.value("thumbsZoomVal").toInt()[0]
         logging.info(self.thumbSize)
@@ -54,6 +54,8 @@ class thumbView(QtGui.QListView):
         self.abortOp = False
         self.isNeedScroll = False
 
+        self.setThumbColors()
+
         self.thumbsDir = QtCore.QDir()
         self.fileFilters = QtCore.QStringList("")
 
@@ -64,12 +66,18 @@ class thumbView(QtGui.QListView):
         logging.info("thumbView.setThumbColors()")
         color = g.GData.thumbsBackgroundColor
         self.bgColor = QtCore.QString("background-color: rgb(%i, %i, %i)" % (color.red(), color.green(), color.blue()))
-        self.bgImage = QtCore.QString("background-image: url("+g.GData.thumbsBackImage+")")
+        self.bgImage = QtCore.QString("background-image: url(d:/fb-Back.png)")
         self.bgSetting = QtCore.QString("background-attachment: fixed")
 
         self.setStyleSheet(self.bgColor)
         self.setStyleSheet(self.bgImage)
-        self.setStyleSheet(self.bgSetting)
+        #self.setStyleSheet(self.bgSetting)
+
+        scrollBarOigPal = self.scrollbar.palette()
+        thumbViewOrigPal = self.palette()
+        thumbViewOrigPal.setColor(QtGui.QPalette().Text, g.GData.thumbsTextColor)
+        self.setPalette(thumbViewOrigPal)
+        self.scrollbar.setPalette(scrollBarOigPal)
 
     def selectCurrentIndex(self):
 
