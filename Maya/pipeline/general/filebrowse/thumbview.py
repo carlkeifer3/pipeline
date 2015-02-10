@@ -49,7 +49,7 @@ class thumbView(QtGui.QListView):
         self.isNeedScroll = False
 
         self.thumbsDir = QtCore.QDir()
-        #self.fileFilters = QtCore.QStringList
+        self.fileFilters = QtCore.QStringList("")
 
     def setNeedScroll(self, needScroll):
         isneedScroll = needScroll
@@ -145,7 +145,7 @@ class thumbView(QtGui.QListView):
 
         logging.info("First thumbnail found: "+ str(first))
         logging.info("Last thumbnail found: "+ str(last))
-        logging.info(" currently displaying "+str(last-first)+" thumbnails.")
+        logging.info(" currently displaying "+str((last-first)+1)+" thumbnails.")
         if first < 0 | last < 0:
             return
 
@@ -170,7 +170,7 @@ class thumbView(QtGui.QListView):
         currThumb = 0
         logging.info("Investigating "+str(self.thumbModel.rowCount())+" rows")
         while currThumb < int(self.thumbModel.rowCount()):
-            logging.info("Looking for first thumbnail in list of thumbs")
+            #logging.info("Looking for first thumbnail in list of thumbs")
             idx = self.thumbModel.index(currThumb, 0)
             if self.viewport().rect().contains(QtCore.QPoint(0, self.visualRect(idx).y() + self.visualRect(idx).height() + 1)):
                 logging.info("First thumbnail found")
@@ -187,7 +187,8 @@ class thumbView(QtGui.QListView):
         logging.info("thumbView.getLastVisibleThumb()")
         logging.info("get last visible thumbnail")
         currThumb = self.thumbModel.rowCount() -1
-        if currThumb >= 0:
+        logging.info("Investigating "+str(currThumb)+" rows")
+        if currThumb > 0:
             logging.info("Looking for last Thumbnail in list of thumbs")
             idx = self.thumbModel.indexFromItem(self.thumbModel.item(currThumb))
             if self.viewport().rect().contains(QtCore.QPoint(0, self.visualRect(idx).y() + self.visualRect(idx).height() + 1)):
@@ -226,12 +227,27 @@ class thumbView(QtGui.QListView):
         thumbWidth = self.thumbSize * thumbAspect
         self.setIconSize(QtCore.QSize(thumbWidth, thumbHeight))
 
-        # skipping filtered search for now
+        self.fileFilters.clear()
+        self.fileFilters.append("*.BMP")
+        self.fileFilters.append("*.GIF")
+        self.fileFilters.append("*.ICO")
+        self.fileFilters.append("*.JPEG")
+        self.fileFilters.append("*.JPG")
+        self.fileFilters.append("*.MNG")
 
-        #self.thumbsDir.setPath(self.currentViewDir)
+        self.thumbsDir.setNameFilters(self.fileFilters)
+        self.thumbsDir.setFilter(QtCore.QDir.Files)
+        #if self.GData.showHiddenFiles:
+        #    self.thumbsDir.setFilter(self.thumbsDir.filters() | QtCore.QDir.hidden)
+        self.thumbsDir.setPath(self.currentViewDir)
         self.thumbModel.clear()
 
+        self.setSpacing(self.GData.thumbsSpacing)
+
         self.abortOp = False
+
+        self.thumbsRangeFirst = -1
+        self.thumbsRangeLast = -1
 
     def load(self):
 
