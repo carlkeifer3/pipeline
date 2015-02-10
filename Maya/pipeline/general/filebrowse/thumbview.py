@@ -311,6 +311,7 @@ class thumbView(QtGui.QListView):
             thumbIitem.setTextAlignment(QtCore.Qt.AlignTop | QtCore.Qt.AlignCenter)
             #thumbIitem.setText(thumbFileInfo.fileName())
             thumbIitem.setIcon(QtGui.QIcon("D:/Nedry.png"))
+            logging.info("Ah, Ah, Ah, you didn't say the magic word")
             #thumbIitem.setIcon(QtGui.QIcon(thumbFileInfo.filePath()))
 
             self.thumbModel.appendRow(thumbIitem)
@@ -324,6 +325,30 @@ class thumbView(QtGui.QListView):
 
     def loadThumbsRange(self):
         logging.info("thumbView.loadThumbsRange")
+
+        thumbReader = QtGui.QImageReader()
+
+        self.inProgress = True
+        currRowCount = self.thumbModel.rowCount()
+
+        currThumb = self.thumbsRangeFirst
+
+        if currThumb < 0:
+            currThumb = 0
+
+        while currThumb <= self.thumbsRangeLast:
+
+
+            imageFileName = self.thumbModel.item(currThumb).data(role=self.r.fileNameRole).toString()
+
+
+
+            self.thumbModel.item(currThumb).setIcon(QtGui.QIcon(imageFileName))
+
+            logging.info(imageFileName+", Should now be loaded.")
+            self.thumbModel.item(currThumb).setData(True, role=self.r.loadedRole)
+            currThumb += 1
+
 
     def addThumb(self):
         logging.info("thumbView.addThumb")
