@@ -306,9 +306,13 @@ class thumbView(QtGui.QListView):
             ## add
             thumbIitem.setData(thumbFileInfo.fileName(), role=QtCore.Qt.DisplayRole)
 
+            thumbIitem.setTextAlignment(QtCore.Qt.AlignTop | QtCore.Qt.AlignCenter
+            )
             thumbIitem.setText(thumbFileInfo.fileName())
             thumbIitem.setIcon(QtGui.QIcon(thumbFileInfo.filePath()))
+
             self.thumbModel.appendRow(thumbIitem)
+            currThumb += 1
 
     def updateFoundDupeState(self):
         logging.info("thumbview.updateFoundDupeState")
