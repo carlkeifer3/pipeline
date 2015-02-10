@@ -175,7 +175,7 @@ class thumbView(QtGui.QListView):
         index = self.thumbModel.index(last, 0)
         logging.info("Last thumbnail: "+ self.thumbModel.data(index).toString())
 
-        self.loadThubsRange()
+        self.loadThumbsRange()
 
     def getFirstVisibleThumb(self):
         logging.info("thumbView.getFirstVisibleThumb()")
@@ -295,8 +295,7 @@ class thumbView(QtGui.QListView):
         emptyPixMap = QtGui.QPixmap()
         hintSize = QtCore.QSize()
 
-         #print self.thumbFileInfoList
-        print "current Path :"+str(self.thumbsDir.currentPath)
+        logging.info("current Path :"+str(self.thumbsDir.currentPath))
         for thumbFileInfo in self.thumbFileInfoList:
             thumbIitem = QtGui.QStandardItem()
             thumbIitem.setText(thumbFileInfo.fileName())
