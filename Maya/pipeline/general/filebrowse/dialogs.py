@@ -142,10 +142,10 @@ class settingsDialog(QtGui.QDialog):
         #self.thumbsBackImageEdit.setClearButtonEnabled(True)
 
         self.chooseThumbsBackImageButton = QtGui.QToolButton()
-        #self.chooseThumbsBackImageButton.setIcon(QtCore.QIcon.fromTheme("document-open", QtCore.QIcon(":/images/open.png")))
+        self.chooseThumbsBackImageButton.setIcon(QtGui.QIcon.fromTheme("document-open", QtGui.QIcon(":/images/open.png")))
         self.chooseThumbsBackImageButton.setFixedSize( 26, 26)
         self.chooseThumbsBackImageButton.setIconSize( QtCore.QSize(16, 16))
-        #self.chooseThumbsBackImageButton.clicked.connect(self.pickBgImage)
+        self.chooseThumbsBackImageButton.clicked.connect(self.pickBgImage)
 
         self.thumbsBackImageEditBox = QtGui.QHBoxLayout()
         self.thumbsBackImageEditBox.addWidget(self.thumbsBackImageLab)
@@ -179,15 +179,15 @@ class settingsDialog(QtGui.QDialog):
         self.thumbPagesHbox.addWidget(self.thumbPagesSpin)
         self.thumbSpacingHbox.addStretch(1)
 
-        self.enableExifCb = QtGui.QCheckBox("Rotate thumbnails according to Exif orientation")
-        self.enableExifCb.setChecked(g.GData.exifRotationEnabled)
+        self.enableThumbExifCb = QtGui.QCheckBox("Rotate thumbnails according to Exif orientation")
+        self.enableThumbExifCb.setChecked(g.GData.exifRotationEnabled)
 
         ## Thumbnail options
         self.thumbsOptBox = QtGui.QVBoxLayout()
         self.thumbsOptBox.addLayout(self.bgThumbColBox)
-        self.thumbsOptBox.addWidget(self.thumbsBackImageEdit)
+        self.thumbsOptBox.addLayout(self.thumbsBackImageEditBox)
         self.thumbsOptBox.addLayout(self.thumbSpacingHbox)
-        #self.thumbsOptBox.addWidget(self.enableThumbExifCb)
+        self.thumbsOptBox.addWidget(self.enableThumbExifCb)
         self.thumbsOptBox.addLayout(self.thumbPagesHbox)
         self.thumbsOptBox.addWidget(self.noSmallThumbCb)
         self.thumbsOptBox.addStretch(1)
@@ -383,3 +383,8 @@ class settingsDialog(QtGui.QDialog):
         logging.info("pick Startup Directory")
         dirName = QtGui.QFileDialog.getExistingDirectory(caption="Choose a startup folder", directory="", options=QtGui.QFileDialog.ShowDirsOnly)
         self.startupDirEdit.setText(dirName)
+
+    def pickBgImage(self):
+        logging.info("Picking a Background Image")
+        dirName = QtGui.QFileDialog.getExistingDirectory(caption="Open File", directory="")#, options="images"+"*.jpg *.jpeg *.png *.bmp *.tiff *.tif *.ppm *.xbm *.xpm")
+        self.thumbsBackImageEdit.setText(dirName)

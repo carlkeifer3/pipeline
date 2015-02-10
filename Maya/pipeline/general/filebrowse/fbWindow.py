@@ -10,6 +10,7 @@ import os
 import sip
 import maya.OpenMayaUI as apiUI
 import pipeline.general.filebrowse.thumbview as tv
+import pipeline.general.filebrowse.imageView as iv
 import pipeline.general.filebrowse.dialogs as dia
 import pipeline.general.filebrowse.GData as g
 
@@ -55,8 +56,12 @@ class fbWindow(QtGui.QMainWindow):
         self.createBookmarks()
         self.createImageView()
         #self.UpdateExternalApps()
-        #self.loadShortcuts()
-        #self.setupDocks()
+        self.loadShortcuts()
+        self.setupDocks()
+
+        self.restoreGeometry(g.GData.appSettings.value("Geometry").toByteArray())
+        self.restoreState(g.GData.appSettings.value("WindowState").toByteArray())
+        self.setWindowIcon(QtGui.QIcon(self.imgDirectory+"phototonic.png"))
 
         self.fbLayout.addWidget(self.thumbView)
         self.centralWidget = QtGui.QWidget()
@@ -111,7 +116,7 @@ class fbWindow(QtGui.QMainWindow):
         self.iiDock.setObjectName("ImageInfo")
         #self.iiDock.setWidget(self.thumbView)
 
-        self.addDockWidget(QtCore.Qt.RightDockWidgetArea, self.iiDock)
+        #self.addDockWidget(QtCore.Qt.RightDockWidgetArea, self.iiDock)
         self.log.info("ThumbView should be built")
 
     def AddMenuSeparator(self):
@@ -129,7 +134,32 @@ class fbWindow(QtGui.QMainWindow):
 
         :return:
         """
-        print "createImageView()"
+        logging.info("createImageView()")
+
+        self.imageView = iv.ImageView()
+
+        self.imageView.ImagePopUpMenu = QtGui.QMenu()
+
+        ## Widget Actions
+        self.imageView.addAction(self.slideShowAction)
+        self.imageView.addAction(self.nextImageAction)
+        self.imageView.addAction(self.prevImageAction)
+        self.imageView.addAction(self.firstImageAction)
+        self.imageView.addAction(self.lastImageAction)
+        self.imageView.addAction(self.randomImageAction)
+        self.imageView.addAction(self.zoomInAct)
+        self.imageView.addAction(self.zoomOutAct)
+        self.imageView.addAction(self.origZoomAct)
+        self.imageView.addAction(self.resetZoomAct)
+        self.imageView.addAction(self.rotateRightAct)
+        self.imageView.addAction(self.rotateLeftAct)
+        self.imageView.addAction(self.freeRotateRight)
+        self.imageView.addAction(self.freeRotateLeftAct)
+        self.imageView.addAction(self.flipHAct)
+        self.imageView.addAction(self.flipVAct)
+        self.imageView.addAction(self.cropAct)
+        self.imageView.addAction(self.cropToSelectionAct)
+        self.imageView.addAction(self.resizeAct)
 
     def createActions(self):
         """
@@ -707,7 +737,8 @@ class fbWindow(QtGui.QMainWindow):
         QtCore.QTimer.singleShot(100, lambda: self.selectRecentThumb())
 
     def setClassicThumbs(self):
-        print "setting classic thumbs view"
+        logging.info("setting classic thumbs view")
+        #g.GData.thumbsLayout = self.tl.Classic
 
     def setCompactThumbs(self):
         print "setting compact thumbs view"
@@ -719,7 +750,9 @@ class fbWindow(QtGui.QMainWindow):
         print "showing hidden files"
 
     def toggleImageToolbar(self):
-        print "toggling Image Toolbar"
+        logging.info("toggling Image Toolbar")
+        self.imageToolBar.setVisible(self.actShowViewerToolbars.isChecked())
+        g.GData.imageToolbarFullScreen = self.actShowViewerToolbars.isChecked()
 
     def showLabels(self):
         print "showing Labels"
@@ -1125,84 +1158,84 @@ class fbWindow(QtGui.QMainWindow):
 
         logging.debug("store loaded setting in memory")
         g.GData.backgroundColor = QtGui.QColor(g.GData.appSettings.value("backgroundColor"))
-        logging.info("Background Color: "+str(g.GData.backgroundColor))
+        #logging.info("Background Color: "+str(g.GData.backgroundColor))
         g.GData.exitInsteadofClose = g.GData.appSettings.value("exitInsteadOfClose").toBool()
-        logging.info("Exit instead of Close: "+str(g.GData.exitInsteadofClose))
+        #logging.info("Exit instead of Close: "+str(g.GData.exitInsteadofClose))
         g.GData.enableAnimations = g.GData.appSettings.value("enableAnimations").toBool()
-        logging.info("Enable Animations: "+str(g.GData.enableAnimations))
+        #logging.info("Enable Animations: "+str(g.GData.enableAnimations))
         g.GData.exifRotationEnabled = g.GData.appSettings.value("exifRotationEnabled").toBool()
-        logging.info("Exif Rotations Enabled: "+str(g.GData.exifRotationEnabled))
+        #logging.info("Exif Rotations Enabled: "+str(g.GData.exifRotationEnabled))
         g.GData.exifThumbRotationEnabled = g.GData.appSettings.value("exifThumbRotationEnabled").toBool()
-        logging.info("Exif Thumbnail Rotations Enabled: "+str(g.GData.exifThumbRotationEnabled))
+        #logging.info("Exif Thumbnail Rotations Enabled: "+str(g.GData.exifThumbRotationEnabled))
         g.GData.reverseMouseBehavior = g.GData.appSettings.value("reverseMouseBehavior").toBool()
-        logging.info("Reverse Mouse Behavior: "+str(g.GData.reverseMouseBehavior))
+        #logging.info("Reverse Mouse Behavior: "+str(g.GData.reverseMouseBehavior))
         g.GData.showHiddenFiles = g.GData.appSettings.value("showHiddenFiles").toBool()
-        logging.info("Showing Hidden Files: "+str(g.GData.showHiddenFiles))
+        #logging.info("Showing Hidden Files: "+str(g.GData.showHiddenFiles))
         g.GData.wrapImageList = g.GData.appSettings.value("wrapImageList").toBool()
-        logging.info("Wrap Image List: "+str(g.GData.wrapImageList))
+        #logging.info("Wrap Image List: "+str(g.GData.wrapImageList))
         trashf = g.GData.appSettings.value("imageZoomFactor").toFloat()
         g.GData.imageZoomFactor = trashf[0]
-        logging.info("Image Zoom Factor: "+str(g.GData.imageZoomFactor))
+        #logging.info("Image Zoom Factor: "+str(g.GData.imageZoomFactor))
         trashi = g.GData.appSettings.value("zoomOutFlags").toInt()
         g.GData.zoomOutFlags = trashi[0]
-        logging.info("Zoom Out Flags: "+str(g.GData.zoomOutFlags))
+        #logging.info("Zoom Out Flags: "+str(g.GData.zoomOutFlags))
         trashi = g.GData.appSettings.value("zoomInFlags").toInt()
         g.GData.zoomInFlags = trashi[0]
-        logging.info("Zoom In Flags: "+str(g.GData.zoomInFlags))
+        #logging.info("Zoom In Flags: "+str(g.GData.zoomInFlags))
         g.GData.rotation = 0
         g.GData.keepTransform = False
         self.shouldMaximize = g.GData.appSettings.value("shouldMaximize").toBool()
-        logging.info("Should Maximize: "+str(self.shouldMaximize))
+        #logging.info("Should Maximize: "+str(self.shouldMaximize))
         g.GData.flipH = False
         g.GData.flipV = False
         trashi =  g.GData.appSettings.value("defaultSaveQuality").toInt()
         g.GData.defaultSaveQuality = trashi[0]
-        logging.info("Default Image Save Quality: "+str(g.GData.defaultSaveQuality))
+        #logging.info("Default Image Save Quality: "+str(g.GData.defaultSaveQuality))
         g.GData.noEnlargeSmallThumbs = g.GData.appSettings.value("noEnlargeSmallThumb").toBool()
-        logging.info("No Enlarge Small Thumb: "+str(g.GData.noEnlargeSmallThumbs))
+        #logging.info("No Enlarge Small Thumb: "+str(g.GData.noEnlargeSmallThumbs))
         trashi = g.GData.appSettings.value("slideShowDelay").toInt()
         g.GData.slideShowDelay = trashi[0]
-        logging.info("Slide Show Delay: "+str(g.GData.slideShowDelay))
+        #logging.info("Slide Show Delay: "+str(g.GData.slideShowDelay))
         g.GData.slideShowRandom = g.GData.appSettings.value("slideShowRandom").toBool()
-        logging.info("Slide Show Random: "+str(g.GData.slideShowRandom))
+        #logging.info("Slide Show Random: "+str(g.GData.slideShowRandom))
         g.GData.slideShowActive = False
-        logging.info("Slide Show Active: "+str(g.GData.slideShowActive))
+        #logging.info("Slide Show Active: "+str(g.GData.slideShowActive))
         self.editToolbarVisible = g.GData.appSettings.value("editToolBarVisible").toBool()
-        logging.info("Edit ToolBar Visible: "+str(self.editToolbarVisible))
+        #logging.info("Edit ToolBar Visible: "+str(self.editToolbarVisible))
         self.goToolBarVisible = g.GData.appSettings.value("goToolBarVisible").toBool()
-        logging.info("Go ToolBar Visible: "+str(self.goToolBarVisible))
+        #logging.info("Go ToolBar Visible: "+str(self.goToolBarVisible))
         self.viewToolBarVisible = g.GData.appSettings.value("viewToolBarVisible").toBool()
-        logging.info("View ToolBar Visible: "+str(self.viewToolBarVisible))
+        #logging.info("View ToolBar Visible: "+str(self.viewToolBarVisible))
         self.imageToolBarVisible = g.GData.appSettings.value("imageToolBarVisible").toBool()
-        logging.info("Image ToolBar Visible: "+str(self.imageToolBarVisible))
+        #logging.info("Image ToolBar Visible: "+str(self.imageToolBarVisible))
         g.GData.fsDockVisible = g.GData.appSettings.value("fsDockVisible").toBool()
-        logging.info("Fs Dock Visible: "+str(g.GData.fsDockVisible))
+        #logging.info("Fs Dock Visible: "+str(g.GData.fsDockVisible))
         g.GData.bmDockVisible = g.GData.appSettings.value("bmDockVisible").toBool()
-        logging.info("Bm Dock Visible: "+str(g.GData.bmDockVisible))
+        #logging.info("Bm Dock Visible: "+str(g.GData.bmDockVisible))
         g.GData.iiDockVisible = g.GData.appSettings.value("iiDockVisible").toBool()
-        logging.info("Ii Dock Visible: "+str(g.GData.iiDockVisible))
+        #logging.info("Ii Dock Visible: "+str(g.GData.iiDockVisible))
         g.GData.pvDockVisible = g.GData.appSettings.value("pvDockVisible").toBool()
-        logging.info("Pv Dock Visible: "+str(g.GData.pvDockVisible))
+        #logging.info("Pv Dock Visible: "+str(g.GData.pvDockVisible))
         trashi = g.GData.appSettings.value("startupDir").toInt()
         g.GData.startupDir = trashi[0]
-        logging.info("Startup Directory: "+str(g.GData.startupDir))
+        #logging.info("Startup Directory: "+str(g.GData.startupDir))
         g.GData.specifiedStartDir = g.GData.appSettings.value("specifiedStartDir").toString()
-        logging.info("specified Start Directory: "+str(g.GData.specifiedStartDir))
+        #logging.info("specified Start Directory: "+str(g.GData.specifiedStartDir))
         g.GData.thumbsBackImage = g.GData.appSettings.value("thumbsBackImage").toString()
-        logging.info("Thumbs Background Image: "+str(g.GData.thumbsBackImage))
+        #logging.info("Thumbs Background Image: "+str(g.GData.thumbsBackImage))
         trashi =  g.GData.appSettings.value("thumbSpacing").toInt()
         g.GData.thumbsSpacing = trashi[0]
-        logging.info("Thumb Spacing: "+ str(g.GData.thumbsSpacing))
+        #logging.info("Thumb Spacing: "+ str(g.GData.thumbsSpacing))
         g.GData.enableImageInfoFS = g.GData.appSettings.value("enableImageInfoFS").toBool()
-        logging.info("Enable Image Info Fs: "+str(g.GData.enableImageInfoFS))
+        #logging.info("Enable Image Info Fs: "+str(g.GData.enableImageInfoFS))
         g.GData.showLabels = g.GData.appSettings.value("showLabels").toBool()
-        logging.info("Show Labels: "+str(g.GData.showLabels))
+        #logging.info("Show Labels: "+str(g.GData.showLabels))
         g.GData.smallIcons = g.GData.appSettings.value("smallIcons").toBool()
-        logging.info("Small Icons: "+str(g.GData.smallIcons))
+        #logging.info("Small Icons: "+str(g.GData.smallIcons))
         g.GData.LockDocks = g.GData.appSettings.value("LockDocks").toBool()
-        logging.info("Lock Docks: "+str(g.GData.LockDocks))
+        #logging.info("Lock Docks: "+str(g.GData.LockDocks))
         g.GData.imageToolbarFullScreen = g.GData.appSettings.value("imageToolbarFullScreen").toBool()
-        logging.info("Image Toolbar Full Screen: "+str(g.GData.imageToolbarFullScreen))
+        #logging.info("Image Toolbar Full Screen: "+str(g.GData.imageToolbarFullScreen))
 
         #g.GData.appSettings.beginGroup("externalApps")
         #extApps = g.GData.appSettings.childKeys()
@@ -1224,7 +1257,23 @@ class fbWindow(QtGui.QMainWindow):
 
 
     def setupDocks(self):
-        print "setting up the docks"
+        logging.info("fbWindow.setupDocks()")
+        logging.info("setting up the docks")
+
+        self.pvDock = QtGui.QDockWidget("Viewer", self)
+        self.pvDock.setObjectName("Viewer")
+
+        self.imageViewContainer = QtGui.QVBoxLayout(self)
+        self.imageViewContainer.setContentsMargins(0, 0, 0, 0)
+        self.imageViewContainer.addWidget(self.imageView)
+        self.imageViewContainerWidget = QtGui.QWidget()
+        self.imageViewContainerWidget.setLayout(self.imageViewContainer)
+
+        self.pvDock.setWidget(self.imageViewContainerWidget)
+        self.pvDock.toggleViewAction().triggered.connect(lambda: self.setPvDockVisibility())
+        #self.pvDock.visiblityChanged().connect(lambda: self.setPvDockVisibility())
+        self.addDockWidget(QtCore.Qt.RightDockWidgetArea, self.pvDock)
+        self.addDockWidget(QtCore.Qt.RightDockWidgetArea, self.iiDock)
 
     def lockDocks(self):
         print "locking all docked items"
