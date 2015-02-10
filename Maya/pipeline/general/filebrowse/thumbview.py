@@ -295,9 +295,10 @@ class thumbView(QtGui.QListView):
         emptyPixMap = QtGui.QPixmap()
         hintSize = QtCore.QSize()
 
-        logging.info("current Path :"+str(self.thumbsDir.currentPath))
         for thumbFileInfo in self.thumbFileInfoList:
+            logging.info("adding %s to the model" % thumbFileInfo.filePath())
             thumbIitem = QtGui.QStandardItem()
+
             thumbIitem.setText(thumbFileInfo.fileName())
             thumbIitem.setIcon(QtGui.QIcon(thumbFileInfo.filePath()))
             self.thumbModel.appendRow(thumbIitem)
