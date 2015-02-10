@@ -169,7 +169,13 @@ class thumbView(QtGui.QListView):
         self.thumbsRangeFirst = first
         self.thumbsRangeLast = last
 
-        #self.loadThubsRange()
+        logging.info("preparing to load the range of thumbs")
+        index = self.thumbModel.index(first, 0)
+        logging.info("First thumbnail "+ self.thumbModel.data(index).toString())
+        index = self.thumbModel.index(last, 0)
+        logging.info("Last thumbnail: "+ self.thumbModel.data(index).toString())
+
+        self.loadThubsRange()
 
     def getFirstVisibleThumb(self):
         logging.info("thumbView.getFirstVisibleThumb()")
@@ -180,8 +186,8 @@ class thumbView(QtGui.QListView):
             #logging.info("Looking for first thumbnail in list of thumbs")
             idx = self.thumbModel.index(currThumb, 0)
             if self.viewport().rect().contains(QtCore.QPoint(0, self.visualRect(idx).y() + self.visualRect(idx).height() + 1)):
-                index = self.thumbModel.index(currThumb, 0)
-                logging.info("First thumbnail "+ str(self.thumbModel.data(index).toString()))
+                #index = self.thumbModel.index(currThumb, 0)
+                #logging.info("First thumbnail "+ str(self.thumbModel.data(index).toString()))
                 return idx.row()
             currThumb += 1
 
@@ -225,7 +231,8 @@ class thumbView(QtGui.QListView):
         """
         :return:
         """
-        print "update thumbnail selection"
+        logging.info("thumbView.updateThumbsSelection")
+        logging.info("update thumbnail selection")
 
     def loadPrepare(self):
         """
@@ -278,25 +285,41 @@ class thumbView(QtGui.QListView):
         self.updateThumbsCount()
         self.loadVisibleThumbs(0)
 
-    def initThumbs(self):
+    def loadDuplicates(self):
+        logging.info("thumbView.loadDuplicates")
 
+    def initThumbs(self):
+        logging.info("thumbView.initThumbs")
         self.thumbFileInfoList = self.thumbsDir.entryInfoList()
+        currThumb = 0
+        emptyPixMap = QtGui.QPixmap()
+        hintSize = QtCore.QSize()
+
          #print self.thumbFileInfoList
         print "current Path :"+str(self.thumbsDir.currentPath)
         for thumbFileInfo in self.thumbFileInfoList:
             thumbIitem = QtGui.QStandardItem()
-            thumbIitem.setText(str(thumbFileInfo))
+            thumbIitem.setText(thumbFileInfo.fileName())
             thumbIitem.setIcon(QtGui.QIcon(thumbFileInfo.filePath()))
             self.thumbModel.appendRow(thumbIitem)
+
+    def updateFoundDupeState(self):
+        logging.info("thumbview.updateFoundDupeState")
+
+    def findDupes(self):
+        logging.info("thumbView.findDupes")
+
+    def loadThumbsRange(self):
+        logging.info("thumbView.loadThumbsRange")
 
     def addThumb(self):
         logging.info("thumbView.addThumb")
 
-    def wheelEvent(self, event):
-        logging.info("thumbView.wheelEvent")
+    #def wheelEvent(self, event):
+    #    logging.info("thumbView.wheelEvent")
 
-    def mousePressEvent(self, event):
-        logging.info("thumbView.mousePressEvent")
+    #def mousePressEvent(self, event):
+    #    logging.info("thumbView.mousePressEvent")
 
     def invertSelection(self):
         logging.info("thumbView.invertSelection")
