@@ -43,15 +43,6 @@ class fbWindow(QtGui.QMainWindow):
         #self.fbLayout.setContentsMargins(0,0,0,0)
         #self.fbLayout.setSpacing(10)
 
-        # internal class variable time
-        self.copyCutCount = 0
-        self.copyMoveToDialog = 0
-        self.colorsDialog = 0
-        self.cropDialog = 0
-        self.initComplete = True
-
-        self.needHistory = True
-        self.interfaceDisabled = False
 
         self.readSettings()
         self.createThumbView()
@@ -70,6 +61,20 @@ class fbWindow(QtGui.QMainWindow):
         self.centralWidget = QtGui.QWidget()
         self.centralWidget.setLayout(self.fbLayout)
         self.setCentralWidget(self.centralWidget)
+
+        # internal class variable time
+        self.copyCutCount = 0
+        self.copyMoveToDialog = 0
+        self.colorsDialog = 0
+        self.cropDialog = 0
+        self.initComplete = True
+        #self.thumbView.busy = False
+        self.currentHistoryIdx = -1
+        self.needHistory = True
+        self.interfaceDisabled = False
+
+        self.doFindDuplicates = False
+        self.refreshThumbs(True)
 
         #self.setLayout(self.fbLayout)
 
