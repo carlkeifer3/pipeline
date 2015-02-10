@@ -166,7 +166,7 @@ class thumbView(QtGui.QListView):
 
     def getFirstVisibleThumb(self):
         logging.info("thumbView.getFirstVisibleThumb()")
-        logging.info("get first visible thumb")
+        #logging.info("get first visible thumb")
         currThumb = 0
         logging.info("Investigating "+str(self.thumbModel.rowCount())+" rows")
         while currThumb < int(self.thumbModel.rowCount()):
@@ -186,19 +186,19 @@ class thumbView(QtGui.QListView):
         :return:
         """
         logging.info("thumbView.getLastVisibleThumb()")
-        logging.info("get last visible thumbnail")
+        #logging.info("get last visible thumbnail")
         currThumb = int(self.thumbModel.rowCount())-1
         logging.info("Investigating "+str(currThumb)+" rows")
-        if currThumb > 0:
-            logging.info("Looking for last Thumbnail in list of thumbs")
+        while currThumb >= 0:
+            #logging.info("Looking for last Thumbnail in list of thumbs")
             idx = self.thumbModel.indexFromItem(self.thumbModel.item(currThumb))
             if self.viewport().rect().contains(QtCore.QPoint(0, self.visualRect(idx).y() + self.visualRect(idx).height() + 1)):
                 index = self.thumbModel.index(currThumb, 0)
                 logging.info("Last thumbnail: "+ str(self.thumbModel.data(index).toString()))
                 return idx.row()
             currThumb -= 1
-            print "currThumb: "+ str(currThumb)
-        print "nothing found exit -1"
+            #print "currThumb: "+ str(currThumb)
+        #print "nothing found exit -1"
         return -1
 
     def isThumbVisible(self, idx):
