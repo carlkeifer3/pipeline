@@ -150,12 +150,12 @@ class thumbView(QtGui.QListView):
             return
 
         if scrolledForward == True:
-            last += last - first
+            last = (last - first) * (self.GData.thumbPagesReadahead + 1)
             if last >= self.thumbModel.rowCount():
                 last = self.thumbModel.rowCount() -1
 
         else:
-            first -= last -first
+            first = (last -first) * (self.GData.thumbPagesReadahead +1)
             if first < 0:
                 first = 0
 
@@ -163,6 +163,13 @@ class thumbView(QtGui.QListView):
             if last >= self.thumbModel.rowCount():
                 last = self.thumbModel.rowCount()-1
 
+        if self.thumbsRangeFirst == first & self.thumbsRangeLast == last:
+            return
+
+        self.thumbsRangeFirst = first
+        self.thumbsRangeLast = last
+
+        #self.loadThubsRange()
 
     def getFirstVisibleThumb(self):
         logging.info("thumbView.getFirstVisibleThumb()")
@@ -281,3 +288,15 @@ class thumbView(QtGui.QListView):
             thumbIitem.setText(str(thumbFileInfo))
             thumbIitem.setIcon(QtGui.QIcon(thumbFileInfo.filePath()))
             self.thumbModel.appendRow(thumbIitem)
+
+    def addThumb(self):
+        logging.info("thumbView.addThumb")
+
+    def wheelEvent(self, event):
+        logging.info("thumbView.wheelEvent")
+
+    def mousePressEvent(self, event):
+        logging.info("thumbView.mousePressEvent")
+
+    def invertSelection(self):
+        logging.info("thumbView.invertSelection")
