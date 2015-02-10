@@ -775,7 +775,7 @@ class fbWindow(QtGui.QMainWindow):
         #if dialog.exec():
         #     self.thumbView.setThumbColors()
         #     self.GData.imageZoomFactor = 1.0
-        del dialog
+        #del dialog
 
     def toggleFullScreen(self):
         print "Toggle Full Screen Mode"
@@ -877,7 +877,11 @@ class fbWindow(QtGui.QMainWindow):
         print "Free rotate Right"
 
     def showColorsDialog(self):
-        print "Show colors dialog"
+        logging.info("fbWindow.showColorsDialog()")
+        logging.info("Showing colors dialog")
+
+        if self.GData.slideShowActive:
+            self.slideShow()
 
     def moveRight(self):
         print "moving Image Right"
@@ -906,8 +910,16 @@ class fbWindow(QtGui.QMainWindow):
     def setMirrorQuad(self):
         print "set mirror quad"
 
-    def isValidPath(self):
-        print "is this path Valid"
+    def isValidPath(self, path):
+        logging.info("fbWindow.isValidPath()")
+        logging.info("is this path Valid")
+
+        checkPath = QtCore.QDir(path)
+        if checkPath.exists() == False:
+            if checkPath.isReadable() == False:
+                return False
+
+        return True
 
     def pasteThumbs(self):
         print "paste thumbnails"
