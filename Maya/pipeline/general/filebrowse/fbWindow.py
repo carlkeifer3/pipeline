@@ -698,9 +698,10 @@ class fbWindow(QtGui.QMainWindow):
         self.refreshThumbs(False)
 
     def refreshThumbs(self, scrollToTop):
-        print "refresh Thumbs"
+        logging.info("refresh Thumbs")
         self.thumbView.setNeedScroll(scrollToTop)
         QtCore.QTimer.singleShot(0, lambda: self.reloadThumbsSlot())
+        QtCore.QTimer.singleShot(100, lambda: self.selectRecentThumb())
 
     def setClassicThumbs(self):
         print "setting classic thumbs view"
