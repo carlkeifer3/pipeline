@@ -301,6 +301,7 @@ class thumbView(QtGui.QListView):
             logging.info("adding %s to the model" % thumbFileInfo.filePath())
             thumbIitem = QtGui.QStandardItem()
             thumbIitem.setData(False, role=self.r.loadedRole)
+            thumbIitem.setData(currThumb, role=self.r.sortRole)
             thumbIitem.setText(thumbFileInfo.fileName())
             thumbIitem.setIcon(QtGui.QIcon(thumbFileInfo.filePath()))
             self.thumbModel.appendRow(thumbIitem)
