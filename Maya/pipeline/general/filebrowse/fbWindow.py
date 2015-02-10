@@ -976,10 +976,26 @@ class fbWindow(QtGui.QMainWindow):
         self.refreshThumbs(True)
 
     def goPathBarDir(self):
-        print "go to the directory indicated by the path bar"
+        logging.info("fbWindow.goPathBarDir()")
+        logging.info("go to the directory indicated by the path bar")
 
-    def bookmarkClicked(self):
-        print "bookmark selected"
+        self.thumbView.setNeedScroll(True)
+
+        self.checkPath = QtCore.QDir(self.pathBar.text())
+        if self.checkPath.exists() == False:
+            if self.checkPath.isReadable():
+
+                self.msgBox = QtGui.QMessageBox()
+                self.msgBox.critical(self, "Error", "Invalid Path: "+ self.pathBar.text())
+                #self.pathBar.setText(self.thumbView.currentViewDir)
+                return
+        #self.thumbView.currentViewDir = self.pathBar.text()
+        self.refreshThumbs(True)
+        self.selectCurrentViewDir()
+
+    def bookmarkClicked(self, item, col):
+        logging.info("bookmark selected")
+        self.goTo(item.toolTip(col))
 
     def setThumbsFilter(self):
         print "setting thumbnails filter"
