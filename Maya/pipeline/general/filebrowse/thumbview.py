@@ -297,6 +297,8 @@ class thumbView(QtGui.QListView):
         emptyPixMap = QtGui.QPixmap()
         hintSize = QtCore.QSize()
 
+        #emptyPixMap.fromImage(self.emptyImg).scaled(self.thumbWidth,self.thumbHeight)
+
         for thumbFileInfo in self.thumbFileInfoList:
             logging.info("adding %s to the model" % thumbFileInfo.filePath())
             thumbIitem = QtGui.QStandardItem()
@@ -306,10 +308,10 @@ class thumbView(QtGui.QListView):
             ## add
             thumbIitem.setData(thumbFileInfo.fileName(), role=QtCore.Qt.DisplayRole)
 
-            thumbIitem.setTextAlignment(QtCore.Qt.AlignTop | QtCore.Qt.AlignCenter
-            )
-            thumbIitem.setText(thumbFileInfo.fileName())
-            thumbIitem.setIcon(QtGui.QIcon(thumbFileInfo.filePath()))
+            thumbIitem.setTextAlignment(QtCore.Qt.AlignTop | QtCore.Qt.AlignCenter)
+            #thumbIitem.setText(thumbFileInfo.fileName())
+            thumbIitem.setIcon(QtGui.QIcon("D:/Nedry.png"))
+            #thumbIitem.setIcon(QtGui.QIcon(thumbFileInfo.filePath()))
 
             self.thumbModel.appendRow(thumbIitem)
             currThumb += 1
