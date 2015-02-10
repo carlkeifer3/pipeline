@@ -21,6 +21,8 @@ class thumbView(QtGui.QListView):
 
         self.r = g.UserRoles()
 
+        g.GData.thumbsBackgroundColor = QtGui.QColor(g.GData.appSettings.value("backgroundThumbColor"))
+
         self.thumbSize = g.GData.appSettings.value("thumbsZoomVal").toInt()[0]
         logging.info(self.thumbSize)
 
@@ -56,7 +58,10 @@ class thumbView(QtGui.QListView):
         isneedScroll = needScroll
 
     def setThumbColors(self):
-        self.bgColor = QtCore.QString("background: rgb(%1, %2, %3)")
+        logging.info("thumbView.setThumbColors()")
+        color = g.GData.thumbsBackgroundColor
+        self.bgColor = QtCore.QString("background: rgb(%i, %i, %i)" % (color.red(), color.blue(), color.green()))
+        ss = QtCore.QString("QListView{ "+self.bgColor+"background-image: url("+g.GData.thumbsBackImage+")}")
 
     def selectCurrentIndex(self):
 
