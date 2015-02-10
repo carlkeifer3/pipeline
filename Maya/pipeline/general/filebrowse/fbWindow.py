@@ -642,7 +642,7 @@ class fbWindow(QtGui.QMainWindow):
         self.setStatusBar(self.statusBar)
 
     def createFSTree(self):
-        print "creating filesystem tree"
+        logging.info("creating filesystem tree")
         import pipeline.general.filebrowse.fstree as fs
 
         self.fsDock = QtGui.QDockWidget("File System", self)
@@ -651,9 +651,21 @@ class fbWindow(QtGui.QMainWindow):
         self.fsTree = fs.FSTree(self.fsDock)
         self.fsDock.setWidget(self.fsTree)
 
+        self.fsDock.toggleViewAction().triggered.connect(lambda: self.setFsDockVisibility())
+        #self.fsDock.visibilityChanged.connect(lambda: self.setFsDockVisibility())
         self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.fsDock)
 
         #Context Menu
+        self.fsTree.addAction(self.openAction)
+        self.fsTree.addAction(self.createDirAction)
+        self.fsTree.addAction(self.renameAction)
+        self.fsTree.addAction(self.deleteAction)
+        #self.fsTree.addSeparator()
+        self.fsTree.addAction(self.pasteAction)
+        #self.fsTree.addSeparator()
+        self.fsTree.addAction(self.openWithMenuAct)
+        self.fsTree.addAction(self.addBookmarkAction)
+        self.fsTree.setContextMenuPolicy(QtCore.Qt.ActionsContextMenu)
 
         self.fsTree.clicked.connect(lambda: self.goSelectedDir())
 
