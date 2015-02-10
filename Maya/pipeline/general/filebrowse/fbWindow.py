@@ -1275,6 +1275,14 @@ class fbWindow(QtGui.QMainWindow):
         self.addDockWidget(QtCore.Qt.RightDockWidgetArea, self.pvDock)
         self.addDockWidget(QtCore.Qt.RightDockWidgetArea, self.iiDock)
 
+        self.fsDockOrigWidget = self.fsDock.titleBarWidget()
+        self.bmDockOrigWidget = self.bmDock.titleBarWidget()
+
+        self.lockDocks()
+
+        self.setDockOptions(self.AllowNestedDocks)
+        logging.info("Dock setup complete loading program window")
+
     def lockDocks(self):
         print "locking all docked items"
 
