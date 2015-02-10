@@ -658,16 +658,21 @@ class fbWindow(QtGui.QMainWindow):
         self.fsTree.clicked.connect(lambda: self.goSelectedDir())
 
     def createBookmarks(self):
-        print "creating bookmarks window"
+        logging.info("creating bookmarks window")
         import pipeline.general.filebrowse.bookmarks as bm
 
         self.bmDock = QtGui.QDockWidget("Bookmarks", self)
         self.bmDock.setObjectName("Bookmarks")
-
         self. bookmarks = bm.BookMarks(self.bmDock)
         self.bmDock.setWidget(self.bookmarks)
 
+
+
         self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.bmDock)
+
+        self.bookmarks.addAction(self.pasteAction)
+        self.bookmarks.addAction(self.removeBookmarkAction)
+        self.bookmarks.setContextMenuPolicy(QtCore.Qt.ActionsContextMenu)
 
     def sortThumbnails(self):
         print "sorting thumbnails"
