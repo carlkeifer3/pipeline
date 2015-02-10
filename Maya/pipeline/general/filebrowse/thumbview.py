@@ -310,8 +310,8 @@ class thumbView(QtGui.QListView):
 
             thumbIitem.setTextAlignment(QtCore.Qt.AlignTop | QtCore.Qt.AlignCenter)
             #thumbIitem.setText(thumbFileInfo.fileName())
-            thumbIitem.setIcon(QtGui.QIcon("D:/Nedry.png"))
-            logging.info("Ah, Ah, Ah, you didn't say the magic word")
+            #thumbIitem.setIcon(QtGui.QIcon("D:/Nedry.png"))
+            #logging.info("Ah, Ah, Ah, you didn't say the magic word")
             #thumbIitem.setIcon(QtGui.QIcon(thumbFileInfo.filePath()))
 
             self.thumbModel.appendRow(thumbIitem)
@@ -343,7 +343,8 @@ class thumbView(QtGui.QListView):
 
 
 
-            self.thumbModel.item(currThumb).setIcon(QtGui.QIcon(imageFileName))
+            #self.thumbModel.item(currThumb).setIcon(QtGui.QIcon(imageFileName))
+            self.thumbModel.item(currThumb).setIcon(QtGui.QIcon("D:/Nedry.png"))
 
             logging.info(imageFileName+", Should now be loaded.")
             self.thumbModel.item(currThumb).setData(True, role=self.r.loadedRole)
