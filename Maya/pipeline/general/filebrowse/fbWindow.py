@@ -1202,10 +1202,10 @@ class fbWindow(QtGui.QMainWindow):
     def setStatus(self):
         print "setting Status"
 
-    def mouseDoubleClickEvent(self):
+    def mouseDoubleClickEvent(self, event):
         print "mouse has been double clicked"
 
-    def mousePressEvent(self):
+    def mousePressEvent(self, event):
         print "the mouse has been clicked"
 
     def newImage(self):
@@ -1316,7 +1316,7 @@ class fbWindow(QtGui.QMainWindow):
     def reloadThumbsSlot(self):
         #if self.thumbView.busy:
         self.thumbView.abort()
-        # QtCore.QTimer.singleShot(0,self.reloadThumbsSlot())
+        #QtCore.QTimer.singleShot(0,self.reloadThumbsSlot())
         self.thumbView.load()
 
     def setThumbViewWindowTitle(self):
@@ -1343,7 +1343,7 @@ class fbWindow(QtGui.QMainWindow):
         else:
             return ""
 
-    def wheelEvent(self):
+    def wheelEvent(self, event):
         print "mouse wheel event"
 
     def showNewImageWarning(self):
@@ -1361,14 +1361,25 @@ class fbWindow(QtGui.QMainWindow):
     def cleanupColorsDialog(self):
         print "cleaning up the colors dialog"
 
-    def setInterfaceEnabled(self):
-        print "setting the interface to enabled"
+    def setInterfaceEnabled(self, enable):
+        logging.info("setting the interface to enabled")
+
+        ## Actions
+        self.colorsAct.setEnabled(enable)
 
     def addNewBookmark(self):
-        print "adding a new bookmark"
+        logging.info("fbWindow.addNewBookmark()")
+        logging.info("getting selected path and calling addBookmark()")
 
-    def addBookmark(self):
-        print "adding bookmark"
+        self.addBookmark(self.getSelectedPath())
+
+    def addBookmark(self, path):
+        logging.info("fbWindow.addBookmark()")
+        logging.info("adding bookmark for: %s, to global data"% path)
+        self.GData.bookmarkPaths.append(path)
+        logging.info("Reloading bookmarks window")
+        self.bookmarks.reloadBookmarks()
+
 
     def findDuplicateImages(self):
         print "finding duplicate Images"

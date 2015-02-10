@@ -68,7 +68,7 @@ class GData():
     showHiddenFiles = False
     imageToolbarFullScreen = False
     externalApps = None
-    bookmarkPaths = None
+    bookmarkPaths = []
     reverseMouseBehavior = False
     copyCutIdxList = QtCore.QStringList()
     copyOp = False
