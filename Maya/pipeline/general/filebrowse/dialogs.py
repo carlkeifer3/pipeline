@@ -59,7 +59,7 @@ class settingsDialog(QtGui.QDialog):
         self.bgColBox.addWidget(self.backgroundColorLab)
         self.bgColBox.addWidget(self.backgroundColorButton)
         self.bgColBox.addStretch(1)
-        #self.backgroundColorButton.clicked.connect(lambda : self.pickColor())
+        self.backgroundColorButton.clicked.connect(lambda : self.pickColor())
         #self.setButtonBgColor(g.GData.backgroundColor, self.backgroundColorButton)
         self.backgroundColorButton.setAutoFillBackground(True)
         self.bgColor = g.GData.backgroundColor
@@ -119,19 +119,19 @@ class settingsDialog(QtGui.QDialog):
         self.bgThumbColBox = QtGui.QHBoxLayout()
         self.bgThumbColBox.addWidget(self.bgThumbTxtLab)
         self.bgThumbColBox.addWidget(self.colThumbButton)
-        #self.colThumbButton.clicked.connect(self.pickThumbsColor())
+        self.colThumbButton.clicked.connect(lambda: self.pickThumbsColor())
         #self.setButtonColor(g.GData.thumbsBackgroundColor, self.colThumbButton)
         self.colThumbButton.setAutoFillBackground(True)
         self.thumbBgColor = g.GData.thumbsBackgroundColor
 
         ## thumbview text color
-        self.txtThumbTxtLab = QtGui.QLabel("Label color: ")
+        self.txtThumbTxtLab = QtGui.QLabel("\tLabel color: ")
         self.colThumbTextButton = QtGui.QToolButton()
         self.colThumbTextButton.setFixedSize( 48, 24)
         self.bgThumbColBox.addWidget(self.txtThumbTxtLab)
         self.bgThumbColBox.addWidget(self.colThumbTextButton)
         self.bgThumbColBox.addStretch(1)
-        #self.colThumbTextButton.clicked.connect(self.pickThumbsTextColor())
+        self.colThumbTextButton.clicked.connect(lambda: self.pickThumbsTextColor())
         #self.setButtonBgColor(g.GData.thumbsTextColor, self.colThumbTextButton)
         self.colThumbTextButton.setAutoFillBackground(True)
         self.thumbTextColor = g.GData.thumbsTextColor
@@ -139,7 +139,7 @@ class settingsDialog(QtGui.QDialog):
         ## thumbview background image
         self.thumbsBackImageLab = QtGui.QLabel("Background Image: ")
         self.thumbsBackImageEdit = QtGui.QLineEdit()
-        #self.thumbsBackImageEdit.setClearButtonEnabled()
+        #self.thumbsBackImageEdit.setClearButtonEnabled(True)
 
         self.chooseThumbsBackImageButton = QtGui.QToolButton()
         #self.chooseThumbsBackImageButton.setIcon(QtCore.QIcon.fromTheme("document-open", QtCore.QIcon(":/images/open.png")))
@@ -158,6 +158,7 @@ class settingsDialog(QtGui.QDialog):
         self.thumbSpacingLab = QtGui.QLabel("Add space between thumbnails: ")
         self.thumbSpacingSpin = QtGui.QSpinBox()
         self.thumbSpacingSpin.setRange(0, 15)
+        #logging.info("Thumbnail Spacing will be set to: "+str(g.GData.thumbsSpacing))
         self.thumbSpacingSpin.setValue(g.GData.thumbsSpacing)
         self.thumbSpacingHbox = QtGui.QHBoxLayout()
         self.thumbSpacingHbox.addWidget(self.thumbSpacingLab)
@@ -191,6 +192,84 @@ class settingsDialog(QtGui.QDialog):
         self.thumbsOptBox.addWidget(self.noSmallThumbCb)
         self.thumbsOptBox.addStretch(1)
 
+        ## Slide show delay
+        self.slideDelayLab = QtGui.QLabel("Delay Between slides in seconds: ")
+        self.slideDelaySpin = QtGui.QSpinBox()
+        self.slideDelaySpin.setRange(1, 3600)
+        self.slideDelaySpin.setValue(g.GData.slideShowDelay)
+        self.slideDelayHbox = QtGui.QHBoxLayout()
+        self.slideDelayHbox.addWidget(self.slideDelayLab)
+        self.slideDelayHbox.addWidget(self.slideDelaySpin)
+        self.slideDelayHbox.addStretch(1)
+
+        ## Slide Show Random
+        self.slideRandomCb = QtGui.QCheckBox("Show random images")
+        self.slideRandomCb.setChecked(g.GData.slideShowRandom)
+
+        ## Slide Show options
+        self.slideShowVbox = QtGui.QVBoxLayout()
+        self.slideShowVbox.addLayout(self.slideDelayHbox)
+        self.slideShowVbox.addWidget(self.slideRandomCb)
+        self.slideShowVbox.addStretch(1)
+
+        ## Startup Directory
+        self.startupDirGroupBox = QtGui.QGroupBox("Startup Folder")
+        self.startupDirRadios = []
+        self.startupDirRadios.append(QtGui.QRadioButton("Default, or Specified by command line argument."))
+        self.startupDirRadios.append(QtGui.QRadioButton("Remember last"))
+        self.startupDirRadios.append(QtGui.QRadioButton("Specify:"))
+
+        self.startupDirEdit = QtGui.QLineEdit()
+        self.startupDirEdit.setClearButtonEnabled = True
+        self.startupDirEdit.setMinimumWidth(300)
+        self.startupDirEdit.setMaximumWidth(400)
+
+        self.chooseStartupDirButton = QtGui.QToolButton()
+        #self.chooseStartupDirButton.setIcon(QtGui.QIcon.fromTheme("document-open"), QtGui.QIcon(":/images/open.png"))
+        self.chooseStartupDirButton.setFixedSize(26, 26)
+        self.chooseStartupDirButton.setIconSize(QtCore.QSize(16, 16))
+        #self.chooseStartupDirButton.clicked.connect(lambda: self.pickStartupDir())
+
+        self.startupDirEditBox = QtGui.QHBoxLayout()
+        self.startupDirEditBox.addWidget(self.startupDirRadios[2])
+        self.startupDirEditBox.addWidget(self.startupDirEdit)
+        self.startupDirEditBox.addWidget(self.chooseStartupDirButton)
+        self.startupDirEditBox.addStretch(1)
+
+        self.startupDirVbox = QtGui.QVBoxLayout()
+        for radio in self.startupDirRadios:
+            self.startupDirVbox.addWidget(radio)
+            radio.setChecked(False)
+
+        self.startupDirVbox.addLayout(self.startupDirEditBox)
+        self.startupDirVbox.addStretch(1)
+        self.startupDirGroupBox.setLayout(self.startupDirVbox)
+        #if g.GData.startupDir == g.GData.specifiedStartDir:
+
+        self.startupDirEdit.setText(g.GData.specifiedStartDir)
+
+        ## Keyboard shortcuts widgets
+        self.keysCombo = QtGui.QComboBox()
+        #self.keyLine = QtGui.keyGrabLineEdit(self.keysCombo)
+        #self.keyLine.textChanged.connect()
+
+        ## Mouse settings
+        self.reverseMouseCb = QtGui.QCheckBox("Swap mouse left-click and middle-click actions")
+        self.reverseMouseCb.setChecked(g.GData.reverseMouseBehavior)
+
+        ## Keyboard and mouse
+        self.keyboardGrp = QtGui.QGroupBox("Keyboard Shortcuts")
+        self.keyboardHbox = QtGui.QHBoxLayout()
+        self.keyboardHbox.addWidget(self.keysCombo)
+        #self.keyboardHbox.addWidget(self.keyLine)
+        self.keyboardHbox.addStretch(1)
+        self.keyboardGrp.setLayout(self.keyboardHbox)
+
+        self.generalVbox = QtGui.QVBoxLayout()
+        self.generalVbox.addWidget(self.keyboardGrp)
+        self.generalVbox.addWidget(self.reverseMouseCb)
+        self.generalVbox.addWidget(self.startupDirGroupBox)
+
         ## Confirmation buttons
         self.buttonsHbox = QtGui.QHBoxLayout()
         self.okButton = QtGui.QPushButton("OK!")
@@ -215,6 +294,14 @@ class settingsDialog(QtGui.QDialog):
         self.thumbSettings.setLayout(self.thumbsOptBox)
         self.tabs.addTab(self.thumbSettings, "thumbnails")
 
+        self.slideSettings = QtGui.QWidget()
+        self.slideSettings.setLayout(self.slideShowVbox)
+        self.tabs.addTab(self.slideSettings, "Slide Show")
+
+        self.generalSettings = QtGui.QWidget()
+        self.generalSettings.setLayout(self.generalVbox)
+        self.tabs.addTab(self.generalSettings, "General")
+
         self.mainVbox = QtGui.QVBoxLayout()
         self.mainVbox.addWidget(self.tabs)
         self.mainVbox.addLayout(self.buttonsHbox)
@@ -226,6 +313,13 @@ class settingsDialog(QtGui.QDialog):
     def saveSettings(self):
         logging.info("OK clicked, writing settings to GData")
 
+        for radio in self.fitLargeRadios:
+            if radio.isChecked():
+                g.GData.appSettings.setValue("zoomOutFlags", g.GData.zoomOutFlags)
+
+        for radio in self.fitSmallRadios:
+            if radio.isChecked():
+                g.GData.appSettings.setValue("zoomInFlags", g.GData.zoomInFlags)
 
         g.GData.backgroundColor = self.bgColor
         g.GData.thumbsBackgroundColor = self.thumbBgColor
@@ -237,7 +331,7 @@ class settingsDialog(QtGui.QDialog):
         g.GData.exitInsteadofClose = self.exitCliCb.isChecked()
         g.GData.wrapImageList = self.wrapListCb.isChecked()
         g.GData.defaultSaveQuality = self.saveQualitySpin.value()
-        #g.GData.slideShowDelay = self.slideDelaySpin.value()
+        g.GData.slideShowDelay = self.slideDelaySpin.value()
 
 
         self.accept()
@@ -246,3 +340,30 @@ class settingsDialog(QtGui.QDialog):
     def abort(self):
         logging.info("Cancel clicked, aborting preferences window")
         self.reject()
+
+    def pickColor(self):
+        logging.info("Pick Bg color clicked, selecting color swatch for background Color")
+        userColor = QtGui.QColorDialog.getColor(g.GData.backgroundColor)
+        if userColor.isValid():
+            self.setButtonBgColor(userColor, self.backgroundColorButton)
+            self.bgColor = userColor
+
+    def setButtonBgColor(self, color, button):
+        logging.info("Setting buttons background color")
+        style = "background: rgb(%i, %i, %i)"% (color.red(), color.green(), color.blue())
+        button.setStyleSheet(style)
+
+    def pickThumbsColor(self):
+        logging.info("Picking the Thumb Color")
+        userColor = QtGui.QColorDialog.getColor(g.GData.thumbsBackgroundColor)
+        if userColor.isValid():
+            self.setButtonBgColor(userColor, self.colThumbButton)
+            self.thumbBgColor = userColor
+
+    def pickThumbsTextColor(self):
+        logging.info("Picking the thumbs text color")
+        userColor = QtGui.QColorDialog.getColor(g.GData.thumbsTextColor)
+        if userColor.isValid():
+            self.setButtonBgColor(userColor, self.colThumbTextButton)
+            self.thumbTextColor = userColor
+
