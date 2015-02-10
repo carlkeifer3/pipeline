@@ -6,6 +6,10 @@ __author__ = 'cargoyle'
 import logging
 from PyQt4 import QtGui, QtCore
 
+class UserRoles():
+    fileNameRole = QtCore.Qt.UserRole +1
+    sortRole, loadedRole = range(2)
+
 class GData():
     logging.info("Setting the global data")
     QtCore.QCoreApplication.setOrganizationName("ckPipeline")

@@ -20,6 +20,8 @@ class thumbView(QtGui.QListView):
         #logging.info("Get the global Settings Data for use by thumbView class")
         self.GData = g.GData()
 
+        self.r = g.UserRoles()
+
         self.thumbSize = self.GData.appSettings.value("thumbsZoomVal").toInt()[0]
         logging.info(self.thumbSize)
 
@@ -298,7 +300,7 @@ class thumbView(QtGui.QListView):
         for thumbFileInfo in self.thumbFileInfoList:
             logging.info("adding %s to the model" % thumbFileInfo.filePath())
             thumbIitem = QtGui.QStandardItem()
-
+            thumbIitem.setData(False, role=self.r.loadedRole)
             thumbIitem.setText(thumbFileInfo.fileName())
             thumbIitem.setIcon(QtGui.QIcon(thumbFileInfo.filePath()))
             self.thumbModel.appendRow(thumbIitem)
