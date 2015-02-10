@@ -302,6 +302,10 @@ class thumbView(QtGui.QListView):
             thumbIitem = QtGui.QStandardItem()
             thumbIitem.setData(False, role=self.r.loadedRole)
             thumbIitem.setData(currThumb, role=self.r.sortRole)
+            thumbIitem.setData(thumbFileInfo.filePath(), role=self.r.fileNameRole)
+            ## add
+            thumbIitem.setData(thumbFileInfo.fileName(), role=QtCore.Qt.DisplayRole)
+
             thumbIitem.setText(thumbFileInfo.fileName())
             thumbIitem.setIcon(QtGui.QIcon(thumbFileInfo.filePath()))
             self.thumbModel.appendRow(thumbIitem)
