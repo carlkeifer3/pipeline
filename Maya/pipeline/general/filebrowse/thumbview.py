@@ -130,9 +130,8 @@ class thumbView(QtGui.QListView):
         self.abortOp = True
 
     def loadVisibleThumbs(self, scrollbarValue):
-        #print "scrollbar moved"
-
-
+        logging.info("thumbView.loadVisibleThumbs()")
+        logging.info("Scrollbar Moved, recheck for visible Thumbnails")
 
         #if gdata.thumbsLayout == "Compact":
         # scrolledForward = True
@@ -143,6 +142,10 @@ class thumbView(QtGui.QListView):
 
         first = self.getFirstVisibleThumb()
         last = self.getLastVisibleThumb()
+
+        logging.info("First thumbnail found: "+ str(first))
+        logging.info("Last thumbnail found: "+ str(last))
+        logging.info(" currently displaying "+str(last-first)+" thumbnails.")
         if first < 0 | last < 0:
             return
 
@@ -162,15 +165,17 @@ class thumbView(QtGui.QListView):
 
 
     def getFirstVisibleThumb(self):
-        print "get first visible thumb"
-        idx = QtCore.QModelIndex()
+        logging.info("thumbView.getFirstVisibleThumb()")
+        logging.info("get first visible thumb")
         currThumb = 0
-        if self.thumbModel.rowCount() > currThumb:
-            idx = self.thumbModel.indexFromItem(self.thumbModel.item(currThumb))
-            if self.viewport().rect().contains(self.visualRect(idx)):
-                print "thumbnail found"
+        logging.info("Investigating "+str(self.thumbModel.rowCount())+" rows")
+        while currThumb < int(self.thumbModel.rowCount()):
+            logging.info("Looking for first thumbnail in list of thumbs")
+            idx = self.thumbModel.index(currThumb, 0)
+            if self.viewport().rect().contains(QtCore.QPoint(0, self.visualRect(idx).y() + self.visualRect(idx).height() + 1)):
+                logging.info("First thumbnail found")
                 return idx.row()
-            currThumb =+ 1
+            currThumb += 1
 
         return -1
 
@@ -179,15 +184,16 @@ class thumbView(QtGui.QListView):
 
         :return:
         """
-        print "get last visible thumbnail"
-        idx = QtCore.QModelIndex()
+        logging.info("thumbView.getLastVisibleThumb()")
+        logging.info("get last visible thumbnail")
         currThumb = self.thumbModel.rowCount() -1
-        if self.thumbModel.rowCount() > currThumb:
+        if currThumb >= 0:
+            logging.info("Looking for last Thumbnail in list of thumbs")
             idx = self.thumbModel.indexFromItem(self.thumbModel.item(currThumb))
-            if self.viewport().rect().contains(self.visualRect(idx)):
-                print "thumbnail found"
+            if self.viewport().rect().contains(QtCore.QPoint(0, self.visualRect(idx).y() + self.visualRect(idx).height() + 1)):
+                logging.info("Last thumbnail found")
                 return idx.row()
-            currThumb =- 1
+            currThumb -= 1
 
         return -1
 
