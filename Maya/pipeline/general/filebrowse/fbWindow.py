@@ -231,26 +231,26 @@ class fbWindow(QtGui.QMainWindow):
 
         self.actShowHidden = QtGui.QAction("Show Hidden Files", self)
         self.actShowHidden.setCheckable(True)
-        self.actShowHidden.setChecked(self.GData.showHiddenFiles)
+        self.actShowHidden.setChecked(g.GData.showHiddenFiles)
         self.actShowHidden.triggered.connect(lambda: self.showHiddenFiles())
 
         self.actShowLabels = QtGui.QAction("Show Labels", self)
         self.actShowLabels.setCheckable(True)
-        self.actShowLabels.setChecked(self.GData.showLabels)
+        self.actShowLabels.setChecked(g.GData.showLabels)
         self.actShowLabels.triggered.connect(lambda: self.showLabels())
 
         self.actSmallIcons = QtGui.QAction("Small Icons", self)
         self.actSmallIcons.setCheckable(True)
-        self.actSmallIcons.setChecked(self.GData.smallIcons)
+        self.actSmallIcons.setChecked(g.GData.smallIcons)
 
         self.actLockDocks = QtGui.QAction("Hide Docks Title Bar", self)
         self.actLockDocks.setCheckable(True)
-        self.actLockDocks.setChecked(self.GData.LockDocks)
+        self.actLockDocks.setChecked(g.GData.LockDocks)
         self.actLockDocks.triggered.connect(lambda: self.lockDocks())
 
         self.actShowViewerToolbars = QtGui.QAction("Show Toolbar", self)
         self.actShowViewerToolbars.setCheckable(True)
-        self.actShowViewerToolbars.setChecked(self.GData.imageToolbarFullScreen)
+        self.actShowViewerToolbars.setChecked(g.GData.imageToolbarFullScreen)
         self.actShowViewerToolbars.triggered.connect(lambda: self.toggleImageToolbar())
 
         # Thumbnail view actions
@@ -263,9 +263,9 @@ class fbWindow(QtGui.QMainWindow):
         self.actClassic.setCheckable(True)
         self.actCompact.setCheckable(True)
         self.actSquarish.setCheckable(True)
-        #self.actClassic.setChecked(self.GData.thumbsLayout == self.thumbView.Classic)
-        #self.actCompact.setChecked(self.GData.thumbsLayout == self.thumbView.Compact)
-        #self.actSquarish.setChecked(self.GData.thumbsLayout == self.thumbView.Squares)
+        #self.actClassic.setChecked(g.GData.thumbsLayout == self.thumbView.Classic)
+        #self.actCompact.setChecked(g.GData.thumbsLayout == self.thumbView.Compact)
+        #self.actSquarish.setChecked(g.GData.thumbsLayout == self.thumbView.Squares)
 
         self.refreshAction = QtGui.QAction("Reload", self)
         self.refreshAction.setIcon(QtGui.QIcon(str(self.imgDirectory+"refresh.png")))
@@ -694,7 +694,7 @@ class fbWindow(QtGui.QMainWindow):
 
     def setIncludeSubFolders(self):
         logging.debug("set Include SubFolders")
-        self.GData.includeSubFolders = self.subFoldersAction.isChecked()
+        g.GData.includeSubFolders = self.subFoldersAction.isChecked()
         self.refreshThumbs(False)
 
     def refreshThumbs(self, scrollToTop):
@@ -767,14 +767,14 @@ class fbWindow(QtGui.QMainWindow):
 
     def showSettings(self):
         logging.info("loading preferences window")
-        if self.GData.slideShowActive:
+        if g.GData.slideShowActive:
             self.slideShow()
         #self.imageView.setCursorHiding(False)
         dialog = dia.settingsDialog()
 
         #if dialog.exec():
         #     self.thumbView.setThumbColors()
-        #     self.GData.imageZoomFactor = 1.0
+        #     g.GData.imageZoomFactor = 1.0
         #del dialog
 
     def toggleFullScreen(self):
@@ -786,12 +786,12 @@ class fbWindow(QtGui.QMainWindow):
 
     def copyOrCutThumbs(self, copy):
         logging.info("copy or cut thumbs")
-        self.GData.copyCutIdxList = self.thumbView.selectionModel().selectedIndexes()
-        self.GData.copyCutFileList.clear()
-        for f in self.GData.copyCutIdxList:
-            self.GData.copyCutFileList.append(self.thumbView.thumbModel.item(f.row()).data(self.thumbView.fileNameRole).toString())
+        g.GData.copyCutIdxList = self.thumbView.selectionModel().selectedIndexes()
+        g.GData.copyCutFileList.clear()
+        for f in g.GData.copyCutIdxList:
+            g.GData.copyCutFileList.append(self.thumbView.thumbModel.item(f.row()).data(self.thumbView.fileNameRole).toString())
             self.copyCutCount +=1
-        self.GData.copyOp = copy
+        g.GData.copyOp = copy
         self.pasteAction.setEnabled(True)
 
     def cutThumbs(self):
@@ -880,7 +880,7 @@ class fbWindow(QtGui.QMainWindow):
         logging.info("fbWindow.showColorsDialog()")
         logging.info("Showing colors dialog")
 
-        if self.GData.slideShowActive:
+        if g.GData.slideShowActive:
             self.slideShow()
 
     def moveRight(self):
@@ -945,8 +945,8 @@ class fbWindow(QtGui.QMainWindow):
         # what if you want to past this item multiple times
         self.copyCutCount = 0
 
-        #self.GData.copyCutIdxList.clear()
-        #self.GData.copyCutFileList.clear()
+        #g.GData.copyCutIdxList.clear()
+        #g.GData.copyCutFileList.clear()
         self.pasteAction.setEnabled(False)
         self.thumbView.loadVisibleThumbs(0)
 
@@ -1027,50 +1027,50 @@ class fbWindow(QtGui.QMainWindow):
 
     def writeSettings(self):
         logging.info("Writing Settings")
-        #if self.GData.layoutMode
+        #if g.GData.layoutMode
 
-        #self.GData.appSettings.setValue("ThumbsSortFlags", int(self.thumbView.thumbSortFlags))
-        self.GData.appSettings.setValue("ThumbsZoomVal", int(self.thumbView.thumbSize))
-        self.GData.appSettings.setValue("isFullScreen", bool(self.GData.isFullScreen))
-        self.GData.appSettings.setValue("backgroundColor", self.GData.backgroundColor)
-        #logging.info("Background Color" + str(self.GData.backgroundColor))
-        self.GData.appSettings.setValue("backgroundThumbColor", self.GData.thumbsBackgroundColor)
-        #logging.info("Background Thumb Color" + str(self.GData.thumbsBackgroundColor))
-        self.GData.appSettings.setValue("textThumbColor", self.GData.thumbsTextColor)
-        #logging.info("Text Thumb Color" + str(self.GData.thumbsTextColor))
-        self.GData.appSettings.setValue("thumbSpacing", self.GData.thumbsSpacing)
-        logging.info("Thumbs Spacing " + str(self.GData.thumbsSpacing[0]))
-        self.GData.appSettings.setValue("thumbsPagesReadahead", int(self.GData.thumbPagesReadahead))
-        self.GData.appSettings.setValue("thumbLayout", int(self.GData.thumbsLayout))
-        self.GData.appSettings.setValue("exitInsteadOfClose", int(self.GData.exitInsteadofClose))
-        self.GData.appSettings.setValue("enableAnimations", bool(self.GData.enableAnimations))
-        self.GData.appSettings.setValue("exifRotationEnabled", bool(self.GData.exifRotationEnabled))
-        self.GData.appSettings.setValue("reverseMouseBehavior", bool(self.GData.reverseMouseBehavior))
-        self.GData.appSettings.setValue("showHiddenFiles", bool(self.GData.showHiddenFiles))
-        self.GData.appSettings.setValue("wrapImageList", bool(self.GData.wrapImageList))
-        self.GData.appSettings.setValue("imageZoomFactor", self.GData.imageZoomFactor)
-        self.GData.appSettings.setValue("shouldMaximize", bool(self.isMaximized()))
-        self.GData.appSettings.setValue("defaultSaveQuality", self.GData.defaultSaveQuality)
-        self.GData.appSettings.setValue("noEnlargeSmallThumb", bool(self.GData.noEnlargeSmallThumbs))
-        self.GData.appSettings.setValue("slideShowDelay", self.GData.slideShowDelay)
-        self.GData.appSettings.setValue("slideShowRandom", bool(self.GData.slideShowRandom))
-        self.GData.appSettings.setValue("editToolBarVisible", bool(self.editToolbarVisible))
-        self.GData.appSettings.setValue("goToolBarVisible", bool(self.goToolBarVisible))
-        self.GData.appSettings.setValue("viewToolBarVisible", bool(self.viewToolBarVisible))
-        self.GData.appSettings.setValue("imageToolBarVisible", bool(self.imageToolBarVisible))
-        self.GData.appSettings.setValue("fsDockVisible", bool(self.GData.fsDockVisible))
-        self.GData.appSettings.setValue("iiDockVisible", bool(self.GData.iiDockVisible))
-        self.GData.appSettings.setValue("pvDockVisible", bool(self.GData.pvDockVisible))
-        #self.GData.appSettings.setValue("startupDir", int(self.GData.startupDir))
-        self.GData.appSettings.setValue("specifiedStartDir", self.GData.specifiedStartDir)
-        self.GData.appSettings.setValue("thumbsBackImage", self.GData.thumbsBackImage)
-        #self.GData.appSettings.setValue("lastDir", self.GData.startupDir == self.GData.rememberLastDir)
+        #g.GData.appSettings.setValue("ThumbsSortFlags", int(self.thumbView.thumbSortFlags))
+        g.GData.appSettings.setValue("ThumbsZoomVal", int(self.thumbView.thumbSize))
+        g.GData.appSettings.setValue("isFullScreen", bool(g.GData.isFullScreen))
+        g.GData.appSettings.setValue("backgroundColor", g.GData.backgroundColor)
+        #logging.info("Background Color" + str(g.GData.backgroundColor))
+        g.GData.appSettings.setValue("backgroundThumbColor", g.GData.thumbsBackgroundColor)
+        #logging.info("Background Thumb Color" + str(g.GData.thumbsBackgroundColor))
+        g.GData.appSettings.setValue("textThumbColor", g.GData.thumbsTextColor)
+        #logging.info("Text Thumb Color" + str(g.GData.thumbsTextColor))
+        g.GData.appSettings.setValue("thumbSpacing", g.GData.thumbsSpacing)
+        logging.info("Thumbs Spacing " + str(g.GData.thumbsSpacing))
+        g.GData.appSettings.setValue("thumbsPagesReadahead", int(g.GData.thumbPagesReadahead))
+        g.GData.appSettings.setValue("thumbLayout", int(g.GData.thumbsLayout))
+        g.GData.appSettings.setValue("exitInsteadOfClose", int(g.GData.exitInsteadofClose))
+        g.GData.appSettings.setValue("enableAnimations", bool(g.GData.enableAnimations))
+        g.GData.appSettings.setValue("exifRotationEnabled", bool(g.GData.exifRotationEnabled))
+        g.GData.appSettings.setValue("reverseMouseBehavior", bool(g.GData.reverseMouseBehavior))
+        g.GData.appSettings.setValue("showHiddenFiles", bool(g.GData.showHiddenFiles))
+        g.GData.appSettings.setValue("wrapImageList", bool(g.GData.wrapImageList))
+        g.GData.appSettings.setValue("imageZoomFactor", g.GData.imageZoomFactor)
+        g.GData.appSettings.setValue("shouldMaximize", bool(self.isMaximized()))
+        g.GData.appSettings.setValue("defaultSaveQuality", g.GData.defaultSaveQuality)
+        g.GData.appSettings.setValue("noEnlargeSmallThumb", bool(g.GData.noEnlargeSmallThumbs))
+        g.GData.appSettings.setValue("slideShowDelay", g.GData.slideShowDelay)
+        g.GData.appSettings.setValue("slideShowRandom", bool(g.GData.slideShowRandom))
+        g.GData.appSettings.setValue("editToolBarVisible", bool(self.editToolbarVisible))
+        g.GData.appSettings.setValue("goToolBarVisible", bool(self.goToolBarVisible))
+        g.GData.appSettings.setValue("viewToolBarVisible", bool(self.viewToolBarVisible))
+        g.GData.appSettings.setValue("imageToolBarVisible", bool(self.imageToolBarVisible))
+        g.GData.appSettings.setValue("fsDockVisible", bool(g.GData.fsDockVisible))
+        g.GData.appSettings.setValue("iiDockVisible", bool(g.GData.iiDockVisible))
+        g.GData.appSettings.setValue("pvDockVisible", bool(g.GData.pvDockVisible))
+        #g.GData.appSettings.setValue("startupDir", int(g.GData.startupDir))
+        g.GData.appSettings.setValue("specifiedStartDir", g.GData.specifiedStartDir)
+        g.GData.appSettings.setValue("thumbsBackImage", g.GData.thumbsBackImage)
+        #g.GData.appSettings.setValue("lastDir", g.GData.startupDir == g.GData.rememberLastDir)
 
-        self.GData.appSettings.setValue("enableImageInfoFS", bool(self.GData.enableImageInfoFS))
-        self.GData.appSettings.setValue("showLabels", bool(self.GData.showLabels))
-        self.GData.appSettings.setValue("smallIcons", bool(self.GData.smallIcons))
-        self.GData.appSettings.setValue("LockDocks", bool(self.GData.LockDocks))
-        self.GData.appSettings.setValue("imageToolbarFullScreen", bool(self.GData.imageToolbarFullScreen))
+        g.GData.appSettings.setValue("enableImageInfoFS", bool(g.GData.enableImageInfoFS))
+        g.GData.appSettings.setValue("showLabels", bool(g.GData.showLabels))
+        g.GData.appSettings.setValue("smallIcons", bool(g.GData.smallIcons))
+        g.GData.appSettings.setValue("LockDocks", bool(g.GData.LockDocks))
+        g.GData.appSettings.setValue("imageToolbarFullScreen", bool(g.GData.imageToolbarFullScreen))
 
         logging.info("settings Written exiting Cleanly")
 
@@ -1080,102 +1080,142 @@ class fbWindow(QtGui.QMainWindow):
         self.initComplete = False
         self.needThumbsRefresh = False
 
-        if not self.GData.appSettings.contains("thumbsZoomVal"):
+        if not g.GData.appSettings.contains("thumbsZoomVal"):
             logging.info(" app settings not found")
             self.resize(800, 600)
-            self.GData.appSettings.setValue("thumbsSortFlags", int(0))
-            self.GData.appSettings.setValue("thumbsZoomVal", 150)
-            self.GData.appSettings.setValue("isFullScreen", False)
-            self.GData.appSettings.setValue("backgroundColor", QtGui.QColor(25, 25, 25))
-            self.GData.appSettings.setValue("backgroundThumbColor", QtGui.QColor(200, 200, 200))
-            self.GData.appSettings.setValue("textThumbColor", QtGui.QColor(25, 25, 25))
-            self.GData.appSettings.setValue("thumbSpacing", 10)
-            self.GData.appSettings.setValue("thumbPagesReadahead", 2)
-            self.GData.appSettings.setValue("thumbsLayout", self.GData.thumbsLayout)
-            self.GData.appSettings.setValue("zoomOutFlags", 1)
-            self.GData.appSettings.setValue("zoomInFlags", 0)
-            self.GData.appSettings.setValue("wrapImageList", False)
-            self.GData.appSettings.setValue("exitInsteadOfClose", 0)
-            self.GData.appSettings.setValue("imageZoomFactor", 1.0)
-            self.GData.appSettings.setValue("defaultSaveQuality", 100)
-            self.GData.appSettings.setValue("noEnlargeSmallThumb", True)
-            self.GData.appSettings.setValue("enableAnimations", True)
-            self.GData.appSettings.setValue("exifRotationEnabled", True)
-            self.GData.appSettings.setValue("referseMouseBehavior", False)
-            self.GData.appSettings.setValue("showHiddenFiles", False)
-            self.GData.appSettings.setValue("slideShowDelay", 5)
-            self.GData.appSettings.setValue("slideShowRandom", False)
-            self.GData.appSettings.setValue("editToolBarVisible", True)
-            self.GData.appSettings.setValue("goToolBarVisible", True)
-            self.GData.appSettings.setValue("viewToolBarVisible", True)
-            self.GData.appSettings.setValue("imageToolBarVisible", False)
-            self.GData.appSettings.setValue("fsDockVisible", True)
-            self.GData.appSettings.setValue("bmDockVisible", True)
-            self.GData.appSettings.setValue("iiDockVisible", True)
-            self.GData.appSettings.setValue("pvDockVisible", False)
-            self.GData.appSettings.setValue("enableImageInfoFS", False)
-            self.GData.appSettings.setValue("showLabels", True)
-            self.GData.appSettings.setValue("smallIcons", False)
-            self.GData.appSettings.setValue("LockDocks", True)
-            self.GData.appSettings.setValue("imageToolbarFullScreen", False)
-            #self.GData.bookmarkPaths.insert(QtCore.QDir.homePath())
+            g.GData.appSettings.setValue("thumbsSortFlags", int(0))
+            g.GData.appSettings.setValue("thumbsZoomVal", 150)
+            g.GData.appSettings.setValue("isFullScreen", False)
+            g.GData.appSettings.setValue("backgroundColor", QtGui.QColor(25, 25, 25))
+            g.GData.appSettings.setValue("backgroundThumbColor", QtGui.QColor(200, 200, 200))
+            g.GData.appSettings.setValue("textThumbColor", QtGui.QColor(25, 25, 25))
+            g.GData.appSettings.setValue("thumbSpacing", 10)
+            g.GData.appSettings.setValue("thumbPagesReadahead", 2)
+            g.GData.appSettings.setValue("thumbsLayout", g.GData.thumbsLayout)
+            g.GData.appSettings.setValue("zoomOutFlags", 1)
+            g.GData.appSettings.setValue("zoomInFlags", 0)
+            g.GData.appSettings.setValue("wrapImageList", False)
+            g.GData.appSettings.setValue("exitInsteadOfClose", 0)
+            g.GData.appSettings.setValue("imageZoomFactor", 1.0)
+            g.GData.appSettings.setValue("defaultSaveQuality", 100)
+            g.GData.appSettings.setValue("noEnlargeSmallThumb", True)
+            g.GData.appSettings.setValue("enableAnimations", True)
+            g.GData.appSettings.setValue("exifRotationEnabled", True)
+            g.GData.appSettings.setValue("referseMouseBehavior", False)
+            g.GData.appSettings.setValue("showHiddenFiles", False)
+            g.GData.appSettings.setValue("slideShowDelay", 5)
+            g.GData.appSettings.setValue("slideShowRandom", False)
+            g.GData.appSettings.setValue("editToolBarVisible", True)
+            g.GData.appSettings.setValue("goToolBarVisible", True)
+            g.GData.appSettings.setValue("viewToolBarVisible", True)
+            g.GData.appSettings.setValue("imageToolBarVisible", False)
+            g.GData.appSettings.setValue("fsDockVisible", True)
+            g.GData.appSettings.setValue("bmDockVisible", True)
+            g.GData.appSettings.setValue("iiDockVisible", True)
+            g.GData.appSettings.setValue("pvDockVisible", False)
+            g.GData.appSettings.setValue("enableImageInfoFS", False)
+            g.GData.appSettings.setValue("showLabels", True)
+            g.GData.appSettings.setValue("smallIcons", False)
+            g.GData.appSettings.setValue("LockDocks", True)
+            g.GData.appSettings.setValue("imageToolbarFullScreen", False)
+            #g.GData.bookmarkPaths.insert(QtCore.QDir.homePath())
 
         logging.debug("store loaded setting in memory")
-        self.GData.backgroundColor = self.GData.appSettings.value("backgroundColor")
-        self.GData.exitInsteadofClose = self.GData.appSettings.value("exitInsteadOfClose").toBool()
-        self.GData.enableAnimations = self.GData.appSettings.value("enableAnimations").toBool()
-        self.GData.exifRotationEnabled = self.GData.appSettings.value("exifRotationEnabled").toBool()
-        self.GData.exifThumbRotationEnabled = self.GData.appSettings.value("exifThumbRotationEnabled").toBool()
-        self.GData.reverseMouseBehavior = self.GData.appSettings.value("reverseMouseBehavior").toBool()
-        self.GData.showHiddenFiles = self.GData.appSettings.value("showHiddenFiles").toBool()
-        self.GData.wrapImageList = self.GData.appSettings.value("wrapImageList").toBool()
-        self.GData.imageZoomFactor = self.GData.appSettings.value("imageZoomFactor").toFloat()
-        self.GData.zoomOutFlags = self.GData.appSettings.value("zoomOutFlags").toInt()
-        self.GData.zoomInFlags = self.GData.appSettings.value("zoomInFlags").toInt()
-        self.GData.rotation = 0
-        self.GData.keepTransform = False
-        self.shouldMaximize = self.GData.appSettings.value("shouldMaximize").toBool()
-        self.GData.flipH = False
-        self.GData.flipV = False
-        self.GData.defaultSaveQuality = self.GData.appSettings.value("defaultSaveQuality").toInt()
-        self.GData.noEnlargeSmallThumbs = self.GData.appSettings.value("noEnlargeSmallThumb").toBool()
-        self.GData.slideShowDelay = self.GData.appSettings.value("slideShowDelay").toInt()
-        self.GData.slideShowRandom = self.GData.appSettings.value("slideShowRandom").toBool()
-        self.GData.slideShowActive = False
-        self.editToolbarVisible = self.GData.appSettings.value("editToolBarVisible").toBool()
-        self.goToolBarVisible = self.GData.appSettings.value("goToolBarVisible").toBool()
-        self.viewToolBarVisible = self.GData.appSettings.value("viewToolBarVisible").toBool()
-        self.imageToolBarVisible = self.GData.appSettings.value("imageToolBarVisible").toBool()
-        self.GData.fsDockVisible = self.GData.appSettings.value("fsDockVisible").toBool()
-        self.GData.bmDockVisible = self.GData.appSettings.value("bmDockVisible").toBool()
-        self.GData.iiDockVisible = self.GData.appSettings.value("iiDockVisible").toBool()
-        self.GData.pvDockVisible = self.GData.appSettings.value("pvDockVisible").toBool()
-        self.GData.startupDir = self.GData.appSettings.value("startupDir").toInt()
-        self.GData.specifiedStartDir = self.GData.appSettings.value("specifiedStartDir").toString()
-        self.GData.thumbsBackImage = self.GData.appSettings.value("thumbsBackImage").toString()
-        self.GData.thumbsSpacing = self.GData.appSettings.value("thumbSpacing").toInt()
-        logging.info("Thumb Spacing: "+ str(self.GData.thumbsSpacing[0]))
-        self.GData.enableImageInfoFS = self.GData.appSettings.value("enableImageInfoFS").toBool()
-        self.GData.showLabels = self.GData.appSettings.value("showLabels").toBool()
-        self.GData.smallIcons = self.GData.appSettings.value("smallIcons").toBool()
-        self.GData.LockDocks = self.GData.appSettings.value("LockDocks").toBool()
-        self.GData.imageToolbarFullScreen = self.GData.appSettings.value("imageToolbarFullScreen").toBool()
+        g.GData.backgroundColor = g.GData.appSettings.value("backgroundColor")
+        logging.info("Background Color: ")
+        g.GData.exitInsteadofClose = g.GData.appSettings.value("exitInsteadOfClose").toBool()
+        logging.info("Exit instead of Close: "+str(g.GData.exitInsteadofClose))
+        g.GData.enableAnimations = g.GData.appSettings.value("enableAnimations").toBool()
+        logging.info("Enable Animations: "+str(g.GData.enableAnimations))
+        g.GData.exifRotationEnabled = g.GData.appSettings.value("exifRotationEnabled").toBool()
+        logging.info("Exif Rotations Enabled: "+str(g.GData.exifRotationEnabled))
+        g.GData.exifThumbRotationEnabled = g.GData.appSettings.value("exifThumbRotationEnabled").toBool()
+        logging.info("Exif Thumbnail Rotations Enabled: "+str(g.GData.exifThumbRotationEnabled))
+        g.GData.reverseMouseBehavior = g.GData.appSettings.value("reverseMouseBehavior").toBool()
+        logging.info("Reverse Mouse Behavior: "+str(g.GData.reverseMouseBehavior))
+        g.GData.showHiddenFiles = g.GData.appSettings.value("showHiddenFiles").toBool()
+        logging.info("Showing Hidden Files: "+str(g.GData.showHiddenFiles))
+        g.GData.wrapImageList = g.GData.appSettings.value("wrapImageList").toBool()
+        logging.info("Wrap Image List: "+str(g.GData.wrapImageList))
+        trashf = g.GData.appSettings.value("imageZoomFactor").toFloat()
+        g.GData.imageZoomFactor = trashf[0]
+        logging.info("Image Zoom Factor: "+str(g.GData.imageZoomFactor))
+        trashi = g.GData.appSettings.value("zoomOutFlags").toInt()
+        g.GData.zoomOutFlags = trashi[0]
+        logging.info("Zoom Out Flags: "+str(g.GData.zoomOutFlags))
+        trashi = g.GData.appSettings.value("zoomInFlags").toInt()
+        g.GData.zoomInFlags = trashi[0]
+        logging.info("Zoom In Flags: "+str(g.GData.zoomInFlags))
+        g.GData.rotation = 0
+        g.GData.keepTransform = False
+        self.shouldMaximize = g.GData.appSettings.value("shouldMaximize").toBool()
+        logging.info("Should Maximize: "+str(self.shouldMaximize))
+        g.GData.flipH = False
+        g.GData.flipV = False
+        trashi =  g.GData.appSettings.value("defaultSaveQuality").toInt()
+        g.GData.defaultSaveQuality = trashi[0]
+        logging.info("Default Image Save Quality: "+str(g.GData.defaultSaveQuality))
+        g.GData.noEnlargeSmallThumbs = g.GData.appSettings.value("noEnlargeSmallThumb").toBool()
+        logging.info("No Enlarge Small Thumb: "+str(g.GData.noEnlargeSmallThumbs))
+        trashi = g.GData.appSettings.value("slideShowDelay").toInt()
+        g.GData.slideShowDelay = trashi[0]
+        logging.info("Slide Show Delay: "+str(g.GData.slideShowDelay))
+        g.GData.slideShowRandom = g.GData.appSettings.value("slideShowRandom").toBool()
+        logging.info("Slide Show Random: "+str(g.GData.slideShowRandom))
+        g.GData.slideShowActive = False
+        logging.info("Slide Show Active: "+str(g.GData.slideShowActive))
+        self.editToolbarVisible = g.GData.appSettings.value("editToolBarVisible").toBool()
+        logging.info("Edit ToolBar Visible: "+str(self.editToolbarVisible))
+        self.goToolBarVisible = g.GData.appSettings.value("goToolBarVisible").toBool()
+        logging.info("Go ToolBar Visible: "+str(self.goToolBarVisible))
+        self.viewToolBarVisible = g.GData.appSettings.value("viewToolBarVisible").toBool()
+        logging.info("View ToolBar Visible: "+str(self.viewToolBarVisible))
+        self.imageToolBarVisible = g.GData.appSettings.value("imageToolBarVisible").toBool()
+        logging.info("Image ToolBar Visible: "+str(self.imageToolBarVisible))
+        g.GData.fsDockVisible = g.GData.appSettings.value("fsDockVisible").toBool()
+        logging.info("Fs Dock Visible: "+str(g.GData.fsDockVisible))
+        g.GData.bmDockVisible = g.GData.appSettings.value("bmDockVisible").toBool()
+        logging.info("Bm Dock Visible: "+str(g.GData.bmDockVisible))
+        g.GData.iiDockVisible = g.GData.appSettings.value("iiDockVisible").toBool()
+        logging.info("Ii Dock Visible: "+str(g.GData.iiDockVisible))
+        g.GData.pvDockVisible = g.GData.appSettings.value("pvDockVisible").toBool()
+        logging.info("Pv Dock Visible: "+str(g.GData.pvDockVisible))
+        trashi = g.GData.appSettings.value("startupDir").toInt()
+        g.GData.startupDir = trashi[0]
+        logging.info("Startup Directory: "+str(g.GData.startupDir))
+        g.GData.specifiedStartDir = g.GData.appSettings.value("specifiedStartDir").toString()
+        logging.info("specified Start Directory: "+str(g.GData.specifiedStartDir))
+        g.GData.thumbsBackImage = g.GData.appSettings.value("thumbsBackImage").toString()
+        logging.info("Thumbs Background Image: "+str(g.GData.thumbsBackImage))
+        trashi =  g.GData.appSettings.value("thumbSpacing").toInt()
+        g.GData.thumbsSpacing = trashi[0]
+        logging.info("Thumb Spacing: "+ str(g.GData.thumbsSpacing))
+        g.GData.enableImageInfoFS = g.GData.appSettings.value("enableImageInfoFS").toBool()
+        logging.info("Enable Image Info Fs: "+str(g.GData.enableImageInfoFS))
+        g.GData.showLabels = g.GData.appSettings.value("showLabels").toBool()
+        logging.info("Show Labels: "+str(g.GData.showLabels))
+        g.GData.smallIcons = g.GData.appSettings.value("smallIcons").toBool()
+        logging.info("Small Icons: "+str(g.GData.smallIcons))
+        g.GData.LockDocks = g.GData.appSettings.value("LockDocks").toBool()
+        logging.info("Lock Docks: "+str(g.GData.LockDocks))
+        g.GData.imageToolbarFullScreen = g.GData.appSettings.value("imageToolbarFullScreen").toBool()
+        logging.info("Image Toolbar Full Screen: "+str(g.GData.imageToolbarFullScreen))
 
-        #self.GData.appSettings.beginGroup("externalApps")
-        #extApps = self.GData.appSettings.childKeys()
+        #g.GData.appSettings.beginGroup("externalApps")
+        #extApps = g.GData.appSettings.childKeys()
         #i = 0
         #while i < extApps.size():
-        #    self.GData.externalApps[extApps.at(i)] = self.GData.appSettings.value(extApps.at(i).toString())
+        #    g.GData.externalApps[extApps.at(i)] = g.GData.appSettings.value(extApps.at(i).toString())
         #    i +=1
-        #self.GData.appSettings.endGroup()
+        #g.GData.appSettings.endGroup()
 
-        #self.GData.appSettings.beginGroup("CopyMoveToPaths")
-        #paths = self.GData.appSettings.childKeys()
+        #g.GData.appSettings.beginGroup("CopyMoveToPaths")
+        #paths = g.GData.appSettings.childKeys()
         #i = 0
         #while i < paths.size():
-        #    self.GData.bookmarkPaths.insert(self.GData.appSettings.value(paths.at(i).toString()))
+        #    g.GData.bookmarkPaths.insert(g.GData.appSettings.value(paths.at(i).toString()))
         #    i +=1
-        #self.GData.appSettings.endGroup()
+        #g.GData.appSettings.endGroup()
 
         logging.info("settings Read, program continuing")
 
@@ -1376,7 +1416,7 @@ class fbWindow(QtGui.QMainWindow):
     def addBookmark(self, path):
         logging.info("fbWindow.addBookmark()")
         logging.info("adding bookmark for: %s, to global data"% path)
-        self.GData.bookmarkPaths.append(path)
+        g.GData.bookmarkPaths.append(path)
         logging.info("Reloading bookmarks window")
         self.bookmarks.reloadBookmarks()
 

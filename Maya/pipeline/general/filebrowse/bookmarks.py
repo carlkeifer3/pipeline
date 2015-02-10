@@ -33,7 +33,7 @@ class BookMarks(QtGui.QTreeWidget):
     def reloadBookmarks(self):
         logging.info("reloading Bookmarks")
         self.clear()
-        bmList = self.GData.bookmarkPaths
+        bmList = g.GData.bookmarkPaths
         for model in bmList:
             item = QtGui.QTreeWidgetItem()
             item.setText(0, QtCore.QFileInfo(model).fileName())

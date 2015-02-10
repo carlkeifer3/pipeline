@@ -5,24 +5,23 @@ __author__ = 'cargoyle'
 """
 import logging
 from PyQt4 import Qt, QtGui, QtCore
-
+import pipeline.general.filebrowse.GData as g
 
 class thumbView(QtGui.QListView):
 
     def __init__(self, parent=None):
         import os
-        import pipeline.general.filebrowse.GData as g
+
 
         #logging.debug("initialize the QlistView")
         QtGui.QListView.__init__(self, parent)
         #self. currentRow = 0
 
         #logging.info("Get the global Settings Data for use by thumbView class")
-        self.GData = g.GData()
 
         self.r = g.UserRoles()
 
-        self.thumbSize = self.GData.appSettings.value("thumbsZoomVal").toInt()[0]
+        self.thumbSize = g.GData.appSettings.value("thumbsZoomVal").toInt()[0]
         logging.info(self.thumbSize)
 
         # setting up the list view to display icons nicely
@@ -39,7 +38,7 @@ class thumbView(QtGui.QListView):
 
         self.scrollbar = self.verticalScrollBar()
         self.scrollbar.setValue = 0
-        self.scrollbar.valueChanged.connect(lambda:self.loadVisibleThumbs( self.scrollbar.value()))
+        #self.scrollbar.valueChanged.connect(lambda:self.loadVisibleThumbs( self.scrollbar.value()))
 
         self.lastScrollBarValue = 0
 
@@ -133,7 +132,7 @@ class thumbView(QtGui.QListView):
 
     def loadVisibleThumbs(self, scrollbarValue):
         logging.info("thumbView.loadVisibleThumbs()")
-        logging.info("Scrollbar Moved, recheck for visible Thumbnails")
+        #logging.info("Scrollbar Moved, recheck for visible Thumbnails")
 
         #if gdata.thumbsLayout == "Compact":
         # scrolledForward = True
@@ -152,12 +151,12 @@ class thumbView(QtGui.QListView):
             return
 
         if scrolledForward == True:
-            last = (last - first) * (self.GData.thumbPagesReadahead + 1)
+            last = (last - first) * (g.GData.thumbPagesReadahead + 1)
             if last >= self.thumbModel.rowCount():
                 last = self.thumbModel.rowCount() -1
 
         else:
-            first = (last -first) * (self.GData.thumbPagesReadahead +1)
+            first = (last -first) * (g.GData.thumbPagesReadahead +1)
             if first < 0:
                 first = 0
 
@@ -240,7 +239,8 @@ class thumbView(QtGui.QListView):
         """
         :return:
         """
-        print "preparing to load thumbnails"
+        #logging.info("thumbView.loadPrepare()")
+        #logging.info("preparing to load thumbnails")
         thumbAspect = 1.33
         thumbHeight = float(self.thumbSize) * thumbAspect
         thumbWidth = self.thumbSize * thumbAspect
@@ -268,12 +268,12 @@ class thumbView(QtGui.QListView):
 
         self.thumbsDir.setNameFilters(self.fileFilters)
         self.thumbsDir.setFilter(QtCore.QDir.Files)
-        #if self.GData.showHiddenFiles:
+        #if g.GData.showHiddenFiles:
         #    self.thumbsDir.setFilter(self.thumbsDir.filters() | QtCore.QDir.hidden)
         self.thumbsDir.setPath(self.currentViewDir)
         self.thumbModel.clear()
 
-        self.setSpacing(self.GData.thumbsSpacing)
+        self.setSpacing(g.GData.thumbsSpacing)
 
         self.abortOp = False
 
@@ -284,14 +284,14 @@ class thumbView(QtGui.QListView):
 
         self.loadPrepare()
         self.initThumbs()
-        self.updateThumbsCount()
-        self.loadVisibleThumbs(0)
+        #self.updateThumbsCount()
+        #self.loadVisibleThumbs(0)
 
     def loadDuplicates(self):
         logging.info("thumbView.loadDuplicates")
 
     def initThumbs(self):
-        logging.info("thumbView.initThumbs")
+        logging.info("thumbView.initThumbs()")
         self.thumbFileInfoList = self.thumbsDir.entryInfoList()
         currThumb = 0
         emptyPixMap = QtGui.QPixmap()
@@ -302,17 +302,17 @@ class thumbView(QtGui.QListView):
         for thumbFileInfo in self.thumbFileInfoList:
             logging.info("adding %s to the model" % thumbFileInfo.filePath())
             thumbIitem = QtGui.QStandardItem()
-            thumbIitem.setData(False, role=self.r.loadedRole)
-            thumbIitem.setData(currThumb, role=self.r.sortRole)
-            thumbIitem.setData(thumbFileInfo.filePath(), role=self.r.fileNameRole)
+            thumbIitem.setData(False, role=g.UserRoles.loadedRole)
+            thumbIitem.setData(currThumb, role=g.UserRoles.sortRole)
+            thumbIitem.setData(thumbFileInfo.filePath(), role=g.UserRoles.fileNameRole)
             ## add
             thumbIitem.setData(thumbFileInfo.fileName(), role=QtCore.Qt.DisplayRole)
 
             thumbIitem.setTextAlignment(QtCore.Qt.AlignTop | QtCore.Qt.AlignCenter)
-            #thumbIitem.setText(thumbFileInfo.fileName())
+            thumbIitem.setText(thumbFileInfo.fileName())
             #thumbIitem.setIcon(QtGui.QIcon("D:/Nedry.png"))
             #logging.info("Ah, Ah, Ah, you didn't say the magic word")
-            #thumbIitem.setIcon(QtGui.QIcon(thumbFileInfo.filePath()))
+            thumbIitem.setIcon(QtGui.QIcon(thumbFileInfo.filePath()))
 
             self.thumbModel.appendRow(thumbIitem)
             currThumb += 1
@@ -325,6 +325,8 @@ class thumbView(QtGui.QListView):
 
     def loadThumbsRange(self):
         logging.info("thumbView.loadThumbsRange")
+
+        painter =  QtGui.QPainter()
 
         thumbReader = QtGui.QImageReader()
 
@@ -343,12 +345,16 @@ class thumbView(QtGui.QListView):
 
 
 
-            #self.thumbModel.item(currThumb).setIcon(QtGui.QIcon(imageFileName))
-            self.thumbModel.item(currThumb).setIcon(QtGui.QIcon("D:/Nedry.png"))
+            self.thumbModel.item(currThumb).setIcon(QtGui.QIcon(imageFileName))
+            #self.thumbModel.item(currThumb).setIcon(QtGui.QIcon("D:/Nedry.png"))
 
             logging.info(imageFileName+", Should now be loaded.")
             self.thumbModel.item(currThumb).setData(True, role=self.r.loadedRole)
+            QtGui.qApp.processEvents()
+            self.update(self.thumbModel.index(currThumb,0))
             currThumb += 1
+        painter.restore()
+        painter.end()
 
 
     def addThumb(self):

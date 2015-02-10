@@ -15,8 +15,6 @@ class settingsDialog(QtGui.QDialog):
         QtGui.QDialog.__init__(self, parent)
         self.setWindowTitle("Preferences")
 
-        self.GData = g.GData()
-
         ## Image Viewer Options
         ## Zoom Large Images
         self.fitLargeGroupBox = QtGui.QGroupBox("Fit Large Images")
@@ -34,7 +32,7 @@ class settingsDialog(QtGui.QDialog):
 
         self.fitLargeVbox.addStretch(1)
         self.fitLargeGroupBox.setLayout(self.fitLargeVbox)
-        self.fitLargeRadios[self.GData.zoomOutFlags].setChecked(True)
+        self.fitLargeRadios[g.GData.zoomOutFlags].setChecked(True)
 
         ## Zoom small images
         self.fitSmallGroupBox = QtGui.QGroupBox("Fit Small Images")
@@ -51,7 +49,7 @@ class settingsDialog(QtGui.QDialog):
 
         self.fitSmallVbox.addStretch(1)
         self.fitSmallGroupBox.setLayout(self.fitSmallVbox)
-        self.fitSmallRadios[self.GData.zoomInFlags].setChecked(True)
+        self.fitSmallRadios[g.GData.zoomInFlags].setChecked(True)
 
         ## ImageView background color
         self.backgroundColorLab = QtGui.QLabel("Background color: ")
@@ -62,23 +60,23 @@ class settingsDialog(QtGui.QDialog):
         self.bgColBox.addWidget(self.backgroundColorButton)
         self.bgColBox.addStretch(1)
         #self.backgroundColorButton.clicked.connect(lambda : self.pickColor())
-        #self.setButtonBgColor(self.GData.backgroundColor, self.backgroundColorButton)
+        #self.setButtonBgColor(g.GData.backgroundColor, self.backgroundColorButton)
         self.backgroundColorButton.setAutoFillBackground(True)
-        self.bgColor = self.GData.backgroundColor
+        self.bgColor = g.GData.backgroundColor
 
         ## Exit when opening image
         self.exitCliCb = QtGui.QCheckBox("Exit instead of closing, when image is loaded from the command line")
-        self.exitCliCb.setChecked(self.GData.exitInsteadofClose)
+        self.exitCliCb.setChecked(g.GData.exitInsteadofClose)
 
         ## Wrap image list
         self.wrapListCb = QtGui.QCheckBox("Wrap image list when reachin last or first image")
-        self.wrapListCb.setChecked(self.GData.wrapImageList)
+        self.wrapListCb.setChecked(g.GData.wrapImageList)
 
         ## Save Quality
         self.saveQualityLab = QtGui.QLabel("Default quality when saving images: ")
         self.saveQualitySpin = QtGui.QSpinBox()
         self.saveQualitySpin.setRange(0, 100)
-        self.saveQualitySpin.setValue(self.GData.defaultSaveQuality)
+        self.saveQualitySpin.setValue(g.GData.defaultSaveQuality)
         self.saveQualityHbox = QtGui.QHBoxLayout()
         self.saveQualityHbox.addWidget(self.saveQualityLab)
         self.saveQualityHbox.addWidget(self.saveQualitySpin)
@@ -86,15 +84,15 @@ class settingsDialog(QtGui.QDialog):
 
         ## Enable Animations
         self.enableAnimCb = QtGui.QCheckBox("Enable GIF animation")
-        self.enableAnimCb.setChecked(self.GData.enableAnimations)
+        self.enableAnimCb.setChecked(g.GData.enableAnimations)
 
         ## Enable image Exif rotation
         self.enableExifCb = QtGui.QCheckBox("Rotate image according to Exif orientation")
-        self.enableExifCb.setChecked(self.GData.exifRotationEnabled)
+        self.enableExifCb.setChecked(g.GData.exifRotationEnabled)
 
         ## Image Info
         self.imageInfoCb = QtGui.QCheckBox("Show image file name in full screen mode")
-        self.imageInfoCb.setChecked(self.GData.enableImageInfoFS)
+        self.imageInfoCb.setChecked(g.GData.enableImageInfoFS)
 
         ## Viewer options
         self.viewerOptsBox = QtGui.QVBoxLayout()
@@ -122,9 +120,9 @@ class settingsDialog(QtGui.QDialog):
         self.bgThumbColBox.addWidget(self.bgThumbTxtLab)
         self.bgThumbColBox.addWidget(self.colThumbButton)
         #self.colThumbButton.clicked.connect(self.pickThumbsColor())
-        #self.setButtonColor(self.GData.thumbsBackgroundColor, self.colThumbButton)
+        #self.setButtonColor(g.GData.thumbsBackgroundColor, self.colThumbButton)
         self.colThumbButton.setAutoFillBackground(True)
-        self.thumbBgColor = self.GData.thumbsBackgroundColor
+        self.thumbBgColor = g.GData.thumbsBackgroundColor
 
         ## thumbview text color
         self.txtThumbTxtLab = QtGui.QLabel("Label color: ")
@@ -134,9 +132,9 @@ class settingsDialog(QtGui.QDialog):
         self.bgThumbColBox.addWidget(self.colThumbTextButton)
         self.bgThumbColBox.addStretch(1)
         #self.colThumbTextButton.clicked.connect(self.pickThumbsTextColor())
-        #self.setButtonBgColor(self.GData.thumbsTextColor, self.colThumbTextButton)
+        #self.setButtonBgColor(g.GData.thumbsTextColor, self.colThumbTextButton)
         self.colThumbTextButton.setAutoFillBackground(True)
-        self.thumbTextColor = self.GData.thumbsTextColor
+        self.thumbTextColor = g.GData.thumbsTextColor
 
         ## thumbview background image
         self.thumbsBackImageLab = QtGui.QLabel("Background Image: ")
@@ -154,13 +152,13 @@ class settingsDialog(QtGui.QDialog):
         self.thumbsBackImageEditBox.addWidget(self.thumbsBackImageEdit)
         self.thumbsBackImageEditBox.addWidget(self.chooseThumbsBackImageButton)
         self.thumbsBackImageEditBox.addStretch(1)
-        self.thumbsBackImageEdit.setText(self.GData.thumbsBackImage)
+        self.thumbsBackImageEdit.setText(g.GData.thumbsBackImage)
 
         ## thumbnail spacing
         self.thumbSpacingLab = QtGui.QLabel("Add space between thumbnails: ")
         self.thumbSpacingSpin = QtGui.QSpinBox()
         self.thumbSpacingSpin.setRange(0, 15)
-        self.thumbSpacingSpin.setValue(self.GData.thumbsSpacing)
+        self.thumbSpacingSpin.setValue(g.GData.thumbsSpacing)
         self.thumbSpacingHbox = QtGui.QHBoxLayout()
         self.thumbSpacingHbox.addWidget(self.thumbSpacingLab)
         self.thumbSpacingHbox.addWidget(self.thumbSpacingSpin)
@@ -168,20 +166,20 @@ class settingsDialog(QtGui.QDialog):
 
         ## Do not enlarge small thumbs
         self.noSmallThumbCb = QtGui.QCheckBox("Show original size of images smaller than the thumbnail size")
-        self.noSmallThumbCb.setChecked(self.GData.noEnlargeSmallThumbs)
+        self.noSmallThumbCb.setChecked(g.GData.noEnlargeSmallThumbs)
 
         ##thumbnail pages to read ahead
         self.thumbPagesLab = QtGui.QLabel("Number of thumbnail pages to read ahead: ")
         self.thumbPagesSpin = QtGui.QSpinBox()
         self.thumbPagesSpin.setRange(1, 10)
-        self.thumbPagesSpin.setValue(self.GData.thumbPagesReadahead)
+        self.thumbPagesSpin.setValue(g.GData.thumbPagesReadahead)
         self.thumbPagesHbox = QtGui.QHBoxLayout()
         self.thumbPagesHbox.addWidget(self.thumbPagesLab)
         self.thumbPagesHbox.addWidget(self.thumbPagesSpin)
         self.thumbSpacingHbox.addStretch(1)
 
         self.enableExifCb = QtGui.QCheckBox("Rotate thumbnails according to Exif orientation")
-        self.enableExifCb.setChecked(self.GData.exifRotationEnabled)
+        self.enableExifCb.setChecked(g.GData.exifRotationEnabled)
 
         ## Thumbnail options
         self.thumbsOptBox = QtGui.QVBoxLayout()
@@ -229,17 +227,17 @@ class settingsDialog(QtGui.QDialog):
         logging.info("OK clicked, writing settings to GData")
 
 
-        self.GData.backgroundColor = self.bgColor
-        self.GData.thumbsBackgroundColor = self.thumbBgColor
-        self.GData.thumbsTextColor = self.thumbTextColor
-        self.GData.thumbsBackImage = self.thumbsBackImageEdit.text()
-        self.GData.thumbsSpacing = self.thumbSpacingSpin.value()
-        logging.info("Thumbnail Spacing: " + str(self.GData.thumbsSpacing))
-        self.GData.thumbPagesReadahead = self.thumbPagesSpin.value()
-        self.GData.exitInsteadofClose = self.exitCliCb.isChecked()
-        self.GData.wrapImageList = self.wrapListCb.isChecked()
-        self.GData.defaultSaveQuality = self.saveQualitySpin.value()
-        #self.GData.slideShowDelay = self.slideDelaySpin.value()
+        g.GData.backgroundColor = self.bgColor
+        g.GData.thumbsBackgroundColor = self.thumbBgColor
+        g.GData.thumbsTextColor = self.thumbTextColor
+        g.GData.thumbsBackImage = self.thumbsBackImageEdit.text()
+        g.GData.thumbsSpacing = self.thumbSpacingSpin.value()
+        logging.info("Thumbnail Spacing: " + str(g.GData.thumbsSpacing))
+        g.GData.thumbPagesReadahead = self.thumbPagesSpin.value()
+        g.GData.exitInsteadofClose = self.exitCliCb.isChecked()
+        g.GData.wrapImageList = self.wrapListCb.isChecked()
+        g.GData.defaultSaveQuality = self.saveQualitySpin.value()
+        #g.GData.slideShowDelay = self.slideDelaySpin.value()
 
 
         self.accept()
