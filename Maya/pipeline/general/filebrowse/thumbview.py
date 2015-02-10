@@ -173,7 +173,8 @@ class thumbView(QtGui.QListView):
             #logging.info("Looking for first thumbnail in list of thumbs")
             idx = self.thumbModel.index(currThumb, 0)
             if self.viewport().rect().contains(QtCore.QPoint(0, self.visualRect(idx).y() + self.visualRect(idx).height() + 1)):
-                logging.info("First thumbnail found")
+                index = self.thumbModel.index(currThumb, 0)
+                logging.info("First thumbnail "+ str(self.thumbModel.data(index).toString()))
                 return idx.row()
             currThumb += 1
 
@@ -186,16 +187,18 @@ class thumbView(QtGui.QListView):
         """
         logging.info("thumbView.getLastVisibleThumb()")
         logging.info("get last visible thumbnail")
-        currThumb = self.thumbModel.rowCount() -1
+        currThumb = int(self.thumbModel.rowCount())-1
         logging.info("Investigating "+str(currThumb)+" rows")
         if currThumb > 0:
             logging.info("Looking for last Thumbnail in list of thumbs")
             idx = self.thumbModel.indexFromItem(self.thumbModel.item(currThumb))
             if self.viewport().rect().contains(QtCore.QPoint(0, self.visualRect(idx).y() + self.visualRect(idx).height() + 1)):
-                logging.info("Last thumbnail found")
+                index = self.thumbModel.index(currThumb, 0)
+                logging.info("Last thumbnail: "+ str(self.thumbModel.data(index).toString()))
                 return idx.row()
             currThumb -= 1
-
+            print "currThumb: "+ str(currThumb)
+        print "nothing found exit -1"
         return -1
 
     def isThumbVisible(self, idx):
@@ -263,6 +266,6 @@ class thumbView(QtGui.QListView):
         print "current Path :"+str(self.thumbsDir.currentPath)
         for thumbFileInfo in self.thumbFileInfoList:
             thumbIitem = QtGui.QStandardItem()
-            #thumbIitem.setText(str(thumbFileInfo))
+            thumbIitem.setText(str(thumbFileInfo))
             thumbIitem.setIcon(QtGui.QIcon(thumbFileInfo.filePath()))
             self.thumbModel.appendRow(thumbIitem)
