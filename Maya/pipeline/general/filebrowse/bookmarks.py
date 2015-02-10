@@ -35,11 +35,11 @@ class BookMarks(QtGui.QTreeWidget):
         self.clear()
         bmList = self.GData.bookmarkPaths
         for model in bmList:
-        item = QtGui.QTreeWidgetItem()
-        item.setText(0, QtCore.QFileInfo(model).fileName())
-        item.setIcon(0, QtGui.QIcon(self.imgDirectory+"bookmarks.png"))
-        item.setToolTip(0, model)
-        self.insertTopLevelItem(0, item)
+            item = QtGui.QTreeWidgetItem()
+            item.setText(0, QtCore.QFileInfo(model).fileName())
+            item.setIcon(0, QtGui.QIcon(self.imgDirectory+"bookmarks.png"))
+            item.setToolTip(0, model)
+            self.insertTopLevelItem(0, item)
 
     def resizeTreeColumn(self):
         logging.info("resizing Tree Column")
