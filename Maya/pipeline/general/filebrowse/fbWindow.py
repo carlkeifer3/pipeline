@@ -108,9 +108,7 @@ class fbWindow(QtGui.QMainWindow):
         import pipeline.general.filebrowse.thumbview as tv
 
         self.thumbView = tv.thumbView(self)
-        #self.thumbView.load()
-        #print "thumbview should be built"
-        #self.fbLayout.addWidget(self.thumbView)
+        self.thumbView.selectionModel().selectionChanged.connect(lambda: self.changeActionsBySelection())
 
         self.iiDock = QtGui.QDockWidget("Image Info", self)
         self.iiDock.setObjectName("ImageInfo")
@@ -139,7 +137,7 @@ class fbWindow(QtGui.QMainWindow):
         import pipeline.general.filebrowse.imageview as iv
 
         self.imageView = iv.imageView()
-
+        #self.imageView.saveAction(
         self.imageView.ImagePopUpMenu = QtGui.QMenu()
 
         ## Widget Actions
@@ -162,6 +160,19 @@ class fbWindow(QtGui.QMainWindow):
         self.imageView.addAction(self.cropAct)
         self.imageView.addAction(self.cropToSelectionAct)
         self.imageView.addAction(self.resizeAct)
+        self.imageView.addAction(self.openAction)
+        self.imageView.addAction(self.exitAction)
+
+        ## Actions
+        self.imageView.ImagePopUpMenu.addSeparator()
+        self.imageView.ImagePopUpMenu.addAction(self.nextImageAction)
+        self.imageView.ImagePopUpMenu.addAction(self.prevImageAction)
+
+        self.imageView.ImagePopUpMenu.addAction(self.settingsAction)
+
+        self.imageView.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
+        g.GData.isFullScreen = g.GData.appSettings.value("isFullScreen").toBool()
+        self.fullScreenAct.setChecked(g.GData.isFullScreen)
 
     def createActions(self):
         """
@@ -674,6 +685,8 @@ class fbWindow(QtGui.QMainWindow):
         self.statusBar.addWidget(self.busyLabel)
         self.busyLabel.setVisible(False)
 
+        self.statusBar.setStyleSheet("border: 0px solid black")
+
         self.setStatusBar(self.statusBar)
 
     def createFSTree(self):
@@ -713,6 +726,9 @@ class fbWindow(QtGui.QMainWindow):
         self. bookmarks = bm.BookMarks(self.bmDock)
         self.bmDock.setWidget(self.bookmarks)
 
+        #self.bmDock.toggleViewAction().triggered.connect(lambda:self.setBmDockVisibility())
+        #self.bmDock.visibilityChanged.connect(lambda:self.setBmDockVisibility())
+        self.bookmarks.itemClicked.connect(lambda: self.bookmarkClicked())
 
 
         self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.bmDock)
@@ -1031,9 +1047,10 @@ class fbWindow(QtGui.QMainWindow):
         self.refreshThumbs(True)
         self.selectCurrentViewDir()
 
-    def bookmarkClicked(self, item, col):
+    def bookmarkClicked(self):
         logging.info("bookmark selected")
-        self.goTo(item.toolTip(col))
+        item = self.bookmarks.selectedItems()[0]
+        self.goTo(item.toolTip(0))
 
     def setThumbsFilter(self):
         print "setting thumbnails filter"
@@ -1058,7 +1075,11 @@ class fbWindow(QtGui.QMainWindow):
         print "setting the cut and copy actions"
 
     def changeActionsBySelection(self):
-        print "changing actions by selection"
+        logging.info("fbWindow.changeActionsBySelection()")
+        logging.info("change in selected thumbnail detected!")
+
+        self.setCopyCutActions(self.thumbView.selectionModel().selectedIndexes().size())
+
 
     def UpdateActions(self):
         print "Updating Actions"
