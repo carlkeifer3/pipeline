@@ -388,3 +388,74 @@ class settingsDialog(QtGui.QDialog):
         logging.info("Picking a Background Image")
         dirName = QtGui.QFileDialog.getExistingDirectory(caption="Open File", directory="")#, options="images"+"*.jpg *.jpeg *.png *.bmp *.tiff *.tif *.ppm *.xbm *.xpm")
         self.thumbsBackImageEdit.setText(dirName)
+
+class CropDialog(QtGui.QWidget):
+
+    def __init__(self):
+        logging.info("cropDialog Initialized")
+
+class ColorsDialog(QtGui.QWidget):
+    def __init__(self, parent = None):
+
+        QtGui.QWidget.__init__()
+
+        logging.info("ColorsDialog Initialized")
+        self.setWindowTitle("Colors")
+        self.setWindowIcon(QtGui.QIcon(":/images/colors.png"))
+        self.resize(350, 300)
+
+
+class CopyMoveToDialog(QtGui.QDialog):
+
+    def __init__(self, parent=None):
+        QtGui.QDialog.__init__(self, parent)
+        logging.info("dialogs.CopyMoveToDialog Initialized")
+
+        #copyOp = not move
+        #if move:
+        self.setWindowTitle("Move to...")
+        #    #self.setWindowIcon()
+        #else:
+        #    self.setWindowTitle("Copy to...")
+        #    #self.setWindowIcon()
+
+        self.resize(350, 250)
+        #currentPath = thumbsPath
+
+        self.pathsTable = QtGui.QTableView(self)
+        #self.pathsTable.setSelectionBehavior()
+
+
+        self.addRemoveHbox = QtGui.QHBoxLayout()
+        self.addButton = QtGui.QPushButton("Browse...")
+        #self.addButton.clicked.connect(lambda: self.add())
+        self.removeButton = QtGui.QPushButton("Remove")
+        #self.removeButton.clicked.connect(lambda: self.remove())
+        self.addRemoveHbox.addWidget(self.removeButton, 0, QtCore.Qt.AlignLeft)
+        self.addRemoveHbox.addStretch(1)
+        self.addRemoveHbox.addWidget(self.addButton, 0, QtCore.Qt.AlignRight)
+
+        self.buttonsHbox = QtGui.QHBoxLayout()
+        self.cancelButton = QtGui.QPushButton("Cancel")
+        self.cancelButton.setIcon(QtGui.QIcon.fromTheme("dialog-cancel"))
+        #self.cancelButton.setSizePolicy(QtCore.QSize.QSizePolicy.Fixed, QtCore.QSize.QSizePolicy.Fixed)
+        #self.cancelButton.clicked.connect(lambda:self.justClose())
+
+        self.okButton = QtGui.QPushButton("OK")
+        self.okButton.setIcon(QtGui.QIcon.fromTheme("dialog-ok"))
+        #self.okButton.setSizePolicy(QtCore.QSize.QSizePolicy.Fixed, QtCore.QSize.QSizePolicy.Fixed)
+        #self.okButton.clicked.connect(lambda:self.copyOrMove())
+
+        self.buttonsHbox.addStretch(1)
+        self.buttonsHbox.addWidget(self.cancelButton, 0, QtCore.Qt.AlignRight)
+        self.buttonsHbox.addWidget(self.okButton, 0, QtCore.Qt.AlignLeft)
+
+
+        self.mainVbox = QtGui.QVBoxLayout()
+        self.mainVbox.addWidget(self.pathsTable)
+        self.mainVbox.addLayout(self.addRemoveHbox)
+        #self.mainVbox.addWidget(self.line)
+        #self.mainVbox.addWidget(self.destinationLab)
+        self.mainVbox.addLayout(self.buttonsHbox)
+        self.setLayout(self.mainVbox)
+        self.show()

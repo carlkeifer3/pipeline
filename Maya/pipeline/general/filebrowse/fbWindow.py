@@ -905,6 +905,8 @@ class fbWindow(QtGui.QMainWindow):
 
     def copyMoveImages(self, move):
         print "copy or move images"
+        copyMoveToDialog = dia.CopyMoveToDialog(self)#, thumbsPath=self.getSelectedPath(), move=move)
+
 
 
     def thumbsZoomIn(self):
@@ -973,8 +975,10 @@ class fbWindow(QtGui.QMainWindow):
         logging.info("fbWindow.showColorsDialog()")
         logging.info("Showing colors dialog")
 
-        if g.GData.slideShowActive:
-            self.slideShow()
+        #if g.GData.slideShowActive:
+        #    self.slideShow()
+
+
 
     def moveRight(self):
         print "moving Image Right"
@@ -1110,14 +1114,17 @@ class fbWindow(QtGui.QMainWindow):
         logging.info(" goto home directory")
         self.goTo(QtCore.QDir.homePath())
 
-    def setCopyCutActions(self):
+    def setCopyCutActions(self, setEnabled):
         print "setting the cut and copy actions"
+
+        self.cutAction.setEnabled(setEnabled)
+        self.copyAction.setEnabled(setEnabled)
 
     def changeActionsBySelection(self):
         logging.info("fbWindow.changeActionsBySelection()")
         logging.info("change in selected thumbnail detected!")
 
-        self.setCopyCutActions(self.thumbView.selectionModel().selectedIndexes().size())
+        self.setCopyCutActions(len(self.thumbView.selectionModel().selectedIndexes()))
 
 
     def UpdateActions(self):
@@ -1184,7 +1191,6 @@ class fbWindow(QtGui.QMainWindow):
         g.GData.appSettings.endGroup()
 
         logging.info("settings Written exiting Cleanly")
-
 
     def readSettings(self):
         logging.info("Reading Settings")
@@ -1330,7 +1336,6 @@ class fbWindow(QtGui.QMainWindow):
 
         logging.info("settings Read, program continuing")
 
-
     def setupDocks(self):
         logging.info("fbWindow.setupDocks()")
         logging.info("setting up the docks")
@@ -1382,11 +1387,11 @@ class fbWindow(QtGui.QMainWindow):
     def setStatus(self):
         print "setting Status"
 
-    def mouseDoubleClickEvent(self, event):
-        print "mouse has been double clicked"
+    #def mouseDoubleClickEvent(self, event):
+    #    print "mouse has been double clicked"
 
-    def mousePressEvent(self, event):
-        print "the mouse has been clicked"
+    #def mousePressEvent(self, event):
+    #    print "the mouse has been clicked"
 
     def newImage(self):
         print "creating a new Image"

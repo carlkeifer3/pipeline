@@ -11,6 +11,7 @@ class thumbView(QtGui.QListView):
 
     def __init__(self, parent=None):
         import os
+        import pipeline.general.filebrowse.infoview as iv
 
 
         #logging.debug("initialize the QlistView")
@@ -57,6 +58,7 @@ class thumbView(QtGui.QListView):
 
         self.setThumbColors()
 
+        self.infoView = iv.InfoView()
         self.thumbsDir = QtCore.QDir()
         self.fileFilters = QtCore.QStringList("")
 
@@ -146,8 +148,8 @@ class thumbView(QtGui.QListView):
 
         self.updateThumbSelection()
 
-    def startDrag(self, dropActions):
-        print "starting drag action"
+    #def startDrag(self, dropActions):
+    #    print "starting drag action"
 
     def abort(self):
         self.abortOp = True
