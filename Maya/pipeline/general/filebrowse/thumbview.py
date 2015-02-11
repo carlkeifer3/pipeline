@@ -385,13 +385,13 @@ class thumbView(QtGui.QListView):
     #def wheelEvent(self, event):
     #    logging.info("thumbView.wheelEvent")
 
-    def mousePressEvent(self, event):
-        logging.info("thumbView.mousePressEvent")
+    #def mousePressEvent(self, event):
+    #    logging.info("thumbView.mousePressEvent")
 
-        if g.GData.reverseMouseBehavior & event.button() == QtCore.Qt.MiddleButton:
-
-            if self.selectionModel().selectedIndexes.size() == 1:
-                emit (doubleClicked(self.selectionModel().selectedIndexes().first))
+    #    if g.GData.reverseMouseBehavior & event.button() == QtCore.Qt.MiddleButton:
+    #
+    #        if self.selectionModel().selectedIndexes.size() == 1:
+    #            emit (doubleClicked(self.selectionModel().selectedIndexes().first))
 
     def invertSelection(self):
         logging.info("thumbView.invertSelection")

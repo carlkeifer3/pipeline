@@ -10,7 +10,7 @@ import os
 import sip
 import maya.OpenMayaUI as apiUI
 import pipeline.general.filebrowse.thumbview as tv
-import pipeline.general.filebrowse.imageView as iv
+import pipeline.general.filebrowse.imageview as iv
 import pipeline.general.filebrowse.dialogs as dia
 import pipeline.general.filebrowse.GData as g
 
@@ -134,9 +134,11 @@ class fbWindow(QtGui.QMainWindow):
 
         :return:
         """
-        logging.info("createImageView()")
+        logging.info("fbWindow.createImageView()")
+        logging.info("Creating the Image View")
+        import pipeline.general.filebrowse.imageview as iv
 
-        self.imageView = iv.ImageView()
+        self.imageView = iv.imageView()
 
         self.imageView.ImagePopUpMenu = QtGui.QMenu()
 
