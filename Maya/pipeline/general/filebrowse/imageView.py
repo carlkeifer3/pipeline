@@ -12,7 +12,7 @@ class imageView(QtGui.QWidget):
     def __init__(self, parent = None):
 
         QtGui.QWidget.__init__(self, parent)
-        logging.info("ImageView Widget created")
+        #logging.info("ImageView Widget created")
 
         self.tempDisableResize = True
         self.mirrorLayout = 0
@@ -90,7 +90,7 @@ class imageView(QtGui.QWidget):
         self.cropBand = 0
 
 
-        logging.info("ImageView.__init__ complete!")
+        #logging.info("ImageView.__init__ complete!")
 
     def getHeightByWidth(self, imgWidth, imgHeight, newWidth):
         logging.info("imageview.getHeightByWidth()")
@@ -164,12 +164,23 @@ class imageView(QtGui.QWidget):
         else:
             self.displayImage = self.origImage
 
+        self.transform()
 
+        if g.GData.colorsActive | g.GData.keepTransform:
+            self.colorize()
+
+        if self.mirrorLayout:
+            self.mirror()
+
+        displayPixmap = QtGui.QPixmap.fromImage(self.displayImage)
+        self.imageLabel.setPixmap(displayPixmap)
+        self.resizeImage()
 
     def reload(self):
         logging.info("imageview.reload()")
 
         imageReader = QtGui.QImageReader()
+        self.imageLabel.clear()
 
         if g.GData.enableImageInfoFS:
             if self.currentImageFullPath.isEmpty():
@@ -187,6 +198,13 @@ class imageView(QtGui.QWidget):
 
         if self.newImage | self.currentImageFullPath.isEmpty():
             self.newImage = True
+            self.origImage.load(":/images/no_image.png")
+            self.displayImage = self.origImage
+            displayPixmap = QtGui.QPixmap.fromImage(self.displayImage)
+            self.imageLabel.setPixmap(displayPixmap)
+            self.setWindowTitle("Clipboard")
+            self.isAnimation = False
+            return
 
         imageReader.setFileName(self.currentImageFullPath)
 

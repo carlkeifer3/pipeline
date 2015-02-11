@@ -83,7 +83,7 @@ class fbWindow(QtGui.QMainWindow):
 
         self.doFindDuplicates = False
         self.refreshThumbs(True)
-
+        self.setStatus("")
         #self.setLayout(self.fbLayout)
 
     def handleStartupArgs(self):
@@ -982,8 +982,6 @@ class fbWindow(QtGui.QMainWindow):
         #if g.GData.slideShowActive:
         #    self.slideShow()
 
-
-
     def moveRight(self):
         print "moving Image Right"
 
@@ -1067,19 +1065,23 @@ class fbWindow(QtGui.QMainWindow):
         # this is not the right directory, just trying to get this to work
         self.thumbView.thumbsDir.setPath(path)
         self.refreshThumbs(True)
+        self.setStatus("Current Directory: "+str(path))
 
     def goSelectedDir(self):
-        logging.info("getting the directory selected in the tree widget")
+        #logging.info("fbWindow.goSelectedDir()")
+        #logging.info("getting the directory selected in the tree widget")
+        self.setStatus("Loading Directory")
         self.thumbView.setNeedScroll(True)
         selectedPath = self.getSelectedPath()
         self.thumbView.currentViewDir = selectedPath
         self.thumbView.thumbsDir.setPath(selectedPath)
         self.refreshThumbs(True)
+        self.setStatus("Current Directory: "+str(selectedPath))
 
     def goPathBarDir(self):
         logging.info("fbWindow.goPathBarDir()")
         logging.info("go to the directory indicated by the path bar")
-
+        self.setStatus("Loading Directory")
         self.thumbView.setNeedScroll(True)
 
         self.checkPath = QtCore.QDir(self.pathBar.text())
@@ -1096,8 +1098,10 @@ class fbWindow(QtGui.QMainWindow):
 
     def bookmarkClicked(self):
         #logging.info("bookmark selected")
+        self.setStatus("Loading Bookmark")
         item = self.bookmarks.selectedItems()[0]
         self.goTo(item.toolTip(0))
+
 
     def setThumbsFilter(self):
         print "setting thumbnails filter"
@@ -1372,26 +1376,58 @@ class fbWindow(QtGui.QMainWindow):
         self.lockDocks()
 
         self.setDockOptions(self.AllowNestedDocks)
-        logging.info("Dock setup complete loading program window")
+        #logging.info("Dock setup complete loading program window")
 
     def lockDocks(self):
-        print "locking all docked items"
+        #logging.info("fbWindow.lockDocks()")
+        #logging.info("locking all docked items")
+
+        if self.initComplete:
+            g.GData.LockDocks = self.actLockDocks.isChecked()
+
+        if g.GData.LockDocks:
+            self.fsDock.setTitleBarWidget(self.fsDockEmptyWidget)
+            self.bmDock.setTitleBarWidget(self.bmDockEmptyWidget)
+            self.iiDock.setTitleBarWidget(self.iiDockEmptyWidget)
+            self.pvDock.setTitleBarWidget(self.pvDockEmptyWidget)
+        else:
+            self.fsDock.setTitleBarWidget(self.fsDockOrigWidget)
+            self.bmDock.setTitleBarWidget(self.bmDockOrigWidget)
+            self.iiDock.setTitleBarWidget(self.iiDockOrigWidget)
+            self.pvDock.setTitleBarWidget(self.pvDockOrigWidget)
 
     def createPopupMenu(self):
-        print "creating popup menus"
+        logging.info("fbWindow.createPopupMenu()")
+        logging.info("creating popup menus")
+
+        testMenu = self.createPopupMenu()
+        testMenu.addSeparator()
+        testMenu.addAction(self.actSmallIcons)
+        testMenu.addAction(self.actLockDocks)
+        return testMenu
 
     def loadShortcuts(self):
-        print "loading shortcuts"
+        logging.info("fbWindow.loadShortcuts()")
+        logging.info("loading shortcuts")
+
+        ## Add Customizable key shortcut actions
+        #g.GData.actionKeys[self.thumbsGoTopAct.text()] = self.thumbsGoTopAct
+        #g.GData.actionKeys[self.thumbsGoBottomAct.text()] = self.thumbsGoBottomAct
+        #g.GData.actionKeys[self.closeImageAct.text()] = self.closeImageAct
 
     def closeEvent(self, event):
+        logging.info("fbWindow.closeEvent()")
         logging.info("close Event")
         self.thumbView.abort()
         self.writeSettings()
 
         event.accept()
 
-    def setStatus(self):
-        print "setting Status"
+    def setStatus(self, state):
+        #logging.info("fbWindow.setStatus()")
+        #logging.info("setting Status")
+
+        self.stateLabel.setText("    "+state+"    ")
 
     #def mouseDoubleClickEvent(self, event):
     #    print "mouse has been double clicked"
@@ -1538,8 +1574,8 @@ class fbWindow(QtGui.QMainWindow):
         print "creating Sub Directory"
 
     def getSelectedPath(self):
-        logging.info("fbWindow.getSelectedPath()")
-        logging.info("getting the path selected in fsTree")
+        #logging.info("fbWindow.getSelectedPath()")
+        #logging.info("getting the path selected in fsTree")
         selectedDirs = self.fsTree.selectionModel().selectedRows()
         if selectedDirs[0].isValid():
             dirInfo = QtCore.QFileInfo(self.fsTree.fsModel.filePath(selectedDirs[0]))
