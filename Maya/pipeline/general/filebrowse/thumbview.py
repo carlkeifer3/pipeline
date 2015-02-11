@@ -316,8 +316,8 @@ class thumbView(QtGui.QListView):
         logging.info("thumbView.initThumbs()")
         self.thumbFileInfoList = self.thumbsDir.entryInfoList()
         currThumb = 0
-        emptyPixMap = QtGui.QPixmap()
-        hintSize = QtCore.QSize()
+        #emptyPixMap = QtGui.QPixmap()
+        #hintSize = QtCore.QSize()
 
         #emptyPixMap.fromImage(self.emptyImg).scaled(self.thumbWidth,self.thumbHeight)
 

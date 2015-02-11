@@ -741,7 +741,11 @@ class fbWindow(QtGui.QMainWindow):
         print "sorting thumbnails"
 
     def reload(self):
-        print "reload"
+        logging.info("fbWindow.reload()")
+        #if g.GData.layoutMode == self.thumbViewIdx:
+        #self.refreshThumbs(False)
+        #else:
+        #    self.imageView.reload()
 
     def setIncludeSubFolders(self):
         logging.debug("set Include SubFolders")
@@ -760,23 +764,38 @@ class fbWindow(QtGui.QMainWindow):
 
     def setCompactThumbs(self):
         print "setting compact thumbs view"
+        #g.GData.thumbsLayout = self.tl.Compact
+        #self.actShowLabels.setEnabled(True)
+        #self.refreshThumbs(False)
 
     def setSquareishThumbs(self):
         print "setting Square thumbs view"
+        #g.GData.thumbsLayout = self.tl.Squares
+        #self.actShowLabels.setEnabled(False)
+        #self.refreshThumbs(False)
 
     def showHiddenFiles(self):
-        print "showing hidden files"
+        logging.info("fbWindow.showHiddenFiles")
+        logging.info("showing hidden files")
+        g.GData.showHiddenFiles = self.actShowHidden.isChecked()
+        self.fsTree.setModelFlags()
+        self.refreshThumbs(False)
 
     def toggleImageToolbar(self):
+        logging.info("fbWindow.toggleImageToolbar")
         logging.info("toggling Image Toolbar")
         self.imageToolBar.setVisible(self.actShowViewerToolbars.isChecked())
         g.GData.imageToolbarFullScreen = self.actShowViewerToolbars.isChecked()
 
     def showLabels(self):
-        print "showing Labels"
+        logging.info("fbWindow.showLabels()")
+        logging.info("showing Labels")
+        g.GData.showLabels = self.actShowLabels.isChecked()
+        self.refreshThumbs(False)
 
     def about(self):
-        print " displaying about message"
+        logging.info("fbWindow.about()")
+        logging.info(" displaying about message")
         aboutString = QtCore.QString("<h2>Phototonic v1.5 for maya</h2>"\
             "<p>ImageViewer and Organizer</p>"\
             "QT v"\
@@ -799,16 +818,36 @@ class fbWindow(QtGui.QMainWindow):
         QtGui.QMessageBox.about(self, "About Phototonic", aboutString)
 
     def filterImagesFocus(self):
-        print "filtering ImagesFocus"
+        logging.info("fbWindow.filterImagesFocus()")
+        #logging.info("filtering ImagesFocus")
+
+        #if g.GData.layoutMode == self.thumbViewIdx:
+        #    if not self.viewToolBar.isVisible():
+        #        self.viewToolBar.setVisible(True)
+        #    self.setViewToolBarVisibility()
+        #    self.filterBar.setFocus(QtCore.Qt.OtherFocusReason)
+        #    self.filterBar.selectAll()
 
     def setPathFocus(self):
-        print "setting Path Focus"
+        logging.info("fbWindow.setPathFocus()")
+        logging.info("setting Path Focus")
+
+        #if g.GData.layoutMode == self.thumbViewIdx:
+        #    if not self.goToolBar.isVisible():
+        #        self.goToolBar.setVisible(True)
+        #    self.setGoToolBarVisibility()
+        #    self.filterBar.setFocus(QtCore.Qt.OtherFocusReason)
+        #    self.filterBar.selectAll()
 
     def cleanupSender(self):
         print "cleanup Sender"
 
     def externalAppError(self):
-        print "External Applications error"
+        logging.info("fbWindow.externalAppError()")
+        logging.info("External Applications error")
+
+        msgBox = QtGui.QMessageBox()
+        msgBox.critical(self, "Error", "Failed to start external application")
 
     def runExternalApp(self):
         print "Running external Application"
