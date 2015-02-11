@@ -1131,6 +1131,19 @@ class fbWindow(QtGui.QMainWindow):
         g.GData.appSettings.setValue("LockDocks", bool(g.GData.LockDocks))
         g.GData.appSettings.setValue("imageToolbarFullScreen", bool(g.GData.imageToolbarFullScreen))
 
+
+
+        ## CopyMoveTo Paths : Bookmarks
+        idx = 0
+        g.GData.appSettings.beginGroup("CopyMoveToPaths")
+        g.GData.appSettings.remove("")
+        for path in g.GData.bookmarkPaths:
+            g.GData.appSettings.setValue("path"+str(idx), path)
+            logging.info("the Path "+path+" has been added to GData")
+            idx += 1
+
+        g.GData.appSettings.endGroup()
+
         logging.info("settings Written exiting Cleanly")
 
 
@@ -1268,13 +1281,13 @@ class fbWindow(QtGui.QMainWindow):
         #    i +=1
         #g.GData.appSettings.endGroup()
 
-        #g.GData.appSettings.beginGroup("CopyMoveToPaths")
-        #paths = g.GData.appSettings.childKeys()
-        #i = 0
-        #while i < paths.size():
-        #    g.GData.bookmarkPaths.insert(g.GData.appSettings.value(paths.at(i).toString()))
-        #    i +=1
-        #g.GData.appSettings.endGroup()
+        g.GData.appSettings.beginGroup("CopyMoveToPaths")
+        paths = g.GData.appSettings.childKeys()
+        i = 0
+        while i < len(paths):
+            g.GData.bookmarkPaths.append(g.GData.appSettings.value(paths[i]).toString())
+            i +=1
+        g.GData.appSettings.endGroup()
 
         logging.info("settings Read, program continuing")
 
