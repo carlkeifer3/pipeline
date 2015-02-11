@@ -13,13 +13,20 @@ class imageView(QtGui.QWidget):
 
         QtGui.QWidget.__init__(self, parent)
         logging.info("ImageView Widget created")
+
+        self.tempDisableResize = True
+        self.mirrorLayout = 0
+        self.currentImageFullPath = QtCore.QString("")
+        self.displayImage = QtGui.QImage()
+        self.origImage = QtGui.QImage()
+
         self.cursorIsHidden = False
         self.moveImageLocked = False
 
         self.imageLabel = QtGui.QLabel()
         self.imageLabel.setScaledContents(True)
         self.isAnimation = False
-        self.anim = 0
+        self.anim = QtGui.QMovie()
         self.setPalette(QtGui.QPalette(g.GData.backgroundColor))
 
         self.mainVLayout = QtGui.QVBoxLayout()
@@ -150,9 +157,72 @@ class imageView(QtGui.QWidget):
 
     def refresh(self):
         logging.info("imageview.refresh()")
+        if self.isAnimation:
+            return
+        if g.GData.scaledWidth:
+            self.displayImage = self.origImage.scaled(g.GData.scaledWidth, g.GData.scaledHeight, QtCore.Qt.IgnoreAspectRatio, QtCore.Qt.SmoothTransformation)
+        else:
+            self.displayImage = self.origImage
+
+
 
     def reload(self):
         logging.info("imageview.reload()")
+
+        imageReader = QtGui.QImageReader()
+
+        if g.GData.enableImageInfoFS:
+            if self.currentImageFullPath.isEmpty():
+                self.setInfo("ClipBoard")
+            else:
+                self.setInfo(QtCore.QFileInfo(self.currentImageFullPath).fileName())
+
+        if not g.GData.keepTransform:
+            g.GData.cropLeftPercent = g.GData.cropTopPercent = g.GData.cropWidthPercent = g.GData.cropHeightPercent = 0
+            g.GData.rotation = 0
+            g.GData.flipH = g.GData.flipV = False
+
+        g.GData.scaledWidth = g.GData.scaledHeight = 0
+        g.GData.cropLeft = g.GData.cropTop = g.GData.cropWidth = g.GData.cropHeight = 0
+
+        if self.newImage | self.currentImageFullPath.isEmpty():
+            self.newImage = True
+
+        imageReader.setFileName(self.currentImageFullPath)
+
+        if g.GData.enableAnimations:
+            if imageReader.supportsAnimation():
+                self.isAnimation = False
+        else:
+            self.isAnimation = False
+
+        if self.isAnimation:
+            logging.info("Animation supported")
+            try:
+                if self.anim:
+                    del self.anim
+            except:
+                pass
+
+            self.anim = QtGui.QMovie(self.currentImageFullPath)
+            self.imageLabel.setMovie(self.anim)
+            self.anim.start()
+        else:
+            if imageReader.size().isValid():
+                origImage = QtGui.QImage()
+                origImage.load(self.currentImageFullPath)
+                self.displayImage = origImage
+                self.transform()
+                if g.GData.colorsActive | g.GData.keepTransform:
+                    self.colorize()
+                if self.mirrorLayout:
+                    self.mirror()
+                displayPixmap = QtGui.QPixmap.fromImage(self.displayImage)
+            else:
+                displayPixmap = QtGui.QIcon.fromTheme("imageMissing", QtGui.QIcon(":/images/error_image.png")).pixmap(128, 128)
+            self.imageLabel.setPixmap(displayPixmap)
+
+        self.resizeImage()
 
     def setInfo(self, infoString):
         logging.info("imageview.setInfo")
@@ -179,7 +249,17 @@ class imageView(QtGui.QWidget):
         QtCore.QTimer.singleShot(3000, self.unsetFeedback())
 
     def loadImage(self, imageFileName):
-        logging.info("imageview.loadImage()")
+        #logging.info("imageview.loadImage()")
+
+        self.newImage = False
+        self.tempDisableResize = False
+        self.currentImageFullPath = imageFileName
+
+        if not g.GData.keepZoomFactor:
+            g.GData.keepZoomFactor = 1.0
+
+        QtGui.QApplication.processEvents()
+        self.reload()
 
     def monitorCursorState(self):
         logging.info("imageview.monitorCursorState()")

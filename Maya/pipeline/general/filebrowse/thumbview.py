@@ -68,7 +68,7 @@ class thumbView(QtGui.QListView):
         isneedScroll = needScroll
 
     def setThumbColors(self):
-        logging.info("thumbView.setThumbColors()")
+        #logging.info("thumbView.setThumbColors()")
         color = g.GData.thumbsBackgroundColor
         self.bgColor = QtCore.QString("background-color: rgb(%i, %i, %i)" % (color.red(), color.green(), color.blue()))
         self.bgImage = QtCore.QString("background-image: url("+g.GData.thumbsBackImage+")")
