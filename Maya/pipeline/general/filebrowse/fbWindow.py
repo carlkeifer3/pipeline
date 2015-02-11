@@ -112,7 +112,7 @@ class fbWindow(QtGui.QMainWindow):
 
         self.iiDock = QtGui.QDockWidget("Image Info", self)
         self.iiDock.setObjectName("ImageInfo")
-        #self.iiDock.setWidget(self.thumbView)
+        self.iiDock.setWidget(self.thumbView.infoView)
 
         #self.addDockWidget(QtCore.Qt.RightDockWidgetArea, self.iiDock)
         self.log.info("ThumbView should be built")
