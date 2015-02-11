@@ -191,8 +191,18 @@ class thumbView(QtGui.QListView):
             if imageInfoReader.size().isValid():
                 key = "Format"
                 val = imageInfoReader.format().toUpper()
+                #self.infoView.addEntry(key, val)
+
+                key = "Resolution"
+                val = QtCore.QString(str(imageInfoReader.size().width())+" x "+str(imageInfoReader.size().height()))
+                print val
                 self.infoView.addEntry(key, val)
 
+            else:
+                imageInfoReader.read()
+                key = "Error"
+                val = imageInfoReader.errorString()
+                self.infoView.addEntry(key, val)
 
 
 
