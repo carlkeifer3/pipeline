@@ -154,7 +154,7 @@ class thumbView(QtGui.QListView):
 
     def updateExifInfo(self, imageFullPath):
         logging.info("thumbview.updateExifInfo()")
-        import exifread
+        #import exifread
 
 
 
@@ -195,7 +195,10 @@ class thumbView(QtGui.QListView):
 
                 key = "Resolution"
                 val = QtCore.QString(str(imageInfoReader.size().width())+" x "+str(imageInfoReader.size().height()))
-                print val
+                self.infoView.addEntry(key, val)
+
+                key = "Megapixel"
+                val = QtCore.QString(str((imageInfoReader.size().width()*imageInfoReader.size().height())/1000000.0)+"f")
                 self.infoView.addEntry(key, val)
 
             else:
