@@ -67,7 +67,7 @@ class thumbView(QtGui.QListView):
         logging.info("thumbView.setThumbColors()")
         color = g.GData.thumbsBackgroundColor
         self.bgColor = QtCore.QString("background-color: rgb(%i, %i, %i)" % (color.red(), color.green(), color.blue()))
-        self.bgImage = QtCore.QString("background-image: url(d:/fb-Back.png)")
+        self.bgImage = QtCore.QString("background-image: url("+g.GData.thumbsBackImage+")")
         self.bgSetting = QtCore.QString("background-attachment: fixed")
 
         self.setStyleSheet(self.bgColor)

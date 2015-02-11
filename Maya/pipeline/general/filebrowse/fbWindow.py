@@ -1277,7 +1277,12 @@ class fbWindow(QtGui.QMainWindow):
 
         self.fsDockOrigWidget = self.fsDock.titleBarWidget()
         self.bmDockOrigWidget = self.bmDock.titleBarWidget()
-
+        self.iiDockOrigWidget = self.iiDock.titleBarWidget()
+        self.pvDockOrigWidget = self.pvDock.titleBarWidget()
+        self.fsDockEmptyWidget = QtGui.QWidget()
+        self.bmDockEmptyWidget = QtGui.QWidget()
+        self.iiDockEmptyWidget = QtGui.QWidget()
+        self.pvDockEmptyWidget = QtGui.QWidget()
         self.lockDocks()
 
         self.setDockOptions(self.AllowNestedDocks)
