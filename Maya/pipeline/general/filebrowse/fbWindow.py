@@ -35,6 +35,8 @@ class fbWindow(QtGui.QMainWindow):
         self.log =logging.getLogger("phototonic_Logger")
         self.log.setLevel(logging.debug)
 
+        self.r = g.UserRoles()
+
         # locate the directory where all of the images for the ui live
         ScriptDir = pm.internalVar(uad=True)
         self.imgDirectory = str(ScriptDir+"/scripts/pipeline/general/filebrowse/images/")
@@ -109,6 +111,7 @@ class fbWindow(QtGui.QMainWindow):
 
         self.thumbView = tv.thumbView(self)
         self.thumbView.selectionModel().selectionChanged.connect(lambda: self.changeActionsBySelection())
+        self.thumbView.selectionModel().selectionChanged.connect(lambda: self.updateViewerImageBySelection())
 
         self.iiDock = QtGui.QDockWidget("Image Info", self)
         self.iiDock.setObjectName("ImageInfo")
@@ -1133,6 +1136,8 @@ class fbWindow(QtGui.QMainWindow):
     def writeSettings(self):
         logging.info("Writing Settings")
         #if g.GData.layoutMode
+        g.GData.appSettings.setValue("Geometry", self.saveGeometry())
+        g.GData.appSettings.setValue("WindowState", self.saveState())
 
         #g.GData.appSettings.setValue("ThumbsSortFlags", int(self.thumbView.thumbSortFlags))
         g.GData.appSettings.setValue("ThumbsZoomVal", int(self.thumbView.thumbSize))
@@ -1437,7 +1442,20 @@ class fbWindow(QtGui.QMainWindow):
         print "loading Image from thumbnail"
 
     def updateViewerImageBySelection(self):
-        print "Updating Viewer image by selection"
+        logging.info("fbWindow.updateViewerImageBySelection()")
+        logging.info("Updating Viewer image by selection")
+        if not self.pvDock.isVisible():
+            return
+
+        indexesList = self.thumbView.selectionModel().selectedIndexes()
+
+        if len(indexesList) == 1:
+            imagePath = self.thumbView.thumbModel.item(indexesList[0].row()).data(self.r.fileNameRole).toString()
+            self.imageView.loadImage(imagePath)
+
+        else:
+            return
+
 
     def loadImagefromCli(self):
         print "Loading Image from Cli"
