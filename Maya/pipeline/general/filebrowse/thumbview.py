@@ -322,7 +322,7 @@ class thumbView(QtGui.QListView):
         #emptyPixMap.fromImage(self.emptyImg).scaled(self.thumbWidth,self.thumbHeight)
 
         for thumbFileInfo in self.thumbFileInfoList:
-            logging.info("adding %s to the model" % thumbFileInfo.filePath())
+            #logging.info("adding %s to the model" % thumbFileInfo.filePath())
             thumbIitem = QtGui.QStandardItem()
             thumbIitem.setData(False, role=g.UserRoles.loadedRole)
             thumbIitem.setData(currThumb, role=g.UserRoles.sortRole)
