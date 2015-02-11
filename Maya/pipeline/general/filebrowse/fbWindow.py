@@ -103,8 +103,8 @@ class fbWindow(QtGui.QMainWindow):
 #        return event
 
     def createThumbView(self):
-        self.log.debug("fbWindow.createThumbView")
-        self.log.info("Building the ThumbView")
+        #self.log.debug("fbWindow.createThumbView")
+        #self.log.info("Building the ThumbView")
         import pipeline.general.filebrowse.thumbview as tv
 
         self.thumbView = tv.thumbView(self)
@@ -115,7 +115,7 @@ class fbWindow(QtGui.QMainWindow):
         self.iiDock.setWidget(self.thumbView.infoView)
 
         #self.addDockWidget(QtCore.Qt.RightDockWidgetArea, self.iiDock)
-        self.log.info("ThumbView should be built")
+        #self.log.info("ThumbView should be built")
 
     def AddMenuSeparator(self):
         """
@@ -1091,7 +1091,7 @@ class fbWindow(QtGui.QMainWindow):
         self.selectCurrentViewDir()
 
     def bookmarkClicked(self):
-        logging.info("bookmark selected")
+        #logging.info("bookmark selected")
         item = self.bookmarks.selectedItems()[0]
         self.goTo(item.toolTip(0))
 
@@ -1193,7 +1193,7 @@ class fbWindow(QtGui.QMainWindow):
         logging.info("settings Written exiting Cleanly")
 
     def readSettings(self):
-        logging.info("Reading Settings")
+        #logging.info("Reading Settings")
         self.initComplete = False
         self.needThumbsRefresh = False
 
@@ -1334,7 +1334,7 @@ class fbWindow(QtGui.QMainWindow):
             i +=1
         g.GData.appSettings.endGroup()
 
-        logging.info("settings Read, program continuing")
+        #logging.info("settings Read, program continuing")
 
     def setupDocks(self):
         logging.info("fbWindow.setupDocks()")

@@ -58,7 +58,7 @@ class thumbView(QtGui.QListView):
 
         self.setThumbColors()
 
-        self.infoView = iv.InfoView()
+        self.infoView = iv.InfoView(self)
         self.thumbsDir = QtCore.QDir()
         self.fileFilters = QtCore.QStringList("")
 
@@ -166,7 +166,8 @@ class thumbView(QtGui.QListView):
         self.infoView.clear()
         if nSelected == 1:
             imageFullPath = self.thumbModel.item(indexesList[0].row()).data(self.r.fileNameRole).toString()
-            #self.imageInfoReader.setFileName(imageFullPath)
+            imageInfoReader = QtGui.QImageReader()
+            imageInfoReader.setFileName(imageFullPath)
 
             imageInfo = QtCore.QFileInfo(imageFullPath)
             self.infoView.addTitleEntry("General: ")
@@ -186,6 +187,13 @@ class thumbView(QtGui.QListView):
             key = "Modified"
             val = imageInfo.lastModified().toString(QtCore.Qt.SystemLocaleShortDate)
             self.infoView.addEntry(key, val)
+
+            if imageInfoReader.size().isValid():
+                key = "Format"
+                val = imageInfoReader.format().toUpper()
+                self.infoView.addEntry(key, val)
+
+
 
 
 

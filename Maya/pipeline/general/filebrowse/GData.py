@@ -11,7 +11,7 @@ class UserRoles():
     sortRole, loadedRole = range(2)
 
 class GData():
-    logging.info("Setting the global data")
+    #logging.info("Setting the global data")
     QtCore.QCoreApplication.setOrganizationName("ckPipeline")
     QtCore.QCoreApplication.setOrganizationDomain("carlkeifer.com")
     QtCore.QCoreApplication.setApplicationName("Phototonic")
@@ -93,4 +93,4 @@ class GData():
     pvDockVisible = False
     ivDockVisible = False
     thumbsBackImage = QtCore.QString()
-    logging.info("GData Setup Finished")
+    #logging.info("GData Setup Finished")
