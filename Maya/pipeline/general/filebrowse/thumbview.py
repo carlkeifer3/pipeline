@@ -62,6 +62,8 @@ class thumbView(QtGui.QListView):
         self.thumbsDir = QtCore.QDir()
         self.fileFilters = QtCore.QStringList("")
 
+        self.selectionModel().selectionChanged.connect(lambda: self.HandleSelectionChanged())
+
     def setNeedScroll(self, needScroll):
         isneedScroll = needScroll
 
@@ -83,53 +85,66 @@ class thumbView(QtGui.QListView):
         self.scrollbar.setPalette(scrollBarOigPal)
 
     def selectCurrentIndex(self):
-
-        if self.currentIndex.isValid() & self.thumbViewModel.rowCount() > 0:
-            self.tview.scrollTo(self.currentIndex)
-            self.tview.setCurrentIndex(self.currentIndex)
+        logging.info("thumbview.selectCurrentIndex()")
+        if self.currentIndex.isValid() & self.thumbModel.rowCount() > 0:
+            self.scrollTo(self.currentIndex)
+            self.setCurrentIndex(self.currentIndex)
 
     def getSingleSelectionFilename(self):
-        if self.tview.selectionModel().selectedIndexes().size() == 1:
-            return self.thumbViewModel.item(self.tview.selectionModel())
+        logging.info("thumbview.getSingleSelectionFilename()")
+        if self.selectionModel().selectedIndexes().size() == 1:
+            return self.thumbModel.item(self.selectionModel().selectedIndexes().first().row().data(self.r.fileNameRole).toString())
         return("")
 
     def getNextRow(self):
-        if self.currentRow == self.thumbViewModel.rowCount() -1:
+        logging.info("thumbview.getNextRow()")
+        if self.currentRow == self.thumbModel.rowCount() -1:
             return -1
         return self.currentRow + 1
 
     def getPrevRow(self):
+        logging.info("thumbview.getPrevRow")
         if self.currentRow == 0:
             return -1
         return self.currentRow -1
 
     def getLastRow(self):
-        return self.thumbViewModel.rowCount()-1
+        logging.info("thumbview.getLastRow()")
+        return self.thumbModel.rowCount()-1
 
     def getRandomRow(self):
+        logging.info("thumbview.getRandomRow()")
         import random
-        return random.randrange(self.thumbViewModel.rowCount()-1)
+        return random.randrange(self.thumbModel.rowCount()-1)
+
+    def getCurrentRow(self):
+        logging.info("thumbview.getCurrentRow()")
+        return self.currentRow
 
     def setCurrentRow(self, row):
+        logging.info("thumbview.setCurrentRow()")
         if row >= 0:
             self.currentRow = row
         else:
             self.currentRow = 0
 
     def setImageviewWindowTitle(self):
-        title = self.thumbViewModel.item(self.currentRow).data(self.fileNameRole).toString()
-        self.tview.setWindowTitle(title)
+        logging.info("thumbview.setImageviewWindowTitle()")
+        title = self.thumbModel.item(self.currentRow).data(self.r.fileNameRole).toString()
+        self.setWindowTitle(title)
 
     def setCurrentIndexByName(self, fileName):
-        self.indexList = self.thumbModel.match(self.thumbModel.index(0,0), self.fileNameRole, fileName)
+        logging.info("thumbview.setCurrentIndexByName()")
+        self.indexList = self.thumbModel.match(self.thumbModel.index(0,0), self.r.fileNameRole, fileName)
         if self.indexList.size():
-            self.currentIndex = indexList[0]
+            self.currentIndex = self.indexList[0]
             self.setCurrentRow(self.currentIndex.row())
             self.setRowHidden(self.currentIndex.row(). False)
             return True
         return False
 
-    def setCurrentIndexByRow(self, ):
+    def setCurrentIndexByRow(self, row):
+        logging.info("thumbview.setCurrentIndexByRow()")
         idx = self.thumbModel.indexFromItem(self.thumbModel.item(row))
         if idx.isValid():
             self.currentIndex = idx
@@ -137,16 +152,44 @@ class thumbView(QtGui.QListView):
             return True
         return False
 
-    #def updateExifInfo(self, imageFullPath):
+    def updateExifInfo(self, imageFullPath):
+        logging.info("thumbview.updateExifInfo()")
+        import exifread
 
-    def HandleSelectionChanged(self, QItemSelection):
-        indexesList = self.tview.selectionModel().selectedIndexes()
-        nSelected = indexesList.size()
 
+
+    def HandleSelectionChanged(self):
+        #logging.info("thumbView.HandleSelectionChanged()")
+        indexesList = self.selectionModel().selectedIndexes()
+        nSelected = len(indexesList)
+
+        self.infoView.clear()
         if nSelected == 1:
-            imageFullPath = self.thumbViewModel.item(indexesList.first().row().data(self.fileNameRole).toString())
+            imageFullPath = self.thumbModel.item(indexesList[0].row()).data(self.r.fileNameRole).toString()
+            #self.imageInfoReader.setFileName(imageFullPath)
 
-        self.updateThumbSelection()
+            imageInfo = QtCore.QFileInfo(imageFullPath)
+            self.infoView.addTitleEntry("General: ")
+
+            key = "File Name"
+            val = imageInfo.fileName()
+            self.infoView.addEntry(key, val)
+
+            key = "Location"
+            val = imageInfo.path()
+            self.infoView.addEntry(key, val)
+
+            key = "Size"
+            val = QtCore.QString.number(imageInfo.size())
+            self.infoView.addEntry(key, val)
+
+            key = "Modified"
+            val = imageInfo.lastModified().toString(QtCore.Qt.SystemLocaleShortDate)
+            self.infoView.addEntry(key, val)
+
+
+
+        self.updateThumbsSelection()
 
     #def startDrag(self, dropActions):
     #    print "starting drag action"
@@ -256,8 +299,19 @@ class thumbView(QtGui.QListView):
         """
         :return:
         """
-        logging.info("thumbView.updateThumbsSelection")
-        logging.info("update thumbnail selection")
+        #logging.info("thumbView.updateThumbsSelection()")
+        #logging.info("update thumbnail selection")
+        nSelected = len(self.selectionModel().selectedIndexes())
+
+        if not nSelected:
+            state = str(self.thumbModel.rowCount())+" Images"
+        elif nSelected >= 1:
+            state = "Selected "+str(nSelected)+" of "+str(self.thumbModel.rowCount())+" images"
+        else:
+            return
+
+        logging.info(state)
+
 
     def loadPrepare(self):
         """
@@ -305,6 +359,7 @@ class thumbView(QtGui.QListView):
         self.thumbsRangeLast = -1
 
     def load(self):
+        #logging.info("thumbview.load()")
 
         self.loadPrepare()
         self.initThumbs()

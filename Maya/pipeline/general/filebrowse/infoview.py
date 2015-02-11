@@ -12,7 +12,7 @@ class InfoView(QtGui.QTableView):
     def __init__(self, parent = None):
 
         QtGui.QTableView.__init__(self,parent)
-        logging.info("InfoView Class instantiated")
+        #logging.info("InfoView Class instantiated")
 
         self.setSelectionBehavior(QtGui.QAbstractItemView.SelectItems)
         self.setSelectionMode(QtGui.QAbstractItemView.ExtendedSelection)
@@ -36,7 +36,7 @@ class InfoView(QtGui.QTableView):
         self.infoMenu.addAction(self.copyAction)
         self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
 
-        logging.info("InfoView Class Init complete")
+        #logging.info("InfoView Class Init complete")
 
     def showInfoViewMenu(self, pt):
         logging.info("infoview.showInfoViewMenu()")
@@ -46,11 +46,11 @@ class InfoView(QtGui.QTableView):
             self.infoMenu.popup(self.viewport().maptoGlobal(pt))
 
     def clear(self):
-        logging.info("infoview.clear()")
+        #logging.info("infoview.clear()")
         self.infoModel.clear()
 
     def addEntry(self, key, value):
-        logging.info("infoview.addEntry()")
+        #logging.info("infoview.addEntry()")
 
         atRow = self.infoModel.rowCount()
         itemKey = QtGui.QStandardItem(key)
@@ -67,8 +67,8 @@ class InfoView(QtGui.QTableView):
         itemKey = QtGui.QStandardItem(title)
         self.infoModel.insertRow(atRow, itemKey)
 
-        boldFont = QtGui.QFont.boldFont()
-        boldFont.setBold(True)
+        boldFont = QtGui.QFont.Bold
+        #boldFont.setBold(True)
         itemKey.setData(boldFont, QtCore.Qt.FontRole)
 
     def copyEntry(self):
