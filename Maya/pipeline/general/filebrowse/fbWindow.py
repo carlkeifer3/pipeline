@@ -806,7 +806,7 @@ class fbWindow(QtGui.QMainWindow):
         if g.GData.slideShowActive:
             self.slideShow()
         #self.imageView.setCursorHiding(False)
-        dialog = dia.settingsDialog()
+        dialog = dia.settingsDialog(self)
 
         #if dialog.exec():
         #     self.thumbView.setThumbColors()
@@ -1023,9 +1023,9 @@ class fbWindow(QtGui.QMainWindow):
 
                 self.msgBox = QtGui.QMessageBox()
                 self.msgBox.critical(self, "Error", "Invalid Path: "+ self.pathBar.text())
-                #self.pathBar.setText(self.thumbView.currentViewDir)
+                self.pathBar.setText(self.thumbView.currentViewDir)
                 return
-        #self.thumbView.currentViewDir = self.pathBar.text()
+        self.thumbView.currentViewDir = self.pathBar.text()
         self.refreshThumbs(True)
         self.selectCurrentViewDir()
 
@@ -1270,7 +1270,7 @@ class fbWindow(QtGui.QMainWindow):
         self.imageViewContainerWidget.setLayout(self.imageViewContainer)
 
         self.pvDock.setWidget(self.imageViewContainerWidget)
-        self.pvDock.toggleViewAction().triggered.connect(lambda: self.setPvDockVisibility())
+        #self.pvDock.toggleViewAction().triggered.connect(lambda: self.setPvDockVisibility())
         #self.pvDock.visiblityChanged().connect(lambda: self.setPvDockVisibility())
         self.addDockWidget(QtCore.Qt.RightDockWidgetArea, self.pvDock)
         self.addDockWidget(QtCore.Qt.RightDockWidgetArea, self.iiDock)
