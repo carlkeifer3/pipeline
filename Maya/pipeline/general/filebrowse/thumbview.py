@@ -333,7 +333,6 @@ class thumbView(QtGui.QListView):
 
         logging.info(state)
 
-
     def loadPrepare(self):
         """
         :return:
@@ -391,7 +390,7 @@ class thumbView(QtGui.QListView):
         logging.info("thumbView.loadDuplicates")
 
     def initThumbs(self):
-        logging.info("thumbView.initThumbs()")
+        #logging.info("thumbView.initThumbs()")
         self.thumbFileInfoList = self.thumbsDir.entryInfoList()
         currThumb = 0
         #emptyPixMap = QtGui.QPixmap()
@@ -455,7 +454,6 @@ class thumbView(QtGui.QListView):
             currThumb += 1
         painter.restore()
         painter.end()
-
 
     def addThumb(self):
         logging.info("thumbView.addThumb")

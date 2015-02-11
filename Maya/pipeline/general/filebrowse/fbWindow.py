@@ -135,8 +135,8 @@ class fbWindow(QtGui.QMainWindow):
 
         :return:
         """
-        logging.info("fbWindow.createImageView()")
-        logging.info("Creating the Image View")
+        #logging.info("fbWindow.createImageView()")
+        #logging.info("Creating the Image View")
         import pipeline.general.filebrowse.imageview as iv
 
         self.imageView = iv.imageView()
@@ -182,7 +182,7 @@ class fbWindow(QtGui.QMainWindow):
 
         :return:
         """
-        self.log.debug("creating all actions for the file browser")
+        #self.log.debug("creating all actions for the file browser")
         self.thumbsGoTopAct = QtGui.QAction("Top", self)
         self.thumbsGoTopAct.setIcon(QtGui.QIcon(str(self.imgDirectory+"top.png")))
         self.thumbsGoTopAct.triggered.connect(lambda: self.goTop())
@@ -495,7 +495,7 @@ class fbWindow(QtGui.QMainWindow):
 
         :return:
         """
-        self.log.info("creating the menus")
+        #self.log.info("creating the menus")
         self.menubar = QtGui.QMenuBar(self)
         self.fileMenu = QtGui.QMenu("&File", self.menubar)
         self.fileMenu.addAction(self.subFoldersAction)
@@ -589,7 +589,7 @@ class fbWindow(QtGui.QMainWindow):
         self.menubar.setVisible(True)
 
     def createToolBars(self):
-        print "Creating the tool bars"
+        #logging.info("Creating the tool bars")
         #Edit Toolbar
         self.editToolBar = self.addToolBar("Edit")
         self.editToolBar.setObjectName("Edit")
@@ -693,7 +693,8 @@ class fbWindow(QtGui.QMainWindow):
         self.setStatusBar(self.statusBar)
 
     def createFSTree(self):
-        logging.info("creating filesystem tree")
+        #logging.info("fbWindow.createFSTree()")
+        #logging.info("creating filesystem tree")
         import pipeline.general.filebrowse.fstree as fs
 
         self.fsDock = QtGui.QDockWidget("File System", self)
@@ -721,7 +722,8 @@ class fbWindow(QtGui.QMainWindow):
         self.fsTree.clicked.connect(lambda: self.goSelectedDir())
 
     def createBookmarks(self):
-        logging.info("creating bookmarks window")
+        #logging.info("fbWindow.createBookmarks()")
+        #logging.info("creating bookmarks window")
         import pipeline.general.filebrowse.bookmarks as bm
 
         self.bmDock = QtGui.QDockWidget("Bookmarks", self)
@@ -745,10 +747,10 @@ class fbWindow(QtGui.QMainWindow):
 
     def reload(self):
         logging.info("fbWindow.reload()")
-        #if g.GData.layoutMode == self.thumbViewIdx:
-        #self.refreshThumbs(False)
-        #else:
-        #    self.imageView.reload()
+        if g.GData.layoutMode == self.thumbViewIdx:
+            self.refreshThumbs(False)
+        else:
+            self.imageView.reload()
 
     def setIncludeSubFolders(self):
         logging.debug("set Include SubFolders")
@@ -756,7 +758,8 @@ class fbWindow(QtGui.QMainWindow):
         self.refreshThumbs(False)
 
     def refreshThumbs(self, scrollToTop):
-        logging.info("refresh Thumbs")
+        #logging.info("fbWindow.refreshThumbs()")
+        #logging.info("refresh Thumbs")
         self.thumbView.setNeedScroll(scrollToTop)
         QtCore.QTimer.singleShot(0, lambda: self.reloadThumbsSlot())
         QtCore.QTimer.singleShot(100, lambda: self.selectRecentThumb())
@@ -862,7 +865,7 @@ class fbWindow(QtGui.QMainWindow):
         print "Choose External Application"
 
     def showSettings(self):
-        logging.info("loading preferences window")
+        #logging.info("loading preferences window")
         if g.GData.slideShowActive:
             self.slideShow()
         #self.imageView.setCursorHiding(False)
@@ -909,8 +912,6 @@ class fbWindow(QtGui.QMainWindow):
     def copyMoveImages(self, move):
         print "copy or move images"
         copyMoveToDialog = dia.CopyMoveToDialog(self)#, thumbsPath=self.getSelectedPath(), move=move)
-
-
 
     def thumbsZoomIn(self):
         #if self.thumbView.thumbSize < self.ThumbMaxSize:
@@ -1203,7 +1204,7 @@ class fbWindow(QtGui.QMainWindow):
         self.needThumbsRefresh = False
 
         if not g.GData.appSettings.contains("thumbsZoomVal"):
-            logging.info(" app settings not found")
+            logging.info(" app settings not found, setting defaults")
             self.resize(800, 600)
             g.GData.appSettings.setValue("thumbsSortFlags", int(0))
             g.GData.appSettings.setValue("thumbsZoomVal", 150)
@@ -1242,7 +1243,7 @@ class fbWindow(QtGui.QMainWindow):
             g.GData.appSettings.setValue("imageToolbarFullScreen", False)
             #g.GData.bookmarkPaths.insert(QtCore.QDir.homePath())
 
-        logging.debug("store loaded setting in memory")
+        #logging.debug("store loaded setting in memory")
         g.GData.backgroundColor = QtGui.QColor(g.GData.appSettings.value("backgroundColor"))
         #logging.info("Background Color: "+str(g.GData.backgroundColor))
         g.GData.exitInsteadofClose = g.GData.appSettings.value("exitInsteadOfClose").toBool()
@@ -1342,8 +1343,8 @@ class fbWindow(QtGui.QMainWindow):
         #logging.info("settings Read, program continuing")
 
     def setupDocks(self):
-        logging.info("fbWindow.setupDocks()")
-        logging.info("setting up the docks")
+        #logging.info("fbWindow.setupDocks()")
+        #logging.info("setting up the docks")
 
         self.pvDock = QtGui.QDockWidget("Viewer", self)
         self.pvDock.setObjectName("Viewer")
@@ -1442,8 +1443,8 @@ class fbWindow(QtGui.QMainWindow):
         print "loading Image from thumbnail"
 
     def updateViewerImageBySelection(self):
-        logging.info("fbWindow.updateViewerImageBySelection()")
-        logging.info("Updating Viewer image by selection")
+        #logging.info("fbWindow.updateViewerImageBySelection()")
+        #logging.info("Updating Viewer image by selection")
         if not self.pvDock.isVisible():
             return
 
@@ -1454,8 +1455,7 @@ class fbWindow(QtGui.QMainWindow):
             self.imageView.loadImage(imagePath)
 
         else:
-            return
-
+            self.imageView.loadImage(":/images/no_image.png")
 
     def loadImagefromCli(self):
         print "Loading Image from Cli"
@@ -1538,6 +1538,7 @@ class fbWindow(QtGui.QMainWindow):
         print "creating Sub Directory"
 
     def getSelectedPath(self):
+        logging.info("fbWindow.getSelectedPath()")
         logging.info("getting the path selected in fsTree")
         selectedDirs = self.fsTree.selectionModel().selectedRows()
         if selectedDirs[0].isValid():
@@ -1546,8 +1547,8 @@ class fbWindow(QtGui.QMainWindow):
         else:
             return ""
 
-    def wheelEvent(self, event):
-        print "mouse wheel event"
+    #def wheelEvent(self, event):
+    #    print "mouse wheel event"
 
     def showNewImageWarning(self):
         print "showing a new Image Warning"
