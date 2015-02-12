@@ -1110,7 +1110,14 @@ class fbWindow(QtGui.QMainWindow):
         print "clearing thumbnails filter"
 
     def goBack(self):
-        print "go back one directory"
+        logging.info("fbWindow.goBack()")
+        logging.info("go back one directory")
+        if self.currentHistoryIdx > 0:
+            self.needHistoryRecord = False
+            self.goTo(self.pathHistory.at(--self.currentHistoryIdx))
+            self.goForward().setEnabled(True)
+            if self.currentHistoryIdx == 0:
+                self.goBackAction.setEnabled(False)
 
     def goForward(self):
         print "go forward one directory"
