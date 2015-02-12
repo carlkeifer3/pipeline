@@ -71,6 +71,8 @@ class fbWindow(QtGui.QMainWindow):
         self.setCentralWidget(self.centralWidget)
 
         # internal class variable time
+        self.pathHistory = []
+
         self.copyCutCount = 0
         self.copyMoveToDialog = 0
         self.colorsDialog = 0
@@ -83,7 +85,7 @@ class fbWindow(QtGui.QMainWindow):
 
         self.doFindDuplicates = False
         self.refreshThumbs(True)
-        self.setStatus("")
+        self.setStatus("Interface Loaded")
         #self.setLayout(self.fbLayout)
 
     def handleStartupArgs(self):
@@ -1059,6 +1061,7 @@ class fbWindow(QtGui.QMainWindow):
         print "Deleting"
 
     def goTo(self, path):
+        #logging.info("fbWindow.goTo()")
         logging.info(str("going to QDir "+path))
         self.fsTree.setCurrentIndex(self.fsTree.fsModel.index(path))
         self.thumbView.currentViewDir = path
@@ -1079,8 +1082,8 @@ class fbWindow(QtGui.QMainWindow):
         self.setStatus("Current Directory: "+str(selectedPath))
 
     def goPathBarDir(self):
-        logging.info("fbWindow.goPathBarDir()")
-        logging.info("go to the directory indicated by the path bar")
+        #logging.info("fbWindow.goPathBarDir()")
+        #logging.info("go to the directory indicated by the path bar")
         self.setStatus("Loading Directory")
         self.thumbView.setNeedScroll(True)
 
@@ -1114,19 +1117,33 @@ class fbWindow(QtGui.QMainWindow):
         logging.info("go back one directory")
         if self.currentHistoryIdx > 0:
             self.needHistoryRecord = False
-            self.goTo(self.pathHistory.at(--self.currentHistoryIdx))
+            i = self.currentHistoryIdx - 1
+            self.goTo(self.pathHistory[i])
             self.goForward().setEnabled(True)
             if self.currentHistoryIdx == 0:
                 self.goBackAction.setEnabled(False)
 
     def goForward(self):
-        print "go forward one directory"
+        logging.info("fbWindow.goForward()")
+        logging.info("go forward one directory")
+
+        if self.currentHistoryIdx < len(self.pathHistory)-1:
+
+            needHistoryRecord = False
+            self.goto(self.pathHistory[self.currentHistoryIdx+1])
+            if self.currentHistoryIdx == len(self.pathHistory)-1:
+                self.goFrwdAction.setEnabled(False)
 
     def goUp(self):
-        print " go up one directory"
+        #logging.info("fbWindow.goUp()")
+        #logging.info(" go up one directory")
+
+        fileInfo = QtCore.QFileInfo(self.thumbView.currentViewDir)
+        self.goTo(fileInfo.dir().absolutePath())
 
     def goHome(self):
-        logging.info(" goto home directory")
+        #logging.info("fbWindow.goHome")
+        #logging.info(" goto home directory")
         self.goTo(QtCore.QDir.homePath())
 
     def setCopyCutActions(self, setEnabled):
