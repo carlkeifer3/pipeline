@@ -394,15 +394,70 @@ class CropDialog(QtGui.QWidget):
     def __init__(self):
         logging.info("cropDialog Initialized")
 
-class ColorsDialog(QtGui.QWidget):
-    def __init__(self, parent = None):
+class ColorsDialog(QtGui.QDialog):
 
-        QtGui.QWidget.__init__()
+    def __init__(self, parent=None):
+
+        # initialize the QlistView
+        QtGui.QDialog.__init__(self, parent)
 
         logging.info("ColorsDialog Initialized")
         self.setWindowTitle("Colors")
         self.setWindowIcon(QtGui.QIcon(":/images/colors.png"))
         self.resize(350, 300)
+
+        self.buttonsHbox = QtGui.QHBoxLayout()
+        self.resetButton = QtGui.QPushButton("Reset")
+        self.resetButton.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
+        self.resetButton.setIcon(QtGui.QIcon.fromTheme("document-revert"))
+        #self.resetButton.clicked.connect(lambda: self.reset())
+        self.buttonsHbox.addWidget(self.resetButton, 0, QtCore.Qt.AlignLeft)
+
+        ## Channel mixer
+        self.redLab = QtGui.QLabel("Red")
+        self.redSlide = QtGui.QSlider(QtCore.Qt.Horizontal)
+        self.redSlide.setTickPosition(QtGui.QSlider.TicksAbove)
+        self.redSlide.setTickInterval(25)
+        self.redSlide.setRange(-100, 100)
+        self.redSlide.setTracking(False)
+        #self.redSlide.valueChanged.connect(lambda: self.applyColors())
+
+        self.greenLab = QtGui.QLabel("Green")
+        self.greenSlide = QtGui.QSlider(QtCore.Qt.Horizontal)
+        self.greenSlide.setTickPosition(QtGui.QSlider.TicksAbove)
+        self.greenSlide.setTickInterval(25)
+        self.greenSlide.setRange(-100, 100)
+        self.greenSlide.setTracking(False)
+        #self.greenSlide.valueChanged.connect(lambda: self.applyColors())
+
+        self.blueLab = QtGui.QLabel("Blue")
+        self.blueSlide = QtGui.QSlider(QtCore.Qt.Horizontal)
+        self.blueSlide.setTickPosition(QtGui.QSlider.TicksAbove)
+        self.blueSlide.setTickInterval(25)
+        self.blueSlide.setRange(-100, 100)
+        self.blueSlide.setTracking(False)
+        #self.blueSlide.valueChanged.connect(lambda: self.applyColors())
+
+        self.channelMixbox = QtGui.QGridLayout()
+        self.channelMixbox.addWidget(self.redLab, 1, 0, 1, 1)
+        self.channelMixbox.addWidget(self.redSlide, 1, 1, 1, 1)
+        self.channelMixbox.addWidget(self.greenLab, 2, 0, 1, 1)
+        self.channelMixbox.addWidget(self.greenSlide, 2, 1, 1, 1)
+        self.channelMixbox.addWidget(self.blueLab, 3, 0, 1, 1)
+        self.channelMixbox.addWidget(self.blueSlide, 3, 1, 1, 1)
+        self.channelMixbox.setColumnMinimumWidth(0, 70)
+
+        self.channelMixGroup = QtGui.QGroupBox("Color Balance")
+        self.channelMixGroup.setLayout(self.channelMixbox)
+
+        self.mainVbox = QtGui.QVBoxLayout()
+
+        self.mainVbox.addWidget(self.channelMixGroup)
+
+
+        self.mainVbox.addStretch(1)
+        self.mainVbox.addLayout(self.buttonsHbox)
+        self.setLayout(self.mainVbox)
 
 
 class CopyMoveToDialog(QtGui.QDialog):

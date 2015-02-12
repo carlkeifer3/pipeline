@@ -17,7 +17,7 @@ class thumbView(QtGui.QListView):
         #logging.debug("initialize the QlistView")
         QtGui.QListView.__init__(self, parent)
         #self. currentRow = 0
-
+        
         #logging.info("Get the global Settings Data for use by thumbView class")
 
         self.r = g.UserRoles()

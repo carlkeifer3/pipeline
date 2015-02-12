@@ -981,8 +981,18 @@ class fbWindow(QtGui.QMainWindow):
         logging.info("fbWindow.showColorsDialog()")
         logging.info("Showing colors dialog")
 
-        #if g.GData.slideShowActive:
-        #    self.slideShow()
+        if g.GData.slideShowActive:
+            self.slideShow()
+
+        #if not self.colorsDialog:
+        colorsDialog = dia.ColorsDialog(self)#, self.imageView)
+        colorsDialog.accepted.connect(lambda: self.cleanupColorsDialog())
+        colorsDialog.rejected.connect(lambda: self.cleanupColorsDialog())
+
+        g.GData.colorsActive = True
+        colorsDialog.show()
+        #colorsDialog.applyColors(0)
+        #self.setInterfaceEnabled(False)
 
     def moveRight(self):
         print "moving Image Right"
