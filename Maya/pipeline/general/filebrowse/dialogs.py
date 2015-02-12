@@ -6,6 +6,7 @@ __author__ = 'cargoyle'
 import logging
 from PyQt4 import QtGui, QtCore
 import pipeline.general.filebrowse.GData as g
+import pipeline.general.filebrowse.imageview as iv
 
 class settingsDialog(QtGui.QDialog):
 
@@ -396,8 +397,8 @@ class CropDialog(QtGui.QWidget):
 
 class ColorsDialog(QtGui.QDialog):
 
-    def __init__(self, parent=None):
-
+    def __init__(self, parent=None, imageview=iv.imageView()):
+        self.imageView = imageview
         # initialize the QlistView
         QtGui.QDialog.__init__(self, parent)
 
@@ -410,8 +411,111 @@ class ColorsDialog(QtGui.QDialog):
         self.resetButton = QtGui.QPushButton("Reset")
         self.resetButton.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
         self.resetButton.setIcon(QtGui.QIcon.fromTheme("document-revert"))
-        #self.resetButton.clicked.connect(lambda: self.reset())
+        self.resetButton.clicked.connect(lambda: self.reset())
         self.buttonsHbox.addWidget(self.resetButton, 0, QtCore.Qt.AlignLeft)
+        self.okButton = QtGui.QPushButton("OK")
+        self.okButton.setIcon(QtGui.QIcon.fromTheme("dialog-ok"))
+        self.okButton.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
+        self.okButton.clicked.connect(lambda: self.ok())
+        self.buttonsHbox.addWidget(self.okButton, 0, QtCore.Qt.AlignRight)
+
+        ## Hue Saturation
+        self.hueLab = QtGui.QLabel("Hue")
+        self.satLab = QtGui.QLabel("Saturation")
+        self.lightLab = QtGui.QLabel("Lightness")
+
+        self.hueSlide = QtGui.QSlider(QtCore.Qt.Horizontal)
+        self.hueSlide.setTickPosition(QtGui.QSlider.TicksAbove)
+        self.hueSlide.setTickInterval(25)
+        self.hueSlide.setRange(-100, 100)
+        self.hueSlide.setTracking(False)
+        self.hueSlide.valueChanged.connect(lambda int: self.applyColors(int))
+
+        self.colorizeCb = QtGui.QCheckBox("Colorize", self)
+        if g.GData.colorizeEnabled:
+            self.colorizeCb.setCheckState(QtCore.Qt.Checked)
+        else:
+            self.colorizeCb.setCheckState(QtCore.Qt.Unchecked)
+        self.colorizeCb.stateChanged.connect(lambda state: self.enableColorize(state))
+
+        self.saturationSlide = QtGui.QSlider(QtCore.Qt.Horizontal)
+        self.saturationSlide.setTickPosition(QtGui.QSlider.TicksAbove)
+        self.saturationSlide.setTickInterval(25)
+        self.saturationSlide.setRange(-100, 100)
+        self.saturationSlide.setTracking(False)
+        self.saturationSlide.valueChanged.connect(lambda int: self.applyColors(int))
+
+        self.lightnessSlide = QtGui.QSlider(QtCore.Qt.Horizontal)
+        self.lightnessSlide.setTickPosition(QtGui.QSlider.TicksAbove)
+        self.lightnessSlide.setTickInterval(25)
+        self.lightnessSlide.setRange(-100, 100)
+        self.lightnessSlide.setTracking(False)
+        self.lightnessSlide.valueChanged.connect(lambda int: self.applyColors(int))
+
+        self.channelsHbox = QtGui.QHBoxLayout()
+        self.redB = QtGui.QCheckBox("Red")
+        self.redB.setCheckable(True)
+        self.redB.setChecked(g.GData.hueRedChannel)
+        self.redB.clicked.connect(lambda: self.setRedChannel())
+        self.channelsHbox.addWidget(self.redB, 0, QtCore.Qt.AlignLeft)
+        self.greenB = QtGui.QCheckBox("Green")
+        self.greenB.setCheckable(True)
+        self.greenB.setChecked(g.GData.hueGreenChannel)
+        self.greenB.clicked.connect(lambda: self.setGreenChannel())
+        self.channelsHbox.addWidget(self.greenB, 0, QtCore.Qt.AlignLeft)
+        self.blueB = QtGui.QCheckBox("Blue")
+        self.blueB.setCheckable(True)
+        self.blueB.setChecked(g.GData.hueBlueChannel)
+        self.blueB.clicked.connect(lambda: self.setBlueChannel())
+        self.channelsHbox.addWidget(self.blueB, 0, QtCore.Qt.AlignLeft)
+
+        self.hueSatLay = QtGui.QGridLayout()
+        self.hueSatLay.addWidget(self.hueLab, 1, 0, 1, 1)
+        self.hueSatLay.addWidget(self.hueSlide, 1, 1, 1, 1)
+        self.hueSatLay.addWidget(self.colorizeCb, 2, 1, 1, 1)
+        self.hueSatLay.addWidget(self.satLab, 3, 0, 1, 1)
+        self.hueSatLay.addWidget(self.saturationSlide, 3, 1, 1, 1)
+        self.hueSatLay.addWidget(self.lightLab, 4, 0, 1, 1)
+        self.hueSatLay.addWidget(self.lightnessSlide, 4, 1, 1, 1)
+        self.hueSatLay.setColumnMinimumWidth(0, 70)
+
+        self.hueSatGroup = QtGui.QGroupBox("Hue and Saturation")
+        self.hueSatGroup.setLayout(self.hueSatLay)
+
+        self.channelsLay = QtGui.QGridLayout()
+        self.channelsLay.addLayout(self.channelsHbox, 5, 1, 1, 1)
+        self.channelsLay.setColumnMinimumWidth(0, 70)
+        self.channelsGroup = QtGui.QGroupBox("Affected Channels")
+        self.channelsGroup.setLayout(self.channelsLay)
+
+        ## brightness contrast
+        self.brightLab = QtGui.QLabel("Brightness")
+        self.contrastLab = QtGui.QLabel("Contrast")
+
+        self.brightSlide = QtGui.QSlider(QtCore.Qt.Horizontal)
+        self.brightSlide.setTickPosition(QtGui.QSlider.TicksAbove)
+        self.brightSlide.setTickInterval(25)
+        self.brightSlide.setRange(-100, 100)
+        self.brightSlide.setTracking(False)
+        self.brightSlide.valueChanged.connect(lambda int: self.applyColors(int))
+
+        self.contrastSlide = QtGui.QSlider(QtCore.Qt.Horizontal)
+        self.contrastSlide.setTickPosition(QtGui.QSlider.TicksAbove)
+        self.contrastSlide.setTickInterval(25)
+        self.contrastSlide.setRange(-100, 100)
+        self.contrastSlide.setTracking(False)
+        self.contrastSlide.setInvertedAppearance(True)
+        self.contrastSlide.valueChanged.connect(lambda int: self.applyColors(int))
+
+        self.brightContrastbox = QtGui.QGridLayout()
+        self.brightContrastbox.addWidget(self.brightLab,     1, 0, 1, 1)
+        self.brightContrastbox.addWidget(self.brightSlide,   1, 1, 1, 1)
+        self.brightContrastbox.addWidget(self.contrastLab,   2, 0, 1, 1)
+        self.brightContrastbox.addWidget(self.contrastSlide, 2, 1, 1, 1)
+        self.brightContrastbox.setColumnMinimumWidth(0, 70)
+
+        self.brightContrastGroup = QtGui.QGroupBox("Brightness and Contrast")
+        self.brightContrastGroup.setLayout(self.brightContrastbox)
 
         ## Channel mixer
         self.redLab = QtGui.QLabel("Red")
@@ -420,7 +524,7 @@ class ColorsDialog(QtGui.QDialog):
         self.redSlide.setTickInterval(25)
         self.redSlide.setRange(-100, 100)
         self.redSlide.setTracking(False)
-        #self.redSlide.valueChanged.connect(lambda: self.applyColors())
+        self.redSlide.valueChanged.connect(lambda int: self.applyColors(int))
 
         self.greenLab = QtGui.QLabel("Green")
         self.greenSlide = QtGui.QSlider(QtCore.Qt.Horizontal)
@@ -428,7 +532,7 @@ class ColorsDialog(QtGui.QDialog):
         self.greenSlide.setTickInterval(25)
         self.greenSlide.setRange(-100, 100)
         self.greenSlide.setTracking(False)
-        #self.greenSlide.valueChanged.connect(lambda: self.applyColors())
+        self.greenSlide.valueChanged.connect(lambda int: self.applyColors(int))
 
         self.blueLab = QtGui.QLabel("Blue")
         self.blueSlide = QtGui.QSlider(QtCore.Qt.Horizontal)
@@ -436,7 +540,7 @@ class ColorsDialog(QtGui.QDialog):
         self.blueSlide.setTickInterval(25)
         self.blueSlide.setRange(-100, 100)
         self.blueSlide.setTracking(False)
-        #self.blueSlide.valueChanged.connect(lambda: self.applyColors())
+        self.blueSlide.valueChanged.connect(lambda int: self.applyColors(int))
 
         self.channelMixbox = QtGui.QGridLayout()
         self.channelMixbox.addWidget(self.redLab, 1, 0, 1, 1)
@@ -451,14 +555,67 @@ class ColorsDialog(QtGui.QDialog):
         self.channelMixGroup.setLayout(self.channelMixbox)
 
         self.mainVbox = QtGui.QVBoxLayout()
-
+        self.mainVbox.addWidget(self.brightContrastGroup)
         self.mainVbox.addWidget(self.channelMixGroup)
-
-
+        self.mainVbox.addWidget(self.hueSatGroup)
+        self.mainVbox.addWidget(self.channelsGroup)
         self.mainVbox.addStretch(1)
         self.mainVbox.addLayout(self.buttonsHbox)
         self.setLayout(self.mainVbox)
 
+        self.applyColors(0)
+
+
+    def applyColors(self, int):
+        logging.info("ColorsDialog.applyColors()")
+
+        if self.brightSlide.value() >= 0:
+            g.GData.brightVal = (self.brightSlide.value() * 500 / 100) + 100
+        else:
+            g.GData.brightVal = self.brightSlide.value + 100
+
+        if self.contrastSlide.value() >= 0:
+            g.GData.contrastVal = (self.contrastSlide.value() * 79 / 100) + 78
+        else:
+            g.GData.contrastVal = self.contrastSlide.value() + 79
+
+        g.GData.hueVal = self.hueSlide.value() * 127 / 100
+
+        if self.saturationSlide.value() >= 0:
+            g.GData.saturationVal = (self.saturationSlide.value() * 500 / 100) + 100
+        else:
+            g.GData.saturationVal = self.saturationSlide.value() + 100
+
+        if self.lightnessSlide.value() >= 0:
+            g.GData.lightnessVal = (self.lightnessSlide.value() * 200 / 100) + 100
+        else:
+            g.GData.lightnessVal = self.lightnessSlide.value() + 100
+
+        g.GData.redVal = self.redSlide.value()
+        g.GData.greenVal = self.greenSlide.value()
+        g.GData.blueVal = self.blueSlide.value()
+
+        self.imageView.refresh()
+
+    def ok(self):
+        logging.info("ColorsDialog.ok()")
+
+    def reset(self):
+        logging.info("ColorsDialog.reset()")
+
+    def enableColorize(self, state):
+        logging.info("ColorsDialog.enableColorize()")
+        g.GData.colorizeEnabled = state
+        self.imageView.refresh()
+
+    def setRedChannel(self):
+        logging.info("ColorsDialog.setRedChannel()")
+
+    def setGreenChannel(self):
+        logging.info("ColorsDialog.setGreenChannel()")
+
+    def setBlueChannel(self):
+        logging.info("ColorsDialog.setBlueChannel()")
 
 class CopyMoveToDialog(QtGui.QDialog):
 
