@@ -49,14 +49,33 @@ class BookMarks(QtGui.QTreeWidget):
         self.resizeColumnToContents(0)
 
     def removeBookmark(self):
-        logging.info("remove the selected bookmark")
-        selectedDirs = self.selectionModel().selectedRows()
+        logging.info("bookmarks.removeBookmark()")
+        logging.info("remove the bookmark: "+ self.selectedItems()[0].toolTip(0))
+        g.GData.bookmarkPaths.remove(self.selectedItems()[0].toolTip(0))
+        self.reloadBookmarks()
+
 
     def dragEnterEvent(self, event):
+        logging.info("bookmarks.dragEnterEvent()")
         logging.info("Drag enter event")
 
+        selectedDirs = self.selectionModel().selectedRows()
+        if len(selectedDirs) > 0:
+            self.dndOrigSelection = selectedDirs[0]
+
+        event.acceptProposedAction
+
     def dragMoveEvent(self, event):
+        logging.info("bookmarks.dragMoveEvent()")
         logging.info("Drag move event")
 
+        self.setCurrentIndex(self.indexAt(event.pos()))
+
     def dropEvent(self, event):
+        logging.info("bookmarks.dropEvent()")
         logging.info("Drop event")
+
+        if event.source():
+            fstreeStr = QtCore.QString("FSTree")
+            dirOp = bool(event.source().metaObject().className() == fstreeStr)
+            self.emit(dropOp(event.keyboardModifiers, dirOp, event.mimeData().urls()[0].toLocalFile()))

@@ -4,6 +4,7 @@ __author__ = 'cargoyle'
 
 """
 import logging
+import math as m
 from PyQt4 import QtGui, QtCore
 import pipeline.general.filebrowse.GData as g
 
@@ -131,7 +132,7 @@ class imageView(QtGui.QWidget):
     def hslValue(self, n1, n2, hue):
         logging.info("imageview.hslValue()")
 
-    def rgbToHsl(self, r, g, b, hue, sat, light):
+    def rgbToHsl(self, red, grn, blu):
         logging.info("imageview.rgbToHsl()")
 
         if r > g:
@@ -141,19 +142,81 @@ class imageView(QtGui.QWidget):
             max = max(g, b)
             min = min(r, b)
 
-        l = (max + min) / 2.0
+        lit = (max + min) / 2.0
 
         if max == min:
-            s = 0.0
-            h = 0.0
+            sat = 0.0
+            hue = 0.0
         else:
             delta = max - min
+
+        return hue, sat, lit
 
     def hslToRgb(self, h, s, l, red, green, blue):
         logging.info("imageview.hslToRgb()")
 
     def colorize(self):
+        import math as m
+        import struct
+        import pipeline.general.filebrowse.GData as g
+
         logging.info("imageview.colorize()")
+        contrastTransform = []
+        brightTransform = []
+
+        if self.displayImage.format() == QtGui.QImage.Format_Indexed8:
+            self.displayImage = self.displayImage.convertToFormat(QtGui.QImage.Format_RGB32)
+
+        i = 0
+        contrast = g.GData.contrastVal / 100.0
+        brightness = g.GData.brightVal / 100.0
+
+        while i < 256:
+            if i < int(246 * m.tan(contrast)) & i > int(256 * m.tan(contrast)):
+                contrastTransform.append((i - 128) / m.tan(contrast) + 128)
+            elif i >= int(256 * m.tan(contrast)):
+                contrastTransform.append(255)
+            else:
+                contrastTransform.append(0)
+
+            i += 1
+
+        i = 0
+
+        while i < 256:
+            brightTransform.append(min(255, int(255.0 * m.pow(i/255.0, 1.0/ brightness))+0.5))
+            i += 1
+
+        y = 0
+        height = self.displayImage.height()
+        linewidth = self.displayImage.bytesPerLine()
+        while y < height:
+            line = self.displayImage.scanLine(y).asstring(linewidth)
+
+            x = 0
+            while x < self.displayImage.width():
+                # unpack 32 bit integer
+                color = struct.unpack('I', line[x*4:x*4+4])[0];
+
+                red = QtGui.qRed(color)
+                grn = QtGui.qGreen(color)
+                blu = QtGui.qBlue(color)
+
+                red = red*(g.GData.redVal+100)/100
+                grn = grn*(g.GData.greenVal+100)/100
+
+                red = contrastTransform[red]
+                grn = contrastTransform[grn]
+
+                red = brightTransform[red]
+                grn = brightTransform[grn]
+
+                hue, sat, lit = self.rgbToHsl(red, grn, blu)
+
+                line[x] = QtGui.qRgb(red, grn, blu)
+                x += 1
+            y += 1
+        logging.info(" loop exited successfully")
 
     def refresh(self):
         logging.info("imageview.refresh()")

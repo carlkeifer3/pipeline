@@ -61,7 +61,7 @@ class GData():
     redVal = 0
     greenVal = 0
     blueVal = 0
-    colorsActive = True
+    colorsActive = False
     colorizeEnabled = False
     hueRedChannel = True
     hueGreenChannel = True

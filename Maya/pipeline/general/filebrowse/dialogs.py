@@ -390,10 +390,10 @@ class settingsDialog(QtGui.QDialog):
         dirName = QtGui.QFileDialog.getExistingDirectory(caption="Open File", directory="")#, options="images"+"*.jpg *.jpeg *.png *.bmp *.tiff *.tif *.ppm *.xbm *.xpm")
         self.thumbsBackImageEdit.setText(dirName)
 
-class CropDialog(QtGui.QWidget):
+#class CropDialog(QtGui.Dialog):
 
-    def __init__(self):
-        logging.info("cropDialog Initialized")
+#    def __init__(self):
+#        logging.info("cropDialog Initialized")
 
 class ColorsDialog(QtGui.QDialog):
 
@@ -565,14 +565,13 @@ class ColorsDialog(QtGui.QDialog):
 
         self.applyColors(0)
 
-
     def applyColors(self, int):
-        logging.info("ColorsDialog.applyColors()")
+        #logging.info("ColorsDialog.applyColors()")
 
         if self.brightSlide.value() >= 0:
             g.GData.brightVal = (self.brightSlide.value() * 500 / 100) + 100
         else:
-            g.GData.brightVal = self.brightSlide.value + 100
+            g.GData.brightVal = self.brightSlide.value() + 100
 
         if self.contrastSlide.value() >= 0:
             g.GData.contrastVal = (self.contrastSlide.value() * 79 / 100) + 78
@@ -609,13 +608,19 @@ class ColorsDialog(QtGui.QDialog):
         self.imageView.refresh()
 
     def setRedChannel(self):
-        logging.info("ColorsDialog.setRedChannel()")
+        #logging.info("ColorsDialog.setRedChannel()")
+        g.GData.hueRedChannel = self.redB.isChecked()
+        self.imageView.refresh()
 
     def setGreenChannel(self):
-        logging.info("ColorsDialog.setGreenChannel()")
+        #logging.info("ColorsDialog.setGreenChannel()")
+        g.GData.hueGreenChannel = self.greenB.isChecked()
+        self.imageView.refresh()
 
     def setBlueChannel(self):
-        logging.info("ColorsDialog.setBlueChannel()")
+        #logging.info("ColorsDialog.setBlueChannel()")
+        g.GData.hueBlueChannel = self.blueB.isChecked()
+        self.imageView.refresh()
 
 class CopyMoveToDialog(QtGui.QDialog):
 
