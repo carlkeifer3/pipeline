@@ -722,6 +722,8 @@ class fbWindow(QtGui.QMainWindow):
         self.fsTree.setContextMenuPolicy(QtCore.Qt.ActionsContextMenu)
 
         self.fsTree.clicked.connect(lambda: self.goSelectedDir())
+        self.fsTree.fsModel.rowsRemoved.connect(lambda: self.checkDirState())
+        self.fsTree.dropEvent.connect(lambda keyMods = QtCore.Qt.KeyboardModifiers, isDir = False, string = "": self.dropOp(keyMods, isDir, string))
 
     def createBookmarks(self):
         #logging.info("fbWindow.createBookmarks()")
@@ -736,6 +738,8 @@ class fbWindow(QtGui.QMainWindow):
         #self.bmDock.toggleViewAction().triggered.connect(lambda:self.setBmDockVisibility())
         #self.bmDock.visibilityChanged.connect(lambda:self.setBmDockVisibility())
         self.bookmarks.itemClicked.connect(lambda: self.bookmarkClicked())
+        self.removeBookmarkAction.triggered.connect(self.bookmarks.removeBookmark())
+        self.bookmarks.dropEvent.connect(lambda keymods = QtCore.Qt.KeyboardModifiers, isDir = False, string="": self.dropOp(keyMods, isDir. string))
 
 
         self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.bmDock)
