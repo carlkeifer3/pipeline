@@ -1215,7 +1215,6 @@ class fbWindow(QtGui.QMainWindow):
 
         self.setCopyCutActions(len(self.thumbView.selectionModel().selectedIndexes()))
 
-
     def UpdateActions(self):
         print "Updating Actions"
 
@@ -1625,11 +1624,13 @@ class fbWindow(QtGui.QMainWindow):
         print "hide the viewer"
 
     def goBottom(self):
-        print "Scroll Thumbnail view to the bottom"
+        logging.info("fbWindow.goBottom()")
+        logging.info("Scroll Thumbnail view to the bottom")
         self.thumbView.scrollToBottom()
 
     def goTop(self):
-        print "Scroll Thumbnail view to the top"
+        logging.info("fbWindow.goTop")
+        logging.info("Scroll Thumbnail view to the top")
         self.thumbView.scrollToTop()
 
     def dropOp(self):
@@ -1645,6 +1646,7 @@ class fbWindow(QtGui.QMainWindow):
         print "record History"
 
     def reloadThumbsSlot(self):
+        logging.info("fbWindow.reloadThumbsSlot()")
         #if self.thumbView.busy:
         self.thumbView.abort()
         #QtCore.QTimer.singleShot(0,self.reloadThumbsSlot())
@@ -1699,16 +1701,15 @@ class fbWindow(QtGui.QMainWindow):
         self.colorsAct.setEnabled(enable)
 
     def addNewBookmark(self):
-        logging.info("fbWindow.addNewBookmark()")
-        logging.info("getting selected path and calling addBookmark()")
-
+        #logging.info("fbWindow.addNewBookmark()")
+        #logging.info("getting selected path and calling addBookmark()")
         self.addBookmark(self.getSelectedPath())
 
     def addBookmark(self, path):
-        logging.info("fbWindow.addBookmark()")
+        #logging.info("fbWindow.addBookmark()")
         logging.info("adding bookmark for: %s, to global data"% path)
         g.GData.bookmarkPaths.append(path)
-        logging.info("Reloading bookmarks window")
+        #logging.info("Reloading bookmarks window")
         self.bookmarks.reloadBookmarks()
 
     def findDuplicateImages(self):
