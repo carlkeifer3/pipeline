@@ -127,42 +127,78 @@ class imageView(QtGui.QWidget):
         logging.info("imageview.mirror()")
 
     def bound0_255(self, val):
-        logging.info("imageview.bound0_255()")
+        #logging.info("imageview.bound0_255()")
+        if val > 255:
+            val = 255
+        if val < 0:
+            val = 0
+        return val
 
     def hslValue(self, n1, n2, hue):
         logging.info("imageview.hslValue()")
 
     def rgbToHsl(self, red, grn, blu):
-        logging.info("imageview.rgbToHsl()")
+        #logging.info("imageview.rgbToHsl()")
 
-        if r > g:
-            max = max(r, b)
-            min = min(r, b)
+        if red > grn:
+            high = max(red, blu)
+            low = min(red, blu)
         else:
-            max = max(g, b)
-            min = min(r, b)
+            high = max(grn, blu)
+            low = min(red, blu)
 
-        lit = (max + min) / 2.0
+        lit = (high + low) / 2.0
 
-        if max == min:
+        if high == low:
             sat = 0.0
             hue = 0.0
         else:
-            delta = max - min
+            delta = high - low
+
+            if lit < 128:
+                sat = 255 * delta / (high + low)
+            else:
+                sat = 255 * delta / (511 - high - low)
+
+            if red == max:
+                hue = (grn - blu) / delta
+            elif grn == max:
+                hue = 2 + (blu - red)/ delta
+            else:
+                hue = 4 + (red - grn)/ delta
+
+            hue = hue * 42.5
+
+            if hue < 0:
+                hue += 255
+            elif hue > 255:
+                hue -= 255
+
+        hue = round(hue)
+        sat = round(sat)
+        lit = round(lit)
 
         return hue, sat, lit
 
-    def hslToRgb(self, h, s, l, red, green, blue):
-        logging.info("imageview.hslToRgb()")
+    def hslToRgb(self, hue, sat, lit):
+        #logging.info("imageview.hslToRgb()")
+
+        red = hue
+        grn = sat
+        blu = lit
+
+        return red, grn, blu
 
     def colorize(self):
         import math as m
         import struct
         import pipeline.general.filebrowse.GData as g
-
-        logging.info("imageview.colorize()")
+        print " Current image: "+str(self.currentImageFullPath)
+        #logging.info("imageview.colorize()")
         contrastTransform = []
         brightTransform = []
+
+        self.displayImage = self.origImage
 
         if self.displayImage.format() == QtGui.QImage.Format_Indexed8:
             self.displayImage = self.displayImage.convertToFormat(QtGui.QImage.Format_RGB32)
@@ -170,6 +206,10 @@ class imageView(QtGui.QWidget):
         i = 0
         contrast = g.GData.contrastVal / 100.0
         brightness = g.GData.brightVal / 100.0
+
+        print "adjusting image: Brightness / Contrast"
+        print "Brightness: "+str(brightness)
+        print "Contrast: "+str(contrast)
 
         while i < 256:
             if i < int(246 * m.tan(contrast)) & i > int(256 * m.tan(contrast)):
@@ -190,11 +230,15 @@ class imageView(QtGui.QWidget):
         y = 0
         height = self.displayImage.height()
         linewidth = self.displayImage.bytesPerLine()
+        print "image height: "+str(height)
+        print "image width: "+str(self.displayImage.width())
+        print "pixel byte width: "+str(linewidth)
         while y < height:
             line = self.displayImage.scanLine(y).asstring(linewidth)
 
             x = 0
             while x < self.displayImage.width():
+                #print " adjusting pixel x:"+str(x)+ " y:"+str(y)
                 # unpack 32 bit integer
                 color = struct.unpack('I', line[x*4:x*4+4])[0];
 
@@ -202,24 +246,37 @@ class imageView(QtGui.QWidget):
                 grn = QtGui.qGreen(color)
                 blu = QtGui.qBlue(color)
 
-                red = red*(g.GData.redVal+100)/100
-                grn = grn*(g.GData.greenVal+100)/100
+                red = self.bound0_255(red*(g.GData.redVal+100))/100
+                grn = self.bound0_255(grn*(g.GData.greenVal+100))/100
+                blu = self.bound0_255(blu*(g.GData.blueVal+100))/100
 
-                red = contrastTransform[red]
-                grn = contrastTransform[grn]
+                #red = self.bound0_255(contrastTransform[red])
+                #grn = self.bound0_255(contrastTransform[grn])
+                #blu = self.bound0_255(contrastTransform[blu])
 
-                red = brightTransform[red]
-                grn = brightTransform[grn]
+                #red = self.bound0_255(brightTransform[red])
+                #grn = self.bound0_255(brightTransform[grn])
+                #blu = self.bound0_255(brightTransform[blu])
 
-                hue, sat, lit = self.rgbToHsl(red, grn, blu)
+                #hue, sat, lit = self.rgbToHsl(red, grn, blu)
 
-                line[x] = QtGui.qRgb(red, grn, blu)
+                #if g.GData.colorizeEnabled:
+                #    hue = g.GData.hueVal
+                #else:
+                #    hue += g.GData.hueVal
+
+
+
+                self.displayImage.setPixel(x, y, QtGui.qRgb(red, grn, blu))
                 x += 1
             y += 1
-        logging.info(" loop exited successfully")
+
+        #logging.info(" loop exited successfully")
 
     def refresh(self):
         logging.info("imageview.refresh()")
+        print " Current image: "
+        print self.origImage
         if self.isAnimation:
             return
         if g.GData.scaledWidth:
@@ -251,6 +308,8 @@ class imageView(QtGui.QWidget):
             else:
                 self.setInfo(QtCore.QFileInfo(self.currentImageFullPath).fileName())
 
+        print " Current image: "+str(self.currentImageFullPath)
+
         if not g.GData.keepTransform:
             g.GData.cropLeftPercent = g.GData.cropTopPercent = g.GData.cropWidthPercent = g.GData.cropHeightPercent = 0
             g.GData.rotation = 0
@@ -279,20 +338,14 @@ class imageView(QtGui.QWidget):
 
         if self.isAnimation:
             logging.info("Animation supported")
-            try:
-                if self.anim:
-                    del self.anim
-            except:
-                pass
 
             self.anim = QtGui.QMovie(self.currentImageFullPath)
             self.imageLabel.setMovie(self.anim)
             self.anim.start()
         else:
             if imageReader.size().isValid():
-                origImage = QtGui.QImage()
-                origImage.load(self.currentImageFullPath)
-                self.displayImage = origImage
+                self.origImage.load(self.currentImageFullPath)
+                self.displayImage = self.origImage
                 self.transform()
                 if g.GData.colorsActive | g.GData.keepTransform:
                     self.colorize()

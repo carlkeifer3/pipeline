@@ -47,6 +47,7 @@ class fbWindow(QtGui.QMainWindow):
         #self.fbLayout.setContentsMargins(0,0,0,0)
         #self.fbLayout.setSpacing(10)
 
+        self.LoadType = "Single"
 
         self.readSettings()
         self.createThumbView()
@@ -57,6 +58,10 @@ class fbWindow(QtGui.QMainWindow):
         self.createFSTree()
         self.createBookmarks()
         self.createImageView()
+        #if self.LoadType == "single":
+        self.createSingleFileLoad()
+        #if self.LoadType == "Multi":
+        #    self.createMultiFileLoad()
         #self.UpdateExternalApps()
         self.loadShortcuts()
         self.setupDocks()
@@ -694,6 +699,43 @@ class fbWindow(QtGui.QMainWindow):
 
         self.setStatusBar(self.statusBar)
 
+    def createMultiFileLoad(self):
+        logging.info("fbWindow.createMultiFileLoad()")
+
+        self.createFileButtons()
+
+    def createSingleFileLoad(self):
+        logging.info("fbWindow.createSingleFileLoad()")
+
+        self.createFileButtons()
+
+    def createFileButtons(self):
+        logging.info("fbWindow.createFileButtons()")
+
+        self.flButtons = QtGui.QHBoxLayout(self)
+        self.cancelButton = QtGui.QPushButton("Cancel")
+        self.cancelButton.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
+        self.cancelButton.setIcon(QtGui.QIcon.fromTheme("document-revert"))
+        #self.resetButton.clicked.connect(lambda: self.cancel())
+        self.flButtons.addWidget(self.cancelButton, 0, QtCore.Qt.AlignRight)
+        self.passButton = QtGui.QPushButton("Pass")
+        self.passButton.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
+        self.passButton.setIcon(QtGui.QIcon.fromTheme("document-revert"))
+        #self.resetButton.clicked.connect(lambda: self.pass())
+        self.flButtons.addWidget(self.passButton, 0, QtCore.Qt.AlignRight)
+        self.selectButton = QtGui.QPushButton("Select")
+        self.selectButton.setIcon(QtGui.QIcon.fromTheme("dialog-ok"))
+        self.selectButton.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
+        self.selectButton.clicked.connect(lambda: self.selectEvent())
+        self.flButtons.addWidget(self.selectButton, 0, QtCore.Qt.AlignRight)
+        self.flButtons.addStretch(1)
+
+        self.flWidget = QtGui.QWidget(self)
+        self.flWidget.setLayout(self.flButtons)
+
+        self.flDock = QtGui.QDockWidget("File Load", self)
+        self.flDock.setWidget(self.flWidget)
+
     def createFSTree(self):
         #logging.info("fbWindow.createFSTree()")
         #logging.info("creating filesystem tree")
@@ -989,7 +1031,7 @@ class fbWindow(QtGui.QMainWindow):
             self.slideShow()
 
         #if not self.colorsDialog:
-        colorsDialog = dia.ColorsDialog(self)#, self.imageView)
+        colorsDialog = dia.ColorsDialog(self, self.imageView)
         colorsDialog.accepted.connect(lambda: self.cleanupColorsDialog())
         colorsDialog.rejected.connect(lambda: self.cleanupColorsDialog())
 
@@ -1402,6 +1444,8 @@ class fbWindow(QtGui.QMainWindow):
         #self.pvDock.visiblityChanged().connect(lambda: self.setPvDockVisibility())
         self.addDockWidget(QtCore.Qt.RightDockWidgetArea, self.pvDock)
         self.addDockWidget(QtCore.Qt.RightDockWidgetArea, self.iiDock)
+        self.addDockWidget(QtCore.Qt.BottomDockWidgetArea, self.flDock)
+
 
         self.fsDockOrigWidget = self.fsDock.titleBarWidget()
         self.bmDockOrigWidget = self.bmDock.titleBarWidget()
@@ -1452,6 +1496,15 @@ class fbWindow(QtGui.QMainWindow):
         #g.GData.actionKeys[self.thumbsGoTopAct.text()] = self.thumbsGoTopAct
         #g.GData.actionKeys[self.thumbsGoBottomAct.text()] = self.thumbsGoBottomAct
         #g.GData.actionKeys[self.closeImageAct.text()] = self.closeImageAct
+
+    def selectEvent(self):
+        logging.info("fbWindow.selectEvent()")
+        logging.info("select Event")
+
+        file = "This is your file"
+        self.emit(file)
+
+        self.close()
 
     def closeEvent(self, event):
         logging.info("fbWindow.closeEvent()")
@@ -1641,7 +1694,6 @@ class fbWindow(QtGui.QMainWindow):
 
     def setInterfaceEnabled(self, enable):
         logging.info("setting the interface to enabled")
-
         ## Actions
         self.colorsAct.setEnabled(enable)
 
@@ -1658,10 +1710,10 @@ class fbWindow(QtGui.QMainWindow):
         logging.info("Reloading bookmarks window")
         self.bookmarks.reloadBookmarks()
 
-
     def findDuplicateImages(self):
         print "finding duplicate Images"
 
 def fbWinInit():
+    #logging.info("fbWindow.fbInit()")
     myWindow = fbWindow()
     myWindow.show()

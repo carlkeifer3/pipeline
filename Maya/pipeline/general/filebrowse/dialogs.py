@@ -494,15 +494,17 @@ class ColorsDialog(QtGui.QDialog):
 
         self.brightSlide = QtGui.QSlider(QtCore.Qt.Horizontal)
         self.brightSlide.setTickPosition(QtGui.QSlider.TicksAbove)
-        self.brightSlide.setTickInterval(25)
-        self.brightSlide.setRange(-100, 100)
+        self.brightSlide.setTickInterval(10)
+        self.brightSlide.setRange(0, 100)
+        self.brightSlide.setValue(50)
         self.brightSlide.setTracking(False)
         self.brightSlide.valueChanged.connect(lambda int: self.applyColors(int))
 
         self.contrastSlide = QtGui.QSlider(QtCore.Qt.Horizontal)
         self.contrastSlide.setTickPosition(QtGui.QSlider.TicksAbove)
-        self.contrastSlide.setTickInterval(25)
-        self.contrastSlide.setRange(-100, 100)
+        self.contrastSlide.setTickInterval(10)
+        self.contrastSlide.setRange(0, 100)
+        self.contrastSlide.setValue(50)
         self.contrastSlide.setTracking(False)
         self.contrastSlide.setInvertedAppearance(True)
         self.contrastSlide.valueChanged.connect(lambda int: self.applyColors(int))
@@ -563,20 +565,23 @@ class ColorsDialog(QtGui.QDialog):
         self.mainVbox.addLayout(self.buttonsHbox)
         self.setLayout(self.mainVbox)
 
+        g.GData.colorsActive = True
+
         self.applyColors(0)
 
     def applyColors(self, int):
-        #logging.info("ColorsDialog.applyColors()")
+        logging.info("ColorsDialog.applyColors()")
+        print " Current image: "+str(self.imageView.currentImageFullPath)
 
         if self.brightSlide.value() >= 0:
-            g.GData.brightVal = (self.brightSlide.value() * 500 / 100) + 100
+            g.GData.brightVal = self.brightSlide.value()# * 500 / 100) + 100
         else:
-            g.GData.brightVal = self.brightSlide.value() + 100
+            g.GData.brightVal = self.brightSlide.value()# + 100
 
         if self.contrastSlide.value() >= 0:
-            g.GData.contrastVal = (self.contrastSlide.value() * 79 / 100) + 78
+            g.GData.contrastVal = self.contrastSlide.value()# * 79 / 100) + 78
         else:
-            g.GData.contrastVal = self.contrastSlide.value() + 79
+            g.GData.contrastVal = self.contrastSlide.value()# + 79
 
         g.GData.hueVal = self.hueSlide.value() * 127 / 100
 
@@ -598,9 +603,31 @@ class ColorsDialog(QtGui.QDialog):
 
     def ok(self):
         logging.info("ColorsDialog.ok()")
+        g.GData.colorsActive = False
+        self.accept()
 
     def reset(self):
         logging.info("ColorsDialog.reset()")
+        self.hueSlide.setValue(0)
+        self.colorizeCb.setChecked(False)
+        self.saturationSlide.setValue(0)
+        self.lightnessSlide.setValue(0)
+        self.redB.setChecked(True)
+        self.greenB.setChecked(True)
+        self.blueB.setChecked(True)
+        g.GData.hueRedChannel = True
+        g.GData.hueGreenChannel = True
+        g.GData.hueBlueChannel = True
+
+        self.contrastSlide.setValue(50)
+        self.brightSlide.setValue(50)
+
+        self.redSlide.setValue(0)
+        self.greenSlide.setValue(0)
+        self.blueSlide.setValue(0)
+
+        self.imageView.refresh()
+
 
     def enableColorize(self, state):
         logging.info("ColorsDialog.enableColorize()")
@@ -624,24 +651,29 @@ class ColorsDialog(QtGui.QDialog):
 
 class CopyMoveToDialog(QtGui.QDialog):
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, thumbsPath="", move=True):
         QtGui.QDialog.__init__(self, parent)
         logging.info("dialogs.CopyMoveToDialog Initialized")
 
-        #copyOp = not move
-        #if move:
-        self.setWindowTitle("Move to...")
-        #    #self.setWindowIcon()
-        #else:
-        #    self.setWindowTitle("Copy to...")
-        #    #self.setWindowIcon()
+        copyOp = not move
+        if move:
+            self.setWindowTitle("Move to...")
+            #self.setWindowIcon()
+        else:
+            self.setWindowTitle("Copy to...")
+            #self.setWindowIcon()
 
         self.resize(350, 250)
-        #currentPath = thumbsPath
+        currentPath = thumbsPath
 
         self.pathsTable = QtGui.QTableView(self)
-        #self.pathsTable.setSelectionBehavior()
-
+        self.pathsTable.setSelectionBehavior(QtCore.QAbstractItemView.SelectItems)
+        self.pathsTable.setSelectionMode(QtCore.QAbstractItemView.ExtendedSelection)
+        self.pathsTable.setEditTriggers(QtCore.QAbstractItemView.NoEditTriggers)
+        self.pathsTable.setSelectionBehavior(QtCore.QAbstractItemView.SelectRows)
+        self.pathsTable.setSelectionMode(QtCore.QAbstractItemView.SingleSelection)
+        self.pathsTableModel = QtGui.QStandardItemModel(self)
+        self.pathsTable.setModel(self.pathsTableModel)
 
         self.addRemoveHbox = QtGui.QHBoxLayout()
         self.addButton = QtGui.QPushButton("Browse...")
@@ -675,4 +707,12 @@ class CopyMoveToDialog(QtGui.QDialog):
         #self.mainVbox.addWidget(self.destinationLab)
         self.mainVbox.addLayout(self.buttonsHbox)
         self.setLayout(self.mainVbox)
+
+        ## Load paths List
+        it = QtCore.QSetIterator(g.GData.bookmarkPaths)
+        while it.hasNext():
+            item = QtGui.QStandardItem()
+            self.pathsTableModel.insertRow(self.pathsTableModel.rowCount(), item)
+
+        self.pathsTableModel.sort(0)
         self.show()
