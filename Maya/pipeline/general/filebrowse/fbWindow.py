@@ -18,19 +18,14 @@ def getMayaWindow():
     ptr = apiUI.MQtUtil.mainWindow()
     return sip.wrapinstance(long(ptr), QtCore.QObject)
 
-
 class fbWindow(QtGui.QMainWindow):
-    """
-
-
-    """
 
     def __init__(self, parent=getMayaWindow()):
         import os
         import pymel.core as pm
 
         # initialize the QWidget
-        QtGui.QWidget.__init__(self, parent)
+        QtGui.QDialog.__init__(self, parent)
 
         self.log =logging.getLogger("phototonic_Logger")
         self.log.setLevel(logging.debug)
@@ -680,7 +675,20 @@ class fbWindow(QtGui.QMainWindow):
         self.setToolbarIconSize()
 
     def setToolbarIconSize(self):
-        print "setting Toolbar icon size"
+        logging.info("fbWindow.setToolbarIconSize()")
+        logging.info("setting Toolbar icon size")
+
+        if self.initComplete:
+            g.GData.smallIcons = self.actSmallIcons.isChecked()
+        if g.GData.smallIcons:
+            iconSize = 16
+        else:
+            iconSize = 24
+        iconQSize = QtCore.QSize(iconSize, iconSize)
+        self.editToolBar.setIconSize(iconQSize)
+        self.goToolBar.setIconSize(iconQSize)
+        self.viewToolBar.setIconSize(iconQSize)
+        self.imageToolBar.setIconSize(iconQSize)
 
     def createStatusBar(self):
         self.log.debug("creating Status bar")
@@ -781,7 +789,7 @@ class fbWindow(QtGui.QMainWindow):
         #self.bmDock.visibilityChanged.connect(lambda:self.setBmDockVisibility())
         self.bookmarks.itemClicked.connect(lambda: self.bookmarkClicked())
         self.removeBookmarkAction.triggered.connect(self.bookmarks.removeBookmark)
-        #self.bookmarks.dropEvent.connect(lambda keymods = QtCore.Qt.KeyboardModifiers, isDir = False, string="": self.dropOp(keyMods, isDir. string))
+        self.bookmarks.dropped.connect(lambda keymods = QtCore.Qt.KeyboardModifiers, isDir = False, string="": self.dropOp(keyMods, isDir. string))
 
 
         self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.bmDock)
@@ -1204,14 +1212,14 @@ class fbWindow(QtGui.QMainWindow):
         self.goTo(QtCore.QDir.homePath())
 
     def setCopyCutActions(self, setEnabled):
-        print "setting the cut and copy actions"
+        logging.info("setting the cut and copy actions")
 
         self.cutAction.setEnabled(setEnabled)
         self.copyAction.setEnabled(setEnabled)
 
     def changeActionsBySelection(self):
-        logging.info("fbWindow.changeActionsBySelection()")
-        logging.info("change in selected thumbnail detected!")
+        #logging.info("fbWindow.changeActionsBySelection()")
+        #logging.info("change in selected thumbnail detected!")
 
         self.setCopyCutActions(len(self.thumbView.selectionModel().selectedIndexes()))
 
@@ -1500,9 +1508,19 @@ class fbWindow(QtGui.QMainWindow):
     def selectEvent(self):
         logging.info("fbWindow.selectEvent()")
         logging.info("select Event")
+        import pipeline.lookdev.uberSetup as us
 
-        file = "This is your file"
-        self.emit(file)
+        ##Set Currently Selected Image to diffuse channel
+        files = {"Diffuse":"", "Specular":"D:/projects/Quixeltextures/DDO_SDK_Helmet/DDO Project/previewer/_GameMeshTri1_s.jpg", "Normal":"D:/projects/Quixeltextures/DDO_SDK_Helmet/DDO Project/previewer/_GameMeshTri1_n.jpg"}
+
+        indexesList = self.thumbView.selectionModel().selectedIndexes()
+
+        if len(indexesList) == 1:
+            imagePath = self.thumbView.thumbModel.item(indexesList[0].row()).data(self.r.fileNameRole).toString()
+            logging.info("selecting image: "+str(imagePath)+" as Diffuse map")
+            files['Diffuse']=imagePath
+
+        us.cgFxShaderSetup(files)
 
         self.close()
 
@@ -1719,3 +1737,6 @@ def fbWinInit():
     #logging.info("fbWindow.fbInit()")
     myWindow = fbWindow()
     myWindow.show()
+    #returnCode = myWindow.exec_()
+    #if returnCode == QtGui.QDialog.Accepted:
+    #    print str(myWindow.file)

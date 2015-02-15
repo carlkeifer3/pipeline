@@ -12,55 +12,71 @@ import pymel.core as pm
 import pipeline.lookdev.devLighting as ld
 import pipeline.lookdev.textureNode as tx
 
-shdPath = str( pm.internalVar( uad = True ) + "scripts/pipeline/shaders/")
+def cgFxShaderSetup(files):
 
-getSel = pm.ls(selection = True)
+    shdPath = str( pm.internalVar( uad = True ) + "scripts/pipeline/shaders/")
 
-shdName = str(getSel[0]+"_CGFX")
+    getSel = pm.ls(selection = True)
 
-cgfx = pm.shadingNode("cgfxShader", asShader = True, n = shdName)
-pm.mel.eval('cgfxShader -e -fx  "'+shdPath+'cgfx/lcUberShader_3.0.cgfx" '+shdName+";")
+    shdName = str(getSel[0]+"_CGFX")
 
-# create file nodes for all textures and set them up
-# setup diffuse
-difNode = tx.texNode(cgfx, "Diffuse", getSel[0])
-pm.setAttr(str(shdName+".useDiffuseMap"), True)
-# now connect our new file node to the shader
-difNode.outColor >> cgfx.diffuseMapSampler
+    cgfx = pm.shadingNode("cgfxShader", asShader = True, n = shdName)
+    pm.mel.eval('cgfxShader -e -fx  "'+shdPath+'cgfx/lcUberShader_3.0.cgfx" '+shdName+";")
 
-# setup specular
-specNode = tx.texNode(cgfx, "Specular", getSel[0])
-pm.setAttr(str(shdName+".useSpecularMap"), True)
-# now connect our new file node to the shader
-specNode.outColor >> cgfx.specularMapSampler
+    # create file nodes for all textures and set them up
+    # setup diffuse
+    difNode = tx.texNode(cgfx, "Diffuse", getSel[0])
+    if not files['Diffuse'] == "":
+        print "setting file: "+str(files['Diffuse'])
+        print "to Diffuse Channel"
+        pm.setAttr(difNode+".fileTextureName", str(files['Diffuse']))
+    pm.setAttr(str(shdName+".useDiffuseMap"), True)
+    # now connect our new file node to the shader
+    difNode.outColor >> cgfx.diffuseMapSampler
 
-# setup normal
-nrmlNode = tx.texNode(cgfx, "Normal", getSel[0])
-pm.setAttr(str(shdName+".useNormalMap"), True)
-# now connect our new file node to the shader
-nrmlNode.outColor >> cgfx.normalMapSampler
+    # setup specular
+    specNode = tx.texNode(cgfx, "Specular", getSel[0])
+    if not files['Specular'] == "":
+        print "setting file: "+str(files['Specular'])
+        print "to Specular Channel"
+        pm.setAttr(specNode+".fileTextureName", str(files['Specular']))
+    pm.setAttr(str(shdName+".useSpecularMap"), True)
+    # now connect our new file node to the shader
+    specNode.outColor >> cgfx.specularMapSampler
+
+    # setup normal
+    nrmlNode = tx.texNode(cgfx, "Normal", getSel[0])
+    if not files['Normal'] == "":
+        print "setting file: "+str(files['Normal'])
+        print "to Normal Channel"
+        pm.setAttr(nrmlNode+".fileTextureName", str(files['Normal']))
+    pm.setAttr(str(shdName+".useNormalMap"), True)
+    # now connect our new file node to the shader
+    nrmlNode.outColor >> cgfx.normalMapSampler
 
 
-# I should check to see if this node exists before I just set it up
-envNode = tx.texNode(cgfx, "Environment", "cgfx")
-pm.setAttr("cgfxEnvironment_File.fileTextureName", str(shdPath+"shaders/CubeMaps/sunsetCube.dds"))
-envNode.outColor >> cgfx.envCubeMapSampler
+    # I should check to see if this node exists before I just set it up
+    envNode = tx.texNode(cgfx, "Environment", "cgfx")
+    pm.setAttr("cgfxEnvironment_File.fileTextureName", str(shdPath+"shaders/CubeMaps/sunsetCube.dds"))
+    envNode.outColor >> cgfx.envCubeMapSampler
 
-pm.setAttr(str(shdName+".useReflCube"), True)
-pm.setAttr(str(shdName+".useAmbCube"), True)
-# create a three point light setup
-lights = ld.threePointlight("directional")
-# connecting the lights to the shader
-pm.mel.eval("cgfxShader_connectVector "+shdName+".light1Dir "+lights[0]+";")
-pm.setAttr(str(shdName+".light1Color"),[1.0, 0.95, 0.82])
-pm.mel.eval("cgfxShader_connectVector "+shdName+".light2Dir "+lights[1]+";")
-pm.setAttr(str(shdName+".light2Color"),[0.61, 0.8, 1.0])
-pm.mel.eval("cgfxShader_connectVector "+shdName+".light3Dir "+lights[2]+";")
-pm.setAttr(str(shdName+".light3Color"),[0.4, 0.4, 0.4])
+    pm.setAttr(str(shdName+".useReflCube"), True)
+    pm.setAttr(str(shdName+".useAmbCube"), True)
+    # create a three point light setup
+    lights = ld.threePointlight("directional")
+    # connecting the lights to the shader
+    pm.mel.eval("cgfxShader_connectVector "+shdName+".light1Dir "+lights[0]+";")
+    pm.setAttr(str(shdName+".light1Color"),[1.0, 0.95, 0.82])
+    pm.mel.eval("cgfxShader_connectVector "+shdName+".light2Dir "+lights[1]+";")
+    pm.setAttr(str(shdName+".light2Color"),[0.61, 0.8, 1.0])
+    pm.mel.eval("cgfxShader_connectVector "+shdName+".light3Dir "+lights[2]+";")
+    pm.setAttr(str(shdName+".light3Color"),[0.4, 0.4, 0.4])
 
-# assign Material
-# create a surface Shader and attach out cgfx shader to it.
-cgfxShd = pm.sets(renderable=True, noSurfaceShader=True, empty=True, name=str(shdName+"SurfaceShader"))
-cgfx.outColor >> cgfxShd.surfaceShader
-# Assign the Shader to the objects
-pm.sets(cgfxShd, edit=True, forceElement=getSel[0])
+    # assign Material
+    # create a surface Shader and attach out cgfx shader to it.
+    cgfxShd = pm.sets(renderable=True, noSurfaceShader=True, empty=True, name=str(shdName+"SurfaceShader"))
+    cgfx.outColor >> cgfxShd.surfaceShader
+    # Assign the Shader to the objects
+    pm.sets(cgfxShd, edit=True, forceElement=getSel[0])
+    pm.select(clear=True)
+    pm.select(cgfxShd)
