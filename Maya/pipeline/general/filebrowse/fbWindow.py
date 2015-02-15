@@ -962,6 +962,7 @@ class fbWindow(QtGui.QMainWindow):
         copyMoveToDialog = dia.CopyMoveToDialog(self)#, thumbsPath=self.getSelectedPath(), move=move)
 
     def thumbsZoomIn(self):
+        logging.info("fbWindow.thumbsZoomIn()")
         #if self.thumbView.thumbSize < self.ThumbMaxSize:
         self.thumbView.thumbSize += 25
         self.thumbsZoomInAct.setEnabled(True)
@@ -972,6 +973,7 @@ class fbWindow(QtGui.QMainWindow):
         self.refreshThumbs(False)
 
     def thumbsZoomOut(self):
+        logging.info("fbWindow.thumbsZoomOut()")
         #if self.thumbView.thumbSize < self.ThumbMinSize:
         self.thumbView.thumbSize -= 25
         self.thumbsZoomOutAct.setEnabled(True)
@@ -1160,7 +1162,6 @@ class fbWindow(QtGui.QMainWindow):
         self.setStatus("Loading Bookmark")
         item = self.bookmarks.selectedItems()[0]
         self.goTo(item.toolTip(0))
-
 
     def setThumbsFilter(self):
         print "setting thumbnails filter"
