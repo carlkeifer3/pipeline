@@ -64,7 +64,7 @@ class fbWindow(QtGui.QMainWindow):
 
         self.restoreGeometry(g.GData.appSettings.value("Geometry").toByteArray())
         self.restoreState(g.GData.appSettings.value("WindowState").toByteArray())
-        self.setWindowIcon(QtGui.QIcon(self.imgDirectory+"phototonic.png"))
+        self.setWindowIcon(QtGui.QIcon(self.imgDirectory+"pipelineIconSmall.png"))
 
         self.fbLayout.addWidget(self.thumbView)
         self.centralWidget = QtGui.QWidget()
@@ -1528,10 +1528,7 @@ class fbWindow(QtGui.QMainWindow):
 
         ##Set Currently Selected Image to diffuse channel
         files = {"Diffuse":"", "Specular":"", "Normal":""}
-        fileKeys = files.keys()
-
         i = 0
-
 
         indexesList = self.multiFile.thumbModel.rowCount()
         print "indexesList contains \""+str(indexesList)+"\" items"
@@ -1539,12 +1536,14 @@ class fbWindow(QtGui.QMainWindow):
             if indexesList >= 1:
                 while i < indexesList:
                     imageFile = self.multiFile.thumbModel.item(i).data(self.r.fileNameRole).toString()
-                    logging.info("selecting image: "+str(imageFile)+" as "+files.keys()[i]+" map")
-                    files[files.keys()[i]]=imageFile
+                    imageName = str(imageFile).split("/")
+                    print imageName
+                    imageSort = imageName[len(imageName)-1].split("-")
+                    imageSort = imageSort[1].split(".")
+                    print imageSort
+                    logging.info("selecting image: "+str(imageFile)+" as "+imageSort[0]+" map")
+                    files[imageSort[0]]=imageFile
                     i += 1
-
-        for key, val in files.items():
-            logging.info("selecting image: \""+val+"\" as \""+key+"\" map")
 
         us.cgFxShaderSetup(files)
 

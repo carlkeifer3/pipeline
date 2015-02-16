@@ -79,4 +79,4 @@ def cgFxShaderSetup(files):
     # Assign the Shader to the objects
     pm.sets(cgfxShd, edit=True, forceElement=getSel[0])
     pm.select(clear=True)
-    pm.select(cgfxShd)
+    pm.select(cgfx)
