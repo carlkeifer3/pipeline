@@ -23,8 +23,8 @@ class multiFileView(QtGui.QListView):
         self.setViewMode(QtGui.QListView.IconMode)
         self.setSelectionMode(QtGui.QAbstractItemView.ExtendedSelection)
         self.setResizeMode(QtGui.QListView.Adjust)
-        self.resize(800, 100)
-        self.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+        self.setFixedSize(800, 100)
+        self.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
 
         self.thumbModel = QtGui.QStandardItemModel(self)
         #self.thumbViewModel.setSortRole()
