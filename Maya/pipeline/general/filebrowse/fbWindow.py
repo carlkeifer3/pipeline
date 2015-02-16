@@ -11,6 +11,7 @@ import sip
 import maya.OpenMayaUI as apiUI
 import pipeline.general.filebrowse.thumbview as tv
 import pipeline.general.filebrowse.imageview as iv
+import pipeline.general.filebrowse.multiFileView as mfv
 import pipeline.general.filebrowse.dialogs as dia
 import pipeline.general.filebrowse.GData as g
 
@@ -709,8 +710,11 @@ class fbWindow(QtGui.QMainWindow):
 
     def createMultiFileLoad(self):
         logging.info("fbWindow.createMultiFileLoad()")
+        import pipeline.general.filebrowse.multiFileView as mfv
+        self.multiFile = mfv.multiFileView()
 
         self.createFileButtons()
+        self.flDock.setWidget(self.multiFile)
 
     def createSingleFileLoad(self):
         logging.info("fbWindow.createSingleFileLoad()")
