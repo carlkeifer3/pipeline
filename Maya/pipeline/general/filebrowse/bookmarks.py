@@ -17,6 +17,7 @@ class BookMarks(QtGui.QTreeWidget):
         QtGui.QTreeWidget.__init__(self, parent)
 
         self.GData = g.GData()
+        self.dropOp = QtCore.pyqtSignal(QtCore.Qt.KeyboardModifiers, bool, str)
 
         #locate the directory where all of the images for the UI live
         ScriptDir = pm.internalVar(uad = True)
@@ -78,4 +79,5 @@ class BookMarks(QtGui.QTreeWidget):
         if event.source():
             fstreeStr = QtCore.QString("FSTree")
             dirOp = bool(event.source().metaObject().className() == fstreeStr)
-            self.emit("dropOp(event.keyboardModifiers, dirOp, event.mimeData().urls()[0].toLocalFile())")
+            self.dropOp.connect(event.keyboardModifiers, dirOp, event.mimeData().urls()[0].toLocalFile())
+            self.dropOp.emit()

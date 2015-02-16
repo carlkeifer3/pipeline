@@ -712,9 +712,9 @@ class fbWindow(QtGui.QMainWindow):
         logging.info("fbWindow.createMultiFileLoad()")
         import pipeline.general.filebrowse.multiFileView as mfv
         self.multiFile = mfv.multiFileView()
-
+        self.flButtons = QtGui.QHBoxLayout(self)
+        self.flButtons.addWidget(self.multiFile, 100, QtCore.Qt.AlignLeft)
         self.createFileButtons()
-        self.flButtons.addWidget(self.multiFile, 100, QtCore.Qt.AlignRight)
 
     def createSingleFileLoad(self):
         logging.info("fbWindow.createSingleFileLoad()")
@@ -724,20 +724,21 @@ class fbWindow(QtGui.QMainWindow):
     def createFileButtons(self):
         logging.info("fbWindow.createFileButtons()")
 
-        self.flButtons = QtGui.QHBoxLayout(self)
+        #self.flButtons = QtGui.QHBoxLayout(self)
         self.cancelButton = QtGui.QPushButton("Cancel")
-        self.cancelButton.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
+        self.cancelButton.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Fixed)
         self.cancelButton.setIcon(QtGui.QIcon.fromTheme("document-revert"))
         self.cancelButton.clicked.connect(lambda: self.close())
         self.flButtons.addWidget(self.cancelButton, 1, QtCore.Qt.AlignLeft)
         self.passButton = QtGui.QPushButton("Pass")
-        self.passButton.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
+        self.passButton.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Fixed)
         self.passButton.setIcon(QtGui.QIcon.fromTheme("document-revert"))
         #self.resetButton.clicked.connect(lambda: self.pass())
         self.flButtons.addWidget(self.passButton, 1, QtCore.Qt.AlignLeft)
         self.selectButton = QtGui.QPushButton("Select")
         self.selectButton.setIcon(QtGui.QIcon.fromTheme("dialog-ok"))
-        self.selectButton.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
+        self.selectButton.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Fixed)
+        self.selectButton.resize(93,28)
         self.selectButton.clicked.connect(lambda: self.selectEvent())
         self.flButtons.addWidget(self.selectButton, 10, QtCore.Qt.AlignLeft)
         self.flButtons.addStretch(1)
@@ -793,7 +794,7 @@ class fbWindow(QtGui.QMainWindow):
         #self.bmDock.visibilityChanged.connect(lambda:self.setBmDockVisibility())
         self.bookmarks.itemClicked.connect(lambda: self.bookmarkClicked())
         self.removeBookmarkAction.triggered.connect(self.bookmarks.removeBookmark)
-        #self.bookmarks.dropped.connect(lambda keymods = QtCore.Qt.KeyboardModifiers, isDir = False, string="": self.dropOp(keyMods, isDir. string))
+        #self.bookmarks.dropOp.connect(lambda keymods = QtCore.Qt.KeyboardModifiers, isDir = False, string="": self.dropOp(keyMods, isDir. string))
 
 
         self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.bmDock)
@@ -1528,14 +1529,16 @@ class fbWindow(QtGui.QMainWindow):
         fileKeys = files.keys()
 
         i = 0
-        indexesList = self.multiFile.thumbModel.selectionModel()
-        print "indexesList contains \""+str(len(indexesList))+"\" items"
+
+
+        indexesList = self.multiFile.thumbModel.rowCount()
+        print "indexesList contains \""+str(indexesList)+"\" items"
         if self.LoadType == "Multi":
-            if len(indexesList) >= 1:
-                for index in indexesList:
-                    imagePath = self.thumbView.thumbModel.item(index.row()).data(self.r.fileNameRole).toString()
-                    logging.info("selecting image: "+str(imagePath)+" as "+files.keys()[i]+" map")
-                    files[files.keys()[i]]=imagePath
+            if indexesList >= 1:
+                while i < indexesList:
+                    imageFile = self.multiFile.thumbModel.item(i).data(self.r.fileNameRole).toString()
+                    logging.info("selecting image: "+str(imageFile)+" as "+files.keys()[i]+" map")
+                    files[files.keys()[i]]=imageFile
                     i += 1
 
         for key, val in files.items():

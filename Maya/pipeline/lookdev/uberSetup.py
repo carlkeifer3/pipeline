@@ -57,7 +57,7 @@ def cgFxShaderSetup(files):
 
     # I should check to see if this node exists before I just set it up
     envNode = tx.texNode(cgfx, "Environment", "cgfx")
-    pm.setAttr("cgfxEnvironment_File.fileTextureName", str(shdPath+"shaders/CubeMaps/sunsetCube.dds"))
+    pm.setAttr("cgfxEnvironment_File.fileTextureName", str(shdPath+"CubeMaps/sunsetCube.dds"))
     envNode.outColor >> cgfx.envCubeMapSampler
 
     pm.setAttr(str(shdName+".useReflCube"), True)
