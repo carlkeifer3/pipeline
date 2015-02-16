@@ -35,15 +35,5 @@ class multiFileView(QtGui.QListView):
         #logging.info("multiFileView.setFileViewColors()")
         color = g.GData.thumbsBackgroundColor
         self.bgColor = QtCore.QString("background-color: rgb(%i, %i, %i)" % (color.red(), color.green(), color.blue()))
-        self.bgImage = QtCore.QString("background-image: url("+g.GData.thumbsBackImage+")")
-        self.bgSetting = QtCore.QString("background-attachment: fixed")
 
         self.setStyleSheet(self.bgColor)
-        self.setStyleSheet(self.bgImage)
-        #self.setStyleSheet(self.bgSetting)
-
-        scrollBarOigPal = self.scrollbar.palette()
-        thumbViewOrigPal = self.palette()
-        thumbViewOrigPal.setColor(QtGui.QPalette().Text, g.GData.thumbsTextColor)
-        self.setPalette(thumbViewOrigPal)
-        self.scrollbar.setPalette(scrollBarOigPal)

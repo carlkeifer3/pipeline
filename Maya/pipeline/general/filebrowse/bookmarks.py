@@ -73,7 +73,7 @@ class BookMarks(QtGui.QTreeWidget):
 
     def dropEvent(self, event):
         logging.info("bookmarks.dropEvent()")
-        logging.info("Drop event")
+        #logging.info("Drop event")
 
         if event.source():
             fstreeStr = QtCore.QString("FSTree")

@@ -43,7 +43,7 @@ class fbWindow(QtGui.QMainWindow):
         #self.fbLayout.setContentsMargins(0,0,0,0)
         #self.fbLayout.setSpacing(10)
 
-        self.LoadType = "Single"
+        self.LoadType = "Multi"
 
         self.readSettings()
         self.createThumbView()
@@ -55,9 +55,9 @@ class fbWindow(QtGui.QMainWindow):
         self.createBookmarks()
         self.createImageView()
         #if self.LoadType == "single":
-        self.createSingleFileLoad()
+        #self.createSingleFileLoad()
         #if self.LoadType == "Multi":
-        #    self.createMultiFileLoad()
+        self.createMultiFileLoad()
         #self.UpdateExternalApps()
         self.loadShortcuts()
         self.setupDocks()
@@ -714,7 +714,7 @@ class fbWindow(QtGui.QMainWindow):
         self.multiFile = mfv.multiFileView()
 
         self.createFileButtons()
-        self.flDock.setWidget(self.multiFile)
+        self.flButtons.addWidget(self.multiFile, 100, QtCore.Qt.AlignRight)
 
     def createSingleFileLoad(self):
         logging.info("fbWindow.createSingleFileLoad()")
@@ -728,18 +728,18 @@ class fbWindow(QtGui.QMainWindow):
         self.cancelButton = QtGui.QPushButton("Cancel")
         self.cancelButton.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
         self.cancelButton.setIcon(QtGui.QIcon.fromTheme("document-revert"))
-        #self.resetButton.clicked.connect(lambda: self.cancel())
-        self.flButtons.addWidget(self.cancelButton, 0, QtCore.Qt.AlignRight)
+        self.cancelButton.clicked.connect(lambda: self.close())
+        self.flButtons.addWidget(self.cancelButton, 1, QtCore.Qt.AlignLeft)
         self.passButton = QtGui.QPushButton("Pass")
         self.passButton.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
         self.passButton.setIcon(QtGui.QIcon.fromTheme("document-revert"))
         #self.resetButton.clicked.connect(lambda: self.pass())
-        self.flButtons.addWidget(self.passButton, 0, QtCore.Qt.AlignRight)
+        self.flButtons.addWidget(self.passButton, 1, QtCore.Qt.AlignLeft)
         self.selectButton = QtGui.QPushButton("Select")
         self.selectButton.setIcon(QtGui.QIcon.fromTheme("dialog-ok"))
         self.selectButton.setSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
         self.selectButton.clicked.connect(lambda: self.selectEvent())
-        self.flButtons.addWidget(self.selectButton, 0, QtCore.Qt.AlignRight)
+        self.flButtons.addWidget(self.selectButton, 10, QtCore.Qt.AlignLeft)
         self.flButtons.addStretch(1)
 
         self.flWidget = QtGui.QWidget(self)
@@ -1216,7 +1216,8 @@ class fbWindow(QtGui.QMainWindow):
         self.goTo(QtCore.QDir.homePath())
 
     def setCopyCutActions(self, setEnabled):
-        logging.info("setting the cut and copy actions")
+        #logging.info("fbWindow().setCopyCutActions()")
+        #logging.info("setting the cut and copy actions")
 
         self.cutAction.setEnabled(setEnabled)
         self.copyAction.setEnabled(setEnabled)
@@ -1231,7 +1232,8 @@ class fbWindow(QtGui.QMainWindow):
         print "Updating Actions"
 
     def writeSettings(self):
-        logging.info("Writing Settings")
+        #logging.info("fbWindow.writeSettings()")
+        #logging.info("Writing Settings")
         #if g.GData.layoutMode
         g.GData.appSettings.setValue("Geometry", self.saveGeometry())
         g.GData.appSettings.setValue("WindowState", self.saveState())
@@ -1282,19 +1284,22 @@ class fbWindow(QtGui.QMainWindow):
 
 
         ## CopyMoveTo Paths : Bookmarks
-        idx = 0
-        g.GData.appSettings.beginGroup("CopyMoveToPaths")
-        g.GData.appSettings.remove("")
-        for path in g.GData.bookmarkPaths:
-            g.GData.appSettings.setValue("path"+str(idx), path)
-            logging.info("the Path "+path+" has been added to GData")
-            idx += 1
+        #idx = 0
+        #g.GData.appSettings.beginGroup("CopyMoveToPaths")
+        #g.GData.appSettings.remove("")
+        #g.GData.appSettings.endGroup()
+        #g.GData.appSettings.beginGroup("CopyMoveToPaths")
+        #g.GData.appSettings.remove("")
+        #for path in g.GData.bookmarkPaths:
+        #    g.GData.appSettings.setValue("path"+str(idx), path)
+        #    logging.info("the Path "+path+" has been saved in bookmarks")
+        #    idx += 1
 
-        g.GData.appSettings.endGroup()
-
+        #g.GData.appSettings.endGroup()
         logging.info("settings Written exiting Cleanly")
 
     def readSettings(self):
+        #logging.info("fbWindow.readSettings()")
         #logging.info("Reading Settings")
         self.initComplete = False
         self.needThumbsRefresh = False
@@ -1428,13 +1433,13 @@ class fbWindow(QtGui.QMainWindow):
         #    i +=1
         #g.GData.appSettings.endGroup()
 
-        g.GData.appSettings.beginGroup("CopyMoveToPaths")
-        paths = g.GData.appSettings.childKeys()
-        i = 0
-        while i < len(paths):
-            g.GData.bookmarkPaths.append(g.GData.appSettings.value(paths[i]).toString())
-            i +=1
-        g.GData.appSettings.endGroup()
+        #g.GData.appSettings.beginGroup("CopyMoveToPaths")
+        #paths = g.GData.appSettings.childKeys()
+        #i = 0
+        #while i < len(paths):
+        #    g.GData.bookmarkPaths.append(g.GData.appSettings.value(paths[i]).toString())
+        #    i +=1
+        #g.GData.appSettings.endGroup()
 
         #logging.info("settings Read, program continuing")
 
@@ -1515,14 +1520,22 @@ class fbWindow(QtGui.QMainWindow):
         import pipeline.lookdev.uberSetup as us
 
         ##Set Currently Selected Image to diffuse channel
-        files = {"Diffuse":"", "Specular":"D:/projects/Quixeltextures/DDO_SDK_Helmet/DDO Project/previewer/_GameMeshTri1_s.jpg", "Normal":"D:/projects/Quixeltextures/DDO_SDK_Helmet/DDO Project/previewer/_GameMeshTri1_n.jpg"}
+        files = {"Diffuse":"", "Specular":"", "Normal":""}
+        fileKeys = files.keys()
 
-        indexesList = self.thumbView.selectionModel().selectedIndexes()
+        i = 0
+        indexesList = self.multiFile.thumbModel.selectionModel()
+        print "indexesList contains \""+str(len(indexesList))+"\" items"
+        if self.LoadType == "Multi":
+            if len(indexesList) >= 1:
+                for index in indexesList:
+                    imagePath = self.thumbView.thumbModel.item(index.row()).data(self.r.fileNameRole).toString()
+                    logging.info("selecting image: "+str(imagePath)+" as "+files.keys()[i]+" map")
+                    files[files.keys()[i]]=imagePath
+                    i += 1
 
-        if len(indexesList) == 1:
-            imagePath = self.thumbView.thumbModel.item(indexesList[0].row()).data(self.r.fileNameRole).toString()
-            logging.info("selecting image: "+str(imagePath)+" as Diffuse map")
-            files['Diffuse']=imagePath
+        for key, val in files.items():
+            logging.info("selecting image: \""+val+"\" as \""+key+"\" map")
 
         us.cgFxShaderSetup(files)
 
@@ -1646,13 +1659,13 @@ class fbWindow(QtGui.QMainWindow):
         print "hide the viewer"
 
     def goBottom(self):
-        logging.info("fbWindow.goBottom()")
-        logging.info("Scroll Thumbnail view to the bottom")
+        #logging.info("fbWindow.goBottom()")
+        #logging.info("Scroll Thumbnail view to the bottom")
         self.thumbView.scrollToBottom()
 
     def goTop(self):
-        logging.info("fbWindow.goTop")
-        logging.info("Scroll Thumbnail view to the top")
+        #logging.info("fbWindow.goTop")
+        #logging.info("Scroll Thumbnail view to the top")
         self.thumbView.scrollToTop()
 
     def dropOp(self, keyMods, dirOp, cpMvDirPath):
