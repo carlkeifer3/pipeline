@@ -1284,18 +1284,18 @@ class fbWindow(QtGui.QMainWindow):
 
 
         ## CopyMoveTo Paths : Bookmarks
-        #idx = 0
+        idx = 0
         #g.GData.appSettings.beginGroup("CopyMoveToPaths")
         #g.GData.appSettings.remove("")
         #g.GData.appSettings.endGroup()
-        #g.GData.appSettings.beginGroup("CopyMoveToPaths")
-        #g.GData.appSettings.remove("")
-        #for path in g.GData.bookmarkPaths:
-        #    g.GData.appSettings.setValue("path"+str(idx), path)
-        #    logging.info("the Path "+path+" has been saved in bookmarks")
-        #    idx += 1
+        g.GData.appSettings.beginGroup("CopyMoveToPaths")
+        g.GData.appSettings.remove("")
+        for path in g.GData.bookmarkPaths:
+            g.GData.appSettings.setValue("path"+str(idx), path)
+            logging.info("the Path "+path+" has been saved in bookmarks")
+            idx += 1
 
-        #g.GData.appSettings.endGroup()
+        g.GData.appSettings.endGroup()
         logging.info("settings Written exiting Cleanly")
 
     def readSettings(self):
@@ -1433,13 +1433,17 @@ class fbWindow(QtGui.QMainWindow):
         #    i +=1
         #g.GData.appSettings.endGroup()
 
-        #g.GData.appSettings.beginGroup("CopyMoveToPaths")
-        #paths = g.GData.appSettings.childKeys()
-        #i = 0
-        #while i < len(paths):
-        #    g.GData.bookmarkPaths.append(g.GData.appSettings.value(paths[i]).toString())
-        #    i +=1
-        #g.GData.appSettings.endGroup()
+        ## clear g.GData.bookmarksPaths
+        del g.GData.bookmarkPaths[:]
+        print " bookmarks existing in gData: "
+        print g.GData.bookmarkPaths
+        g.GData.appSettings.beginGroup("CopyMoveToPaths")
+        paths = g.GData.appSettings.childKeys()
+        i = 0
+        while i < len(paths):
+            g.GData.bookmarkPaths.append(g.GData.appSettings.value(paths[i]).toString())
+            i +=1
+        g.GData.appSettings.endGroup()
 
         #logging.info("settings Read, program continuing")
 

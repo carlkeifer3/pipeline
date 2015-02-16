@@ -17,7 +17,7 @@ class GData():
     QtCore.QCoreApplication.setApplicationName("Phototonic")
     appSettings = QtCore.QSettings( )
     # setPath() to try to save to current working directory
-    appSettings.setPath(QtCore.QSettings.IniFormat, QtCore.QSettings.SystemScope, './__phototonicS.ini')
+    appSettings.setPath(QtCore.QSettings.IniFormat, QtCore.QSettings.SystemScope, './phototonicS.ini')
     appSettings.setFallbacksEnabled(False)    # File only, no fallback to registry or or.
     layoutMode = 0
     zoomInFlags = 0
