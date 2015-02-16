@@ -57,17 +57,17 @@ class BookMarks(QtGui.QTreeWidget):
 
     def dragEnterEvent(self, event):
         logging.info("bookmarks.dragEnterEvent()")
-        logging.info("Drag enter event")
+        #logging.info("Drag enter event")
 
         selectedDirs = self.selectionModel().selectedRows()
         if len(selectedDirs) > 0:
             self.dndOrigSelection = selectedDirs[0]
 
-        event.acceptProposedAction
+        event.acceptProposedAction()
 
     def dragMoveEvent(self, event):
         logging.info("bookmarks.dragMoveEvent()")
-        logging.info("Drag move event")
+        #logging.info("Drag move event")
 
         self.setCurrentIndex(self.indexAt(event.pos()))
 
@@ -78,4 +78,4 @@ class BookMarks(QtGui.QTreeWidget):
         if event.source():
             fstreeStr = QtCore.QString("FSTree")
             dirOp = bool(event.source().metaObject().className() == fstreeStr)
-            self.emit(dropOp(event.keyboardModifiers, dirOp, event.mimeData().urls()[0].toLocalFile()))
+            self.emit("dropOp(event.keyboardModifiers, dirOp, event.mimeData().urls()[0].toLocalFile())")

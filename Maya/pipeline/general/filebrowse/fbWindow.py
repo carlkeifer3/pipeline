@@ -789,7 +789,7 @@ class fbWindow(QtGui.QMainWindow):
         #self.bmDock.visibilityChanged.connect(lambda:self.setBmDockVisibility())
         self.bookmarks.itemClicked.connect(lambda: self.bookmarkClicked())
         self.removeBookmarkAction.triggered.connect(self.bookmarks.removeBookmark)
-        self.bookmarks.dropped.connect(lambda keymods = QtCore.Qt.KeyboardModifiers, isDir = False, string="": self.dropOp(keyMods, isDir. string))
+        #self.bookmarks.dropped.connect(lambda keymods = QtCore.Qt.KeyboardModifiers, isDir = False, string="": self.dropOp(keyMods, isDir. string))
 
 
         self.addDockWidget(QtCore.Qt.LeftDockWidgetArea, self.bmDock)
@@ -1651,8 +1651,36 @@ class fbWindow(QtGui.QMainWindow):
         logging.info("Scroll Thumbnail view to the top")
         self.thumbView.scrollToTop()
 
-    def dropOp(self):
-        print "drag item has been dropped"
+    def dropOp(self, keyMods, dirOp, cpMvDirPath):
+        logging.info("fbWindow.dropOp")
+        logging.info("drag item has been dropped")
+
+        self.QApplication.restoreOverrideCursor()
+        g.GData.copyOp = (keyMods == QtCore.Qt.ControlModifier)
+        msgBox = QtGui.QMessageBox()
+
+        if self.QObject().sender() == self.fsTree:
+            destDir == self.getSelectedPath()
+        elif self.QObject().sender() == self.bookmarks:
+            if self.bookmarks.currentItem():
+                destDir = self.bookmarks.currentItem().toolTip(0)
+            else:
+                self.addBookmark(cpMvDirPath)
+                return
+        else:
+            ## Unkown Sender
+            return
+
+        if not self.isValidPath(destDir):
+            msgBox.critical(self, "Error", "Can not Move or copy images to this folder")
+            self.selectCurrentViewDir()
+            return
+        if destDir == self.thumbView.currentViewDir:
+            msgBox.critical(self, "Error", "Destination folder is same as source")
+            return
+
+        if dirOp:
+            return
 
     def selectCurrentViewDir(self):
         print "selecting currently viewed directory"
